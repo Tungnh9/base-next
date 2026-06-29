@@ -1,0 +1,36 @@
+{
+  "common": {
+    "loading": "Đang tải...",
+    "error": "Đã xảy ra lỗi",
+    "retry": "Thử lại",
+    "cancel": "Hủy",
+    "confirm": "Xác nhận",
+    "save": "Lưu",
+    "delete": "Xóa",
+    "edit": "Chỉnh sửa",
+    "back": "Quay lại"
+  },
+  "auth": {
+    "login": "Đăng nhập",
+    "logout": "Đăng xuất",
+    "register": "Đăng ký",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "confirmPassword": "Xác nhận mật khẩu",
+    "forgotPassword": "Quên mật khẩu?",
+    "loginSuccess": "Đăng nhập thành công",
+    "logoutSuccess": "Đăng xuất thành công",
+    "invalidCredentials": "Email hoặc mật khẩu không đúng",
+    "noAccount": "Chưa có tài khoản?",
+    "hasAccount": "Đã có tài khoản?"
+  },
+  "nav": {
+    "home": "Trang chủ",
+    "dashboard": "Bảng điều khiển"
+  },
+  "errors": {
+    "notFound": "Trang không tồn tại",
+    "serverError": "Lỗi máy chủ",
+    "unauthorized": "Bạn không có quyền truy cập"
+  }
+}
