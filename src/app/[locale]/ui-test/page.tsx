@@ -17,6 +17,7 @@ import {
   AlertDescription,
   type AlertVariant,
 } from "@/components/ui/alert";
+import { Badge, type BadgeVariant } from "@/components/ui/badge";
 
 const BODY_TEXT =
   "Lemon drops chocolate cake gummies carrot cake chupa chups muffin topping. Sesame snaps icing marzipan gummi bears macaroon dragée danish caramels powder. Bear claw dragée pastry topping soufflé. Wafer gummi bears marshmallow pastry pie.";
@@ -34,6 +35,22 @@ const ICONS = {
   info:      <Info />,
   dark:      <AlertCircle />,
 };
+
+const BADGE_VARIANTS: BadgeVariant[] = [
+  "primary", "secondary", "success", "danger", "warning", "info", "dark",
+]
+
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
+
+const COUNT_ICON_VARIANTS = [
+  ["primary",   <Star />],
+  ["secondary", <Settings />],
+  ["success",   <CheckCircle />],
+  ["danger",    <XCircle />],
+  ["warning",   <AlertTriangle />],
+  ["info",      <Info />],
+  ["dark",      <AlertCircle />],
+] as const satisfies readonly [BadgeVariant, unknown][]
 
 function AlertClosableDemo() {
   const [dismissed, setDismissed] = useState<Set<AlertVariant>>(new Set());
@@ -145,6 +162,109 @@ export default function UiTestPage() {
                 </AlertTitle>
                 <AlertDescription>{BODY_TEXT}</AlertDescription>
               </Alert>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── BADGE ── */}
+      <section className="flex flex-col gap-10">
+        <h4>Badge</h4>
+
+        {/* Filled */}
+        <div className="flex flex-col gap-3">
+          <h6>Filled</h6>
+          <div className="flex flex-wrap gap-2">
+            {BADGE_VARIANTS.map((v) => (
+              <Badge key={v} variant={v}>{capitalize(v)}</Badge>
+            ))}
+          </div>
+        </div>
+
+        {/* Light */}
+        <div className="flex flex-col gap-3">
+          <h6>Light</h6>
+          <div className="flex flex-wrap gap-2">
+            {BADGE_VARIANTS.map((v) => (
+              <Badge key={v} variant={v} skin="light">{capitalize(v)}</Badge>
+            ))}
+          </div>
+        </div>
+
+        {/* Count + Icon — Filled */}
+        <div className="flex flex-col gap-3">
+          <h6>Count + Icon — Filled</h6>
+          <div className="flex flex-col gap-2">
+            {COUNT_ICON_VARIANTS.map(([v, icon], i) => (
+              <div key={v} className="flex items-center gap-3">
+                <Badge variant={v} className="size-5 justify-center p-0 text-[10px] font-semibold">{i + 1}</Badge>
+                <Badge variant={v} className="size-5 justify-center p-0">{icon}</Badge>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Count + Icon — Light */}
+        <div className="flex flex-col gap-3">
+          <h6>Count + Icon — Light</h6>
+          <div className="flex flex-col gap-2">
+            {COUNT_ICON_VARIANTS.map(([v, icon], i) => (
+              <div key={v} className="flex items-center gap-3">
+                <Badge variant={v} skin="light" className="size-5 justify-center p-0 text-[10px] font-semibold">{i + 1}</Badge>
+                <Badge variant={v} skin="light" className="size-5 justify-center p-0">{icon}</Badge>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Notification Overlay */}
+        <div className="flex flex-col gap-3">
+          <h6>Notification Overlay</h6>
+          <div className="flex flex-wrap gap-8">
+            <div className="relative inline-flex">
+              <Bell className="size-[22px] text-foreground" />
+              <Badge variant="danger" className="absolute -top-1.5 -right-1.5 size-5 justify-center p-0 text-[10px]">7</Badge>
+            </div>
+            <div className="relative inline-flex">
+              <User className="size-[22px] text-foreground" />
+              <Badge variant="primary" className="absolute -top-1.5 -right-1.5 size-5 justify-center p-0 text-[10px]">3</Badge>
+            </div>
+            <div className="relative inline-flex">
+              <Shield className="size-[22px] text-foreground" />
+              <Badge variant="success" className="absolute -top-1.5 -right-1.5 size-5 justify-center p-0 text-[10px]">5</Badge>
+            </div>
+          </div>
+        </div>
+
+        {/* Dot */}
+        <div className="flex flex-col gap-3">
+          <h6>Dot</h6>
+          <div className="flex flex-wrap gap-4">
+            {BADGE_VARIANTS.map((v) => (
+              <Badge key={v} variant={v} skin="dot">
+                <span className="size-1.5 rounded-full bg-current shrink-0" aria-hidden="true" />
+                {capitalize(v)}
+              </Badge>
+            ))}
+          </div>
+        </div>
+
+        {/* Large — Filled */}
+        <div className="flex flex-col gap-3">
+          <h6>Large — Filled</h6>
+          <div className="flex flex-wrap gap-2">
+            {BADGE_VARIANTS.map((v) => (
+              <Badge key={v} variant={v} size="md">{capitalize(v)}</Badge>
+            ))}
+          </div>
+        </div>
+
+        {/* Large — Light */}
+        <div className="flex flex-col gap-3">
+          <h6>Large — Light</h6>
+          <div className="flex flex-wrap gap-2">
+            {BADGE_VARIANTS.map((v) => (
+              <Badge key={v} variant={v} skin="light" size="md">{capitalize(v)}</Badge>
             ))}
           </div>
         </div>
