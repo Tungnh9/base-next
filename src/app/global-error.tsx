@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import "@/app/globals.css";
 import { inter } from "@/lib/fonts";
+import { Button } from "@/components/ui/button";
 
 interface GlobalErrorProps {
   error: Error & { digest?: string };
@@ -19,12 +20,9 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
       <body className="flex min-h-screen items-center justify-center">
         <div className="text-center space-y-4">
           <h2>Lỗi nghiêm trọng</h2>
-          <button
-            onClick={reset}
-            className="px-4 py-2 bg-black text-white rounded-md text-sm"
-          >
+          <Button onClick={reset} className="bg-black text-white enabled:hover:brightness-90 enabled:active:brightness-[0.85]">
             Thử lại
-          </button>
+          </Button>
         </div>
       </body>
     </html>

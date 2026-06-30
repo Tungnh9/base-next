@@ -44,7 +44,7 @@ function AccordionItem({
       data-slot="accordion-item"
       className={cn(
         "group/item",
-        variant === "default" && "rounded-md bg-card shadow-sm",
+        variant === "default" && "rounded-md bg-card shadow-sm overflow-hidden",
         variant === "advance" &&
           "data-[state=open]:shadow-[inset_3px_0_0_var(--color-primary)]",
         className
@@ -70,9 +70,9 @@ function AccordionTrigger({
       <AccordionPrimitive.Trigger
         data-slot="accordion-trigger"
         className={cn(
-          "flex flex-1 items-center gap-[10px] text-[15px] font-semibold text-foreground text-left transition-colors",
+          "flex flex-1 items-center gap-[10px] text-[15px] font-semibold text-foreground text-left transition-colors cursor-pointer hover:bg-foreground/5",
           isAdvance
-            ? "group/trigger py-4 px-6 data-[state=open]:bg-foreground/8"
+            ? "group/trigger py-4 px-6 data-[state=open]:bg-foreground/8 hover:bg-foreground/5"
             : "py-[12.5px] px-[18px]",
           className
         )}
@@ -114,7 +114,8 @@ function AccordionContent({
     >
       <div className={cn(
         "text-[15px] text-foreground",
-        cn("pb-[12.5px]", isAdvance ? "px-6" : "px-[18px]"),
+        "pb-[12.5px]",
+        isAdvance ? "px-6" : "px-[18px]",
         className
       )}>
         {children}

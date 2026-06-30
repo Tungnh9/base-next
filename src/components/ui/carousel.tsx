@@ -214,7 +214,7 @@ function CarouselNavButton({
       onClick={isPrev ? prev : next}
       aria-label={isPrev ? t("prevSlide") : t("nextSlide")}
       className={cn(
-        "absolute top-0 z-10 h-full flex items-center transition-colors",
+        "absolute top-0 z-10 h-full flex items-center transition-colors cursor-pointer",
         "text-white/70 hover:text-white",
         isPrev ? "left-0 pl-5 pr-2" : "right-0 pr-5 pl-2",
         className
@@ -258,8 +258,8 @@ function CarouselIndicators({ className }: { className?: string }) {
           onClick={() => goTo(i)}
           aria-label={t("goToSlide", { index: i + 1 })}
           className={cn(
-            "h-[5px] w-[35px] rounded-[6px] transition-all duration-300",
-            i === currentIndex ? "bg-white" : "bg-white/40"
+            "h-[5px] w-[35px] rounded-[6px] transition-all duration-300 cursor-pointer",
+            i === currentIndex ? "bg-white hover:opacity-80" : "bg-white/40 hover:bg-white/65"
           )}
         />
       ))}

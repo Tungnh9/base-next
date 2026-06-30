@@ -63,7 +63,7 @@ function Alert({
           type="button"
           onClick={onClose}
           aria-label={closeLabel}
-          className="shrink-0 -mr-1 mt-px size-5 flex items-center justify-center rounded opacity-50 hover:opacity-100 transition-opacity"
+          className="shrink-0 -mr-1 mt-px size-5 flex items-center justify-center rounded opacity-50 hover:opacity-100 transition-opacity cursor-pointer"
         >
           <X className="size-4" />
         </button>

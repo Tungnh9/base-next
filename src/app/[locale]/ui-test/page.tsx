@@ -5,6 +5,7 @@ import {
   Star, Sun, Moon, Settings, Bell, Shield,
   Info, AlertTriangle, CheckCircle, XCircle, User, AlertCircle, Home,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Carousel, type CarouselSlide } from "@/components/ui/carousel";
 import {
   Accordion,
@@ -80,13 +81,15 @@ function AlertClosableDemo() {
         )
       )}
       {dismissed.size > 0 && (
-        <button
+        <Button
+          variant="link"
+          size="sm"
           type="button"
-          className="text-xs text-muted-foreground underline self-start"
+          className="h-auto p-0 text-xs text-muted-foreground self-start"
           onClick={() => setDismissed(new Set())}
         >
           Reset
-        </button>
+        </Button>
       )}
     </div>
   );
@@ -135,6 +138,123 @@ export default function UiTestPage() {
   return (
     <div className="flex flex-col gap-16 p-8 max-w-3xl">
       <h1>UI Component Test</h1>
+
+      {/* ── BUTTON ── */}
+      <section className="flex flex-col gap-10">
+        <h4>Button</h4>
+
+        {/* Filled */}
+        <div className="flex flex-col gap-3">
+          <h6>Filled</h6>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button>Primary</Button>
+            <Button variant="secondary">Secondary</Button>
+            <Button variant="success">Success</Button>
+            <Button variant="destructive">Danger</Button>
+            <Button variant="warning">Warning</Button>
+            <Button variant="info">Info</Button>
+            <Button variant="dark">Dark</Button>
+          </div>
+        </div>
+
+        {/* Outline */}
+        <div className="flex flex-col gap-3">
+          <h6>Outline</h6>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button variant="outline" size="sm">Small</Button>
+            <Button variant="outline">Default</Button>
+            <Button variant="outline" size="lg">Large</Button>
+          </div>
+        </div>
+
+        {/* Ghost & Link */}
+        <div className="flex flex-col gap-3">
+          <h6>Ghost (Label) & Link</h6>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button variant="ghost" size="sm">Small</Button>
+            <Button variant="ghost">Default</Button>
+            <Button variant="ghost" size="lg">Large</Button>
+            <Button variant="link">Link</Button>
+          </div>
+        </div>
+
+        {/* Sizes */}
+        <div className="flex flex-col gap-3">
+          <h6>Sizes</h6>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button size="xs">Extra Small</Button>
+            <Button size="sm">Small</Button>
+            <Button>Default</Button>
+            <Button size="lg">Large</Button>
+          </div>
+        </div>
+
+        {/* With Icons */}
+        <div className="flex flex-col gap-3">
+          <h6>With Icons</h6>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button><Star /> Left Icon</Button>
+            <Button>Right Icon <Star /></Button>
+            <Button variant="outline"><Star /> Outline</Button>
+            <Button size="icon"><Star /></Button>
+            <Button size="icon" variant="outline"><Star /></Button>
+            <Button size="icon" variant="ghost"><Star /></Button>
+          </div>
+        </div>
+
+        {/* States */}
+        <div className="flex flex-col gap-4">
+          <h6>States</h6>
+          <div className="overflow-x-auto">
+            <div className="grid grid-cols-[88px_repeat(5,auto)] gap-x-4 gap-y-3 items-center min-w-max">
+              <div />
+              {(["Default", "Hover", "Active", "Focus", "Disabled"] as const).map(s => (
+                <div key={s} className="text-xs font-semibold text-muted-foreground text-center px-1">{s}</div>
+              ))}
+
+              {/* Filled */}
+              <div className="text-xs text-muted-foreground font-medium self-center">Filled</div>
+              <Button>Button</Button>
+              <Button style={{ filter: "brightness(0.9)" }}>Button</Button>
+              <Button style={{ filter: "brightness(0.85)" }}>Button</Button>
+              <Button style={{ filter: "brightness(0.9)", boxShadow: "0 0 0 3px rgba(115,103,240,0.5), 0px 2px 4px rgba(165,163,174,0.3)" }}>Button</Button>
+              <Button disabled>Button</Button>
+
+              {/* Outline */}
+              <div className="text-xs text-muted-foreground font-medium self-center">Outline</div>
+              <Button variant="outline">Button</Button>
+              <Button variant="outline" style={{ backgroundColor: "rgba(115,103,240,0.1)" }}>Button</Button>
+              <Button variant="outline" style={{ backgroundColor: "rgba(115,103,240,0.15)" }}>Button</Button>
+              <Button variant="outline" style={{ backgroundColor: "rgba(115,103,240,0.1)", boxShadow: "0 0 0 3px rgba(115,103,240,0.5)" }}>Button</Button>
+              <Button variant="outline" disabled>Button</Button>
+
+              {/* Ghost */}
+              <div className="text-xs text-muted-foreground font-medium self-center">Ghost</div>
+              <Button variant="ghost">Button</Button>
+              <Button variant="ghost" style={{ backgroundColor: "rgba(115,103,240,0.24)" }}>Button</Button>
+              <Button variant="ghost" style={{ backgroundColor: "rgba(115,103,240,0.28)" }}>Button</Button>
+              <Button variant="ghost" style={{ backgroundColor: "rgba(115,103,240,0.24)", boxShadow: "0 0 0 3px rgba(115,103,240,0.5)" }}>Button</Button>
+              <Button variant="ghost" disabled>Button</Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Disabled */}
+        <div className="flex flex-col gap-3">
+          <h6>Disabled</h6>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button disabled>Primary</Button>
+            <Button variant="secondary" disabled>Secondary</Button>
+            <Button variant="success" disabled>Success</Button>
+            <Button variant="destructive" disabled>Danger</Button>
+            <Button variant="warning" disabled>Warning</Button>
+            <Button variant="info" disabled>Info</Button>
+            <Button variant="dark" disabled>Dark</Button>
+            <Button variant="outline" disabled>Outline</Button>
+            <Button variant="ghost" disabled>Ghost</Button>
+          </div>
+        </div>
+      </section>
 
       {/* ── ALERT ── */}
       <section className="flex flex-col gap-10">
