@@ -15,7 +15,7 @@ export default function Error({ error, reset }: ErrorProps) {
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center gap-4">
-      <h2 className="text-xl font-semibold">Đã xảy ra lỗi</h2>
+      <h2>Đã xảy ra lỗi</h2>
       <p className="text-muted-foreground text-sm">{error.message}</p>
       <Button onClick={reset}>Thử lại</Button>
     </div>

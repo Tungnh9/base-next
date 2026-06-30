@@ -5,7 +5,7 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-background font-sans">
-      <h1 className="text-2xl font-bold">{t("home")}</h1>
+      <h1>{t("home")}</h1>
     </div>
   );
 }

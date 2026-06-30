@@ -4,6 +4,24 @@
 
 /* Vuexy Design System — Light Mode */
 :root {
+  /* Typography Scale */
+  --font-size-h1: 3.5rem;
+  --font-size-h2: 2.5rem;
+  --font-size-h3: 2rem;
+  --font-size-h4: 1.75rem;
+  --font-size-h5: 1.5rem;
+  --font-size-h6: 1.25rem;
+  --font-size-subtitle1: 1rem;
+  --font-size-subtitle2: 0.875rem;
+  --font-size-body1: 1rem;
+  --font-size-body2: 0.875rem;
+  --font-size-caption: 0.75rem;
+  --font-size-overline: 0.75rem;
+
+  /* Typography Colors */
+  --text-heading: var(--foreground);
+  --text-body: #6E6B7B;
+  --text-muted: var(--muted-foreground);
   --background: #F8F7FA;
   --foreground: #4B465C;
   --card: #FFFFFF;
@@ -43,6 +61,8 @@
 
 /* Vuexy Design System — Dark Mode */
 .dark {
+  /* Typography Colors */
+  --text-body: #A8AAAE;
   --background: #25293C;
   --foreground: #D0D4F1;
   --card: #2F3349;
@@ -118,8 +138,28 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* Typography Scale Tokens */
+  --text-h1: var(--font-size-h1);
+  --text-h1--line-height: 1.2;
+  --text-h2: var(--font-size-h2);
+  --text-h2--line-height: 1.2;
+  --text-h3: var(--font-size-h3);
+  --text-h3--line-height: 1.25;
+  --text-h4: var(--font-size-h4);
+  --text-h4--line-height: 1.2;
+  --text-h5: var(--font-size-h5);
+  --text-h5--line-height: 1.334;
+  --text-h6: var(--font-size-h6);
+  --text-h6--line-height: 1.6;
+  --text-subtitle1: var(--font-size-subtitle1);
+  --text-subtitle2: var(--font-size-subtitle2);
+  --text-body1: var(--font-size-body1);
+  --text-body2: var(--font-size-body2);
+  --text-caption: var(--font-size-caption);
+  --text-overline: var(--font-size-overline);
 }
 
 @layer base {
@@ -128,5 +168,51 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-body1);
+    line-height: 1.5;
+    letter-spacing: 0.15px;
+  }
+  h1 {
+    font-size: var(--font-size-h1);
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    color: var(--text-heading);
+  }
+  h2 {
+    font-size: var(--font-size-h2);
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: 0;
+    color: var(--text-heading);
+  }
+  h3 {
+    font-size: var(--font-size-h3);
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: 0.25px;
+    color: var(--text-heading);
+  }
+  h4 {
+    font-size: var(--font-size-h4);
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: 0;
+    color: var(--text-heading);
+  }
+  h5 {
+    font-size: var(--font-size-h5);
+    font-weight: 500;
+    line-height: 1.334;
+    letter-spacing: 0;
+    color: var(--text-heading);
+  }
+  h6 {
+    font-size: var(--font-size-h6);
+    font-weight: 500;
+    line-height: 1.6;
+    letter-spacing: 0.15px;
+    color: var(--text-heading);
   }
 }
