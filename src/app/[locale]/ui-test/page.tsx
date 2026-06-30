@@ -197,8 +197,8 @@ export default function UiTestPage() {
           <div className="flex flex-col gap-2">
             {COUNT_ICON_VARIANTS.map(([v, icon], i) => (
               <div key={v} className="flex items-center gap-3">
-                <Badge variant={v} className="size-4 justify-center p-0 text-[10px] font-semibold">{i + 1}</Badge>
-                <Badge variant={v} className="size-4 justify-center p-0">{icon}</Badge>
+                <Badge variant={v} className="size-6 justify-center p-0 rounded-[4px] text-[13px] font-semibold">{i + 1}</Badge>
+                <Badge variant={v} className="size-6 justify-center p-0 rounded-[4px] [&_svg]:size-4">{icon}</Badge>
               </div>
             ))}
           </div>
@@ -210,8 +210,8 @@ export default function UiTestPage() {
           <div className="flex flex-col gap-2">
             {COUNT_ICON_VARIANTS.map(([v, icon], i) => (
               <div key={v} className="flex items-center gap-3">
-                <Badge variant={v} skin="light" className="size-4 justify-center p-0 text-[10px] font-semibold">{i + 1}</Badge>
-                <Badge variant={v} skin="light" className="size-4 justify-center p-0">{icon}</Badge>
+                <Badge variant={v} skin="light" className="size-6 justify-center p-0 rounded-[4px] text-[13px] font-semibold">{i + 1}</Badge>
+                <Badge variant={v} skin="light" className="size-6 justify-center p-0 rounded-[4px] [&_svg]:size-4">{icon}</Badge>
               </div>
             ))}
           </div>
