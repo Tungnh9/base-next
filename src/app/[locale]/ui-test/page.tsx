@@ -197,8 +197,8 @@ export default function UiTestPage() {
           <div className="flex flex-col gap-2">
             {COUNT_ICON_VARIANTS.map(([v, icon], i) => (
               <div key={v} className="flex items-center gap-3">
-                <Badge variant={v} className="size-5 justify-center p-0 text-[10px] font-semibold">{i + 1}</Badge>
-                <Badge variant={v} className="size-5 justify-center p-0">{icon}</Badge>
+                <Badge variant={v} className="size-4 justify-center p-0 text-[10px] font-semibold">{i + 1}</Badge>
+                <Badge variant={v} className="size-4 justify-center p-0">{icon}</Badge>
               </div>
             ))}
           </div>
@@ -210,8 +210,8 @@ export default function UiTestPage() {
           <div className="flex flex-col gap-2">
             {COUNT_ICON_VARIANTS.map(([v, icon], i) => (
               <div key={v} className="flex items-center gap-3">
-                <Badge variant={v} skin="light" className="size-5 justify-center p-0 text-[10px] font-semibold">{i + 1}</Badge>
-                <Badge variant={v} skin="light" className="size-5 justify-center p-0">{icon}</Badge>
+                <Badge variant={v} skin="light" className="size-4 justify-center p-0 text-[10px] font-semibold">{i + 1}</Badge>
+                <Badge variant={v} skin="light" className="size-4 justify-center p-0">{icon}</Badge>
               </div>
             ))}
           </div>
@@ -223,15 +223,15 @@ export default function UiTestPage() {
           <div className="flex flex-wrap gap-8">
             <div className="relative inline-flex">
               <Bell className="size-[22px] text-foreground" />
-              <Badge variant="danger" className="absolute -top-1.5 -right-1.5 size-5 justify-center p-0 text-[10px]">7</Badge>
+              <Badge variant="danger" className="absolute -top-1.5 -right-1.5 size-4 justify-center p-0 text-[10px]">7</Badge>
             </div>
             <div className="relative inline-flex">
               <User className="size-[22px] text-foreground" />
-              <Badge variant="primary" className="absolute -top-1.5 -right-1.5 size-5 justify-center p-0 text-[10px]">3</Badge>
+              <Badge variant="primary" className="absolute -top-1.5 -right-1.5 size-4 justify-center p-0 text-[10px]">3</Badge>
             </div>
             <div className="relative inline-flex">
               <Shield className="size-[22px] text-foreground" />
-              <Badge variant="success" className="absolute -top-1.5 -right-1.5 size-5 justify-center p-0 text-[10px]">5</Badge>
+              <Badge variant="success" className="absolute -top-1.5 -right-1.5 size-4 justify-center p-0 text-[10px]">5</Badge>
             </div>
           </div>
         </div>
