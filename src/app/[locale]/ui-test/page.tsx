@@ -5,6 +5,7 @@ import {
   Star, Sun, Moon, Settings, Bell, Shield,
   Info, AlertTriangle, CheckCircle, XCircle, User, AlertCircle, Home,
 } from "lucide-react";
+import { Carousel, type CarouselSlide } from "@/components/ui/carousel";
 import {
   Accordion,
   AccordionItem,
@@ -90,6 +91,45 @@ function AlertClosableDemo() {
     </div>
   );
 }
+
+const CAROUSEL_SLIDES: CarouselSlide[] = [
+  {
+    image: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=900&q=80",
+    alt: "Donuts and milk",
+    title: "First Slide",
+  },
+  {
+    image: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=900&q=80",
+    alt: "City building",
+    title: "Second Slide",
+  },
+  {
+    image: "https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?w=900&q=80",
+    alt: "Oranges and ice",
+    title: "Third Slide",
+  },
+]
+
+const CAROUSEL_CAPTION_SLIDES: CarouselSlide[] = [
+  {
+    image: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=900&q=80",
+    alt: "Donuts and milk",
+    label: "First slide label",
+    description: "Some representative placeholder content for the first slide.",
+  },
+  {
+    image: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=900&q=80",
+    alt: "City building",
+    label: "Second slide label",
+    description: "Some representative placeholder content for the second slide.",
+  },
+  {
+    image: "https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?w=900&q=80",
+    alt: "Oranges and ice",
+    label: "Third slide label",
+    description: "Some representative placeholder content for the third slide.",
+  },
+]
 
 export default function UiTestPage() {
   return (
@@ -471,6 +511,41 @@ export default function UiTestPage() {
               <AccordionContent>{BODY_TEXT}</AccordionContent>
             </AccordionItem>
           </Accordion>
+        </div>
+      </section>
+
+      {/* ── CAROUSEL ── */}
+      <section className="flex flex-col gap-10">
+        <h4>Carousel</h4>
+
+        <div className="flex flex-col gap-3">
+          <h6>Slide Only</h6>
+          <Carousel variant="slide-only" slides={CAROUSEL_SLIDES} />
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <h6>With Control</h6>
+          <Carousel variant="with-control" slides={CAROUSEL_SLIDES} />
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <h6>With Indicator</h6>
+          <Carousel variant="with-indicator" slides={CAROUSEL_SLIDES} />
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <h6>With Caption</h6>
+          <Carousel variant="with-caption" slides={CAROUSEL_CAPTION_SLIDES} />
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <h6>With AutoPlay</h6>
+          <Carousel
+            variant="with-indicator"
+            slides={CAROUSEL_SLIDES}
+            autoPlay
+            interval={3000}
+          />
         </div>
       </section>
     </div>

@@ -32,5 +32,10 @@
     "notFound": "Trang không tồn tại",
     "serverError": "Lỗi máy chủ",
     "unauthorized": "Bạn không có quyền truy cập"
+  },
+  "carousel": {
+    "prevSlide": "Slide trước",
+    "nextSlide": "Slide tiếp theo",
+    "goToSlide": "Đến slide {index}"
   }
 }

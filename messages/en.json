@@ -32,5 +32,10 @@
     "notFound": "Page not found",
     "serverError": "Server error",
     "unauthorized": "You are not authorized to access this page"
+  },
+  "carousel": {
+    "prevSlide": "Previous slide",
+    "nextSlide": "Next slide",
+    "goToSlide": "Go to slide {index}"
   }
 }
