@@ -3,7 +3,7 @@
 import { useState } from "react";
 import {
   Star, Sun, Moon, Settings, Bell, Shield,
-  Info, AlertTriangle, CheckCircle, XCircle, User, AlertCircle,
+  Info, AlertTriangle, CheckCircle, XCircle, User, AlertCircle, Home,
 } from "lucide-react";
 import {
   Accordion,
@@ -18,6 +18,14 @@ import {
   type AlertVariant,
 } from "@/components/ui/alert";
 import { Badge, type BadgeVariant } from "@/components/ui/badge";
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 const BODY_TEXT =
   "Lemon drops chocolate cake gummies carrot cake chupa chups muffin topping. Sesame snaps icing marzipan gummi bears macaroon dragée danish caramels powder. Bear claw dragée pastry topping soufflé. Wafer gummi bears marshmallow pastry pie.";
@@ -267,6 +275,71 @@ export default function UiTestPage() {
               <Badge key={v} variant={v} skin="light" size="md">{capitalize(v)}</Badge>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ── BREADCRUMB ── */}
+      <section className="flex flex-col gap-10">
+        <h4>Breadcrumb</h4>
+
+        {/* Chevron */}
+        <div className="flex flex-col gap-3">
+          <h6>Chevron</h6>
+          <Breadcrumb separator="chevron">
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="#"><Home className="size-4" /> Home</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink href="#">Library</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Data</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
+
+        {/* Slash */}
+        <div className="flex flex-col gap-3">
+          <h6>Slash</h6>
+          <Breadcrumb separator="slash">
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="#">Home</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink href="#">Library</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Data</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
+
+        {/* Check */}
+        <div className="flex flex-col gap-3">
+          <h6>Check</h6>
+          <Breadcrumb separator="check">
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="#">Home</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink href="#">Library</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Data</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
         </div>
       </section>
 
