@@ -40,6 +40,8 @@
   --success: #28C76F;
   --warning: #FF9F43;
   --info: #00CFE8;
+  --dark: #4B465C;
+  --dark-foreground: #FFFFFF;
   --border: #DBDADE;
   --input: #DBDADE;
   --ring: #7367F0;
@@ -81,6 +83,8 @@
   --success: #28C76F;
   --warning: #FF9F43;
   --info: #00CFE8;
+  --dark: #3F4261;
+  --dark-foreground: #FFFFFF;
   --border: #434968;
   --input: #434968;
   --ring: #7367F0;
@@ -118,6 +122,8 @@
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-info: var(--info);
+  --color-dark: var(--dark);
+  --color-dark-foreground: var(--dark-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
