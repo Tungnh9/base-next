@@ -19,6 +19,16 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio";
+import { Switch } from "@/components/ui/switch";
+import { FileUpload } from "@/components/ui/file-upload";
+import {
+  Avatar,
+  AvatarImage,
+  AvatarFallback,
+  AvatarGroup,
+  type AvatarColor,
+  type AvatarStatus,
+} from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { Carousel, type CarouselSlide } from "@/components/ui/carousel";
 import {
@@ -45,6 +55,19 @@ import {
 
 const BODY_TEXT =
   "Lemon drops chocolate cake gummies carrot cake chupa chups muffin topping. Sesame snaps icing marzipan gummi bears macaroon dragée danish caramels powder. Bear claw dragée pastry topping soufflé. Wafer gummi bears marshmallow pastry pie.";
+
+// Inline placeholder photos so the Avatar demo below doesn't depend on an external URL.
+const placeholderPhoto = (color: string) =>
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="${color}"/><circle cx="50" cy="38" r="18" fill="#fff" fill-opacity="0.9"/><ellipse cx="50" cy="92" rx="32" ry="26" fill="#fff" fill-opacity="0.9"/></svg>`
+  );
+const PLACEHOLDER_PHOTO = placeholderPhoto("#7367F0");
+const PLACEHOLDER_PHOTOS = [placeholderPhoto("#EA5455"), placeholderPhoto("#7367F0"), placeholderPhoto("#FF9F43")];
+
+const AVATAR_SIZES = [26, 32, 38, 48, 64, 72] as const;
+const AVATAR_COLORS: AvatarColor[] = ["primary", "secondary", "success", "danger", "warning", "info"];
+const AVATAR_STATUSES: AvatarStatus[] = ["online", "offline", "busy", "away"];
 
 const COLORS: AlertVariant[] = [
   "primary", "secondary", "success", "danger", "warning", "info", "dark",
@@ -96,6 +119,26 @@ function TagInputDemo({ variant, initialValues }: { variant: "select" | "tag"; i
         }
       }}
       className="w-[250px]"
+    />
+  );
+}
+
+function FileUploadDemo({ multiple }: { multiple: boolean }) {
+  const [files, setFiles] = useState<File[]>([]);
+
+  return (
+    <FileUpload
+      multiple={multiple}
+      files={files}
+      onFilesChange={setFiles}
+      title="Drop files here or click to upload"
+      subtitle={
+        multiple
+          ? "(You can select or drop multiple files.)"
+          : "(Only one file is kept — a new selection replaces it.)"
+      }
+      removeLabel={(name) => `Remove ${name}`}
+      className="w-full max-w-[500px]"
     />
   );
 }
@@ -550,6 +593,161 @@ export default function UiTestPage() {
               <Label htmlFor="radio-invalid" className="text-[15px] text-foreground">Accept terms</Label>
             </div>
           </RadioGroup>
+        </div>
+      </section>
+
+      {/* ── SWITCH ── */}
+      <section className="flex flex-col gap-10">
+        <h4>Switch</h4>
+
+        <div className="flex flex-col gap-3">
+          <h6>States</h6>
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-2">
+              <Switch id="switch-unchecked" />
+              <Label htmlFor="switch-unchecked" className="text-[15px] text-foreground">Not Checked</Label>
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch id="switch-checked" defaultChecked />
+              <Label htmlFor="switch-checked" className="text-[15px] text-foreground">Checked</Label>
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch id="switch-disabled" disabled />
+              <Label htmlFor="switch-disabled" className="text-[15px] text-foreground">Disabled</Label>
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch id="switch-disabled-checked" disabled defaultChecked />
+              <Label htmlFor="switch-disabled-checked" className="text-[15px] text-foreground">Disabled Checked</Label>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <h6>Invalid</h6>
+          <div className="flex items-center gap-2">
+            <Switch id="switch-invalid" aria-invalid />
+            <Label htmlFor="switch-invalid" className="text-[15px] text-foreground">Accept terms</Label>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FILE UPLOAD ── */}
+      <section className="flex flex-col gap-10">
+        <h4>File Upload</h4>
+
+        <div className="flex flex-col gap-3">
+          <h6>Single file</h6>
+          <FileUploadDemo multiple={false} />
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <h6>Multiple files</h6>
+          <FileUploadDemo multiple={true} />
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <h6>Disabled</h6>
+          <FileUpload
+            multiple
+            files={[]}
+            onFilesChange={() => {}}
+            disabled
+            title="Drop files here or click to upload"
+            className="w-full max-w-[500px]"
+          />
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <h6>Invalid</h6>
+          <FileUpload
+            multiple
+            files={[]}
+            onFilesChange={() => {}}
+            aria-invalid
+            title="Drop files here or click to upload"
+            className="w-full max-w-[500px]"
+          />
+        </div>
+      </section>
+
+      {/* ── AVATAR ── */}
+      <section className="flex flex-col gap-10">
+        <h4>Avatar</h4>
+
+        <div className="flex flex-col gap-3">
+          <h6>Sizes (image)</h6>
+          <div className="flex flex-wrap items-end gap-3">
+            {AVATAR_SIZES.map((size) => (
+              <Avatar key={size} size={size}>
+                <AvatarImage src={PLACEHOLDER_PHOTO} alt="User avatar" />
+                <AvatarFallback size={size}>PI</AvatarFallback>
+              </Avatar>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <h6>Initials — filled</h6>
+          <div className="flex flex-col gap-3">
+            {AVATAR_COLORS.map((color) => (
+              <div key={color} className="flex flex-wrap items-end gap-3">
+                {AVATAR_SIZES.map((size) => (
+                  <Avatar key={size} size={size}>
+                    <AvatarFallback size={size} color={color} skin="filled">PI</AvatarFallback>
+                  </Avatar>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <h6>Initials — light</h6>
+          <div className="flex flex-col gap-3">
+            {AVATAR_COLORS.map((color) => (
+              <div key={color} className="flex flex-wrap items-end gap-3">
+                {AVATAR_SIZES.map((size) => (
+                  <Avatar key={size} size={size}>
+                    <AvatarFallback size={size} color={color} skin="light">PI</AvatarFallback>
+                  </Avatar>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <h6>Status indicator</h6>
+          <div className="flex flex-wrap items-end gap-3">
+            {AVATAR_STATUSES.map((status) => (
+              <Avatar key={status} size={38} status={status}>
+                <AvatarImage src={PLACEHOLDER_PHOTO} alt="User avatar" />
+                <AvatarFallback size={38}>PI</AvatarFallback>
+              </Avatar>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <h6>Avatar group</h6>
+          <div className="flex flex-wrap items-center gap-6">
+            <AvatarGroup size={38} max={3}>
+              <Avatar size={38}><AvatarImage src={PLACEHOLDER_PHOTOS[0]} alt="" /><AvatarFallback size={38} color="danger">PI</AvatarFallback></Avatar>
+              <Avatar size={38}><AvatarImage src={PLACEHOLDER_PHOTOS[1]} alt="" /><AvatarFallback size={38} color="primary">PI</AvatarFallback></Avatar>
+              <Avatar size={38}><AvatarImage src={PLACEHOLDER_PHOTOS[2]} alt="" /><AvatarFallback size={38} color="warning">PI</AvatarFallback></Avatar>
+              <Avatar size={38}><AvatarFallback size={38} color="success">PI</AvatarFallback></Avatar>
+              <Avatar size={38}><AvatarFallback size={38} color="info">PI</AvatarFallback></Avatar>
+              <Avatar size={38}><AvatarFallback size={38} color="secondary">PI</AvatarFallback></Avatar>
+              <Avatar size={38}><AvatarFallback size={38} color="primary">PI</AvatarFallback></Avatar>
+            </AvatarGroup>
+            <AvatarGroup size={38} max={3}>
+              <Avatar size={38}><AvatarFallback size={38} color="danger">AB</AvatarFallback></Avatar>
+              <Avatar size={38}><AvatarFallback size={38} color="primary">CD</AvatarFallback></Avatar>
+              <Avatar size={38}><AvatarFallback size={38} color="warning">EF</AvatarFallback></Avatar>
+              <Avatar size={38}><AvatarFallback size={38} color="success">GH</AvatarFallback></Avatar>
+              <Avatar size={38}><AvatarFallback size={38} color="info">IJ</AvatarFallback></Avatar>
+            </AvatarGroup>
+          </div>
         </div>
       </section>
 
