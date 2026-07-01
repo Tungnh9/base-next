@@ -48,6 +48,7 @@ export interface CarouselProps {
   autoPlay?: boolean
   interval?: number
   className?: string
+  label?: string
 }
 
 function Carousel({
@@ -56,14 +57,13 @@ function Carousel({
   autoPlay = false,
   interval = 5000,
   className,
+  label,
 }: CarouselProps) {
   const [currentIndex, setCurrentIndex] = React.useState(0)
-  // FIX #4 & #7: useRef instead of useState — hover events no longer
-  // trigger a full subtree re-render; interval countdown is not reset on hover.
   const isPausedRef = React.useRef(false)
+  const t = useTranslations("carousel")
   const count = slides.length
 
-  // FIX #1: guard against empty slides array (count === 0 → modulo-by-zero = NaN)
   const prev = React.useCallback(() => {
     if (count === 0) return
     setCurrentIndex(i => (i - 1 + count) % count)
@@ -74,7 +74,6 @@ function Carousel({
     setCurrentIndex(i => (i + 1) % count)
   }, [count])
 
-  // FIX #3: clamp index to valid range in goTo
   const goTo = React.useCallback(
     (index: number) => {
       if (count === 0) return
@@ -83,17 +82,26 @@ function Carousel({
     [count]
   )
 
+  // Clamp currentIndex when the slides array shrinks so it never points out of range
+  React.useEffect(() => {
+    if (count > 0 && currentIndex >= count) {
+      setCurrentIndex(count - 1)
+    }
+  }, [count, currentIndex])
+
   React.useEffect(() => {
     if (!autoPlay || count < 2) return
-    // FIX #2: enforce minimum interval to prevent runaway spinning
     const safeInterval = Math.max(100, interval)
-    // FIX #4: check the ref inside the callback — interval is never torn down
-    // on hover, so the countdown is preserved across mouse enter/leave.
     const timer = setInterval(() => {
       if (!isPausedRef.current) next()
     }, safeInterval)
     return () => clearInterval(timer)
   }, [autoPlay, interval, next, count])
+
+  const contextValue = React.useMemo(
+    () => ({ currentIndex, count, prev, next, goTo }),
+    [currentIndex, count, prev, next, goTo]
+  )
 
   const showControls = variant !== "slide-only"
   const showIndicators =
@@ -102,14 +110,22 @@ function Carousel({
   const current = slides[currentIndex]
 
   return (
-    <CarouselContext.Provider value={{ currentIndex, count, prev, next, goTo }}>
+    <CarouselContext.Provider value={contextValue}>
       <div
         role="region"
         aria-roledescription="carousel"
+        aria-label={label}
         className={cn("relative w-full overflow-hidden rounded-md", className)}
         onMouseEnter={() => { isPausedRef.current = true }}
         onMouseLeave={() => { isPausedRef.current = false }}
       >
+        {/* Visually hidden — text content changes on each slide, triggering screen reader announcement.
+            CSS transform on the slide strip does not mutate DOM text, so aria-live there is ineffective. */}
+        <span aria-live="polite" aria-atomic="true" className="sr-only">
+          {t("slideLabel", { index: currentIndex + 1, total: count })}
+          {slides[currentIndex]?.title ? ` — ${slides[currentIndex].title}` : ""}
+        </span>
+
         <CarouselContent slides={slides} showTitle={!showCaption} />
 
         {showControls && (
@@ -146,12 +162,14 @@ function CarouselContent({
     <div
       className="flex h-[350px] transition-transform duration-500 ease-in-out"
       style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-      aria-live="polite"
     >
-      {/* FIX #5: use slide.image as key instead of array index to prevent
-          DOM reuse and stale-image flash when the slides array is replaced */}
-      {slides.map((slide) => (
-        <CarouselItem key={slide.image} slide={slide} showTitle={showTitle} />
+      {slides.map((slide, i) => (
+        <CarouselItem
+          key={i}
+          slide={slide}
+          showTitle={showTitle}
+          aria-label={`${i + 1} / ${slides.length}`}
+        />
       ))}
     </div>
   )
@@ -163,15 +181,16 @@ function CarouselItem({
   slide,
   showTitle = true,
   className,
+  ...props
 }: {
   slide: CarouselSlide
   showTitle?: boolean
-  className?: string
-}) {
+} & Omit<React.ComponentProps<"div">, "role">) {
   return (
     <div
       role="group"
       aria-roledescription="slide"
+      {...props}
       className={cn("relative flex-[0_0_100%] h-full", className)}
     >
       <img
@@ -193,8 +212,6 @@ function CarouselItem({
 }
 
 // ─── Nav button (internal) ─────────────────────────────────────────────────────
-// FIX #8: merge CarouselPrevious/Next into one component to eliminate
-// structural duplication; any style change now applies to both directions.
 
 function CarouselNavButton({
   direction,
@@ -204,7 +221,6 @@ function CarouselNavButton({
   className?: string
 }) {
   const { prev, next } = useCarousel()
-  // FIX #6: aria-labels via next-intl (no more hardcoded English strings)
   const t = useTranslations("carousel")
   const isPrev = direction === "prev"
 
@@ -241,7 +257,6 @@ function CarouselNext({ className }: { className?: string }) {
 
 function CarouselIndicators({ className }: { className?: string }) {
   const { currentIndex, count, goTo } = useCarousel()
-  // FIX #6: aria-label via next-intl
   const t = useTranslations("carousel")
 
   return (
@@ -257,6 +272,7 @@ function CarouselIndicators({ className }: { className?: string }) {
           type="button"
           onClick={() => goTo(i)}
           aria-label={t("goToSlide", { index: i + 1 })}
+          aria-pressed={i === currentIndex}
           className={cn(
             "h-[5px] w-[35px] rounded-[6px] transition-all duration-300 cursor-pointer",
             i === currentIndex ? "bg-white hover:opacity-80" : "bg-white/40 hover:bg-white/65"

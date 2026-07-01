@@ -36,6 +36,10 @@
   "carousel": {
     "prevSlide": "Slide trước",
     "nextSlide": "Slide tiếp theo",
-    "goToSlide": "Đến slide {index}"
+    "goToSlide": "Đến slide {index}",
+    "slideLabel": "Slide {index}/{total}"
+  },
+  "alert": {
+    "close": "Đóng"
   }
 }

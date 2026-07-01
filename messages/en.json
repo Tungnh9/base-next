@@ -36,6 +36,10 @@
   "carousel": {
     "prevSlide": "Previous slide",
     "nextSlide": "Next slide",
-    "goToSlide": "Go to slide {index}"
+    "goToSlide": "Go to slide {index}",
+    "slideLabel": "Slide {index} of {total}"
+  },
+  "alert": {
+    "close": "Close"
   }
 }

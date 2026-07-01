@@ -3,6 +3,7 @@
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { X } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 import { cn } from "@/lib/utils"
 
@@ -35,7 +36,7 @@ function Alert({
   variant = DEFAULT_VARIANT,
   icon,
   onClose,
-  closeLabel = "Close",
+  closeLabel,
   children,
   ...props
 }: React.ComponentProps<"div"> &
@@ -44,6 +45,8 @@ function Alert({
     onClose?: () => void
     closeLabel?: string
   }) {
+  const t = useTranslations("alert")
+  const resolvedCloseLabel = closeLabel ?? t("close")
   return (
     <div
       role="alert"
@@ -62,7 +65,7 @@ function Alert({
         <button
           type="button"
           onClick={onClose}
-          aria-label={closeLabel}
+          aria-label={resolvedCloseLabel}
           className="shrink-0 -mr-1 mt-px size-5 flex items-center justify-center rounded opacity-50 hover:opacity-100 transition-opacity cursor-pointer"
         >
           <X className="size-4" />

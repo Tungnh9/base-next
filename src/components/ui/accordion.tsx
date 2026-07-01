@@ -72,7 +72,7 @@ function AccordionTrigger({
         className={cn(
           "flex flex-1 items-center gap-[10px] text-[15px] font-semibold text-foreground text-left transition-colors cursor-pointer hover:bg-foreground/5",
           isAdvance
-            ? "group/trigger py-4 px-6 data-[state=open]:bg-foreground/8 hover:bg-foreground/5"
+            ? "group/trigger py-4 px-6 data-[state=open]:bg-foreground/8"
             : "py-[12.5px] px-[18px]",
           className
         )}
@@ -108,15 +108,15 @@ function AccordionContent({
       data-slot="accordion-content"
       className={cn(
         "overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down",
-        isAdvance && "data-[state=open]:bg-foreground/8"
+        isAdvance && "data-[state=open]:bg-foreground/8",
+        className
       )}
       {...props}
     >
       <div className={cn(
         "text-[15px] text-foreground",
         "pb-[12.5px]",
-        isAdvance ? "px-6" : "px-[18px]",
-        className
+        isAdvance ? "px-6" : "px-[18px]"
       )}>
         {children}
       </div>
