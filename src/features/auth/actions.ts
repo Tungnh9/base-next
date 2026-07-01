@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { signToken, setSessionCookie, clearSessionCookie } from "@/lib/auth";
 import { ROUTES } from "@/lib/constants";
 import { authApi } from "./api";
-import { loginSchema, type LoginInput } from "./schemas";
+import { loginSchema } from "./schemas";
 
 export interface ActionState {
   error?: string;
@@ -29,6 +29,10 @@ export async function loginAction(
 
   if (error) {
     return { error: error.message };
+  }
+
+  if (!data?.user) {
+    return { error: "Unexpected response from server" };
   }
 
   const token = await signToken({
