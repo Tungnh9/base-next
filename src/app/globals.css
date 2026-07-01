@@ -51,6 +51,7 @@
   --chart-4: #EA5455;
   --chart-5: #00CFE8;
   --radius: 0.375rem;
+  --card-shadow: 0 2px 6px 0 rgb(75 70 92 / 14%);
   --sidebar: #FFFFFF;
   --sidebar-foreground: #4B465C;
   --sidebar-primary: #7367F0;
@@ -136,6 +137,7 @@
   --radius-md: var(--radius);
   --radius-lg: calc(var(--radius) + 2px);
   --radius-xl: calc(var(--radius) + 6px);
+  --shadow-card: var(--card-shadow);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);

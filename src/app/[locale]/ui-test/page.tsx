@@ -21,6 +21,10 @@ import {
 } from "@/components/ui/alert";
 import { Badge, type BadgeVariant } from "@/components/ui/badge";
 import {
+  Card, CardImage, CardHeader, CardTitle, CardDescription,
+  CardContent, CardItem, CardFooter,
+} from "@/components/ui/card";
+import {
   Breadcrumb,
   BreadcrumbList,
   BreadcrumbItem,
@@ -501,6 +505,93 @@ export default function UiTestPage() {
             </BreadcrumbList>
           </Breadcrumb>
         </div>
+      </section>
+
+      {/* ── CARD ── */}
+      <section className="flex flex-col gap-6">
+        <h4>Card</h4>
+
+        {/* Row 1: 2 image cards */}
+        <div className="grid grid-cols-2 gap-6">
+          <Card>
+            <CardImage src="https://picsum.photos/seed/arch/400/200" className="h-48" />
+            <CardContent>
+              <CardTitle>Card Title</CardTitle>
+              <p className="text-sm">Some quick example text to build on the card title and make up the bulk of the card&apos;s content.</p>
+              <div>
+                <Button>Button</Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardImage src="https://picsum.photos/seed/food/400/200" className="h-48" />
+            <CardContent>
+              <p className="text-sm">Some quick example text to build on the card title and make up the bulk of the card&apos;s content.</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Row 2: tall card left + 3 stacked right */}
+        <div className="grid grid-cols-2 gap-6 items-start">
+          <Card>
+            <CardImage src="https://picsum.photos/seed/city/400/240" className="h-52" />
+            <CardContent>
+              <CardTitle>Card Title</CardTitle>
+              <p className="text-sm">Some quick example text to build on the card title and make up the bulk of the card&apos;s content.</p>
+            </CardContent>
+            <CardItem>An item</CardItem>
+            <CardItem>A second item</CardItem>
+            <CardItem>A third item</CardItem>
+            <div className="flex gap-4 px-6 py-4">
+              <a href="#" className="text-sm text-primary hover:underline">Card Links</a>
+              <a href="#" className="text-sm text-primary hover:underline">Another Links</a>
+            </div>
+          </Card>
+
+          <div className="flex flex-col gap-6">
+            <Card>
+              <CardContent>
+                <CardTitle>Card Title</CardTitle>
+                <CardDescription>Card Subtitle</CardDescription>
+                <p className="text-sm">Some quick example text to build on the card title and make up the bulk of the card&apos;s content.</p>
+                <div className="flex gap-4">
+                  <a href="#" className="text-sm text-primary hover:underline">Card Links</a>
+                  <a href="#" className="text-sm text-primary hover:underline">Another Links</a>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>Header</CardHeader>
+              <CardItem>An item</CardItem>
+              <CardItem>A second item</CardItem>
+              <CardItem>A third item</CardItem>
+              <CardFooter>Footer</CardFooter>
+            </Card>
+
+            <Card>
+              <CardContent>
+                <p className="text-sm">Some quick example text to build on the card title and make up the bulk of the card&apos;s content.</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Row 3: horizontal card */}
+        <Card className="flex-row">
+          <CardImage
+            src="https://picsum.photos/seed/avocado/300/400"
+            className="w-48 h-auto min-h-[220px] shrink-0 object-cover"
+          />
+          <CardContent className="flex-1">
+            <CardTitle>Card Title</CardTitle>
+            <p className="text-sm">Some quick example text to build on the card title and make up the bulk of the card&apos;s content.</p>
+            <div>
+              <Button>Button</Button>
+            </div>
+          </CardContent>
+        </Card>
       </section>
 
       {/* ── ACCORDION ── */}
