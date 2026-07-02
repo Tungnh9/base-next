@@ -2,17 +2,23 @@
 
 import * as React from "react"
 import { ChevronLeft, ChevronRight, CalendarDays, Clock3 } from "lucide-react"
+import { useLocale, useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// ─── Locale-aware calendar helpers ────────────────────────────────────────────
 
-const MONTH_NAMES = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
-]
-const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+function getMonthName(locale: string, year: number, month: number): string {
+  return new Intl.DateTimeFormat(locale, { month: "long" }).format(new Date(year, month))
+}
+
+function getDayLabels(locale: string): string[] {
+  // 2024-01-07 is a Sunday — generate 7 labels starting from Sunday
+  return Array.from({ length: 7 }, (_, i) =>
+    new Intl.DateTimeFormat(locale, { weekday: "short" }).format(new Date(2024, 0, 7 + i))
+  )
+}
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -105,6 +111,9 @@ interface MonthGridProps {
 function MonthGrid({
   year, month, mode, selected, rangeFrom, rangeTo, hovered, onSelect, onHover,
 }: MonthGridProps) {
+  const locale = useLocale()
+  const dayLabels = getDayLabels(locale)
+
   const daysInMonth = getDaysInMonth(year, month)
   const firstDay = getFirstDayOfMonth(year, month)
   const [prevY, prevM] = shiftMonth(year, month, -1)
@@ -129,7 +138,7 @@ function MonthGrid({
     <div>
       {/* Day header row */}
       <div className="grid grid-cols-7 mb-1">
-        {DAY_LABELS.map(d => (
+        {dayLabels.map(d => (
           <div key={d} className="h-9 flex items-center justify-center text-xs font-medium text-muted-foreground">
             {d}
           </div>
@@ -161,20 +170,14 @@ function MonthGrid({
                 <div
                   className={cn(
                     "absolute inset-y-[3px] bg-primary/[.16]",
-                    // Middle cells: full width, round on row edges
                     inRange && "inset-x-0",
                     inRange && col === 0 && "rounded-l-full",
                     inRange && col === 6 && "rounded-r-full",
-                    // Inside start (circle covers centre): strip right-half only
                     !outside && isStart && !isEnd && "left-1/2 right-0",
-                    // Outside start (no circle): full width
                     outside && isStart && !isEnd && "inset-x-0",
-                    // Inside end (circle covers centre): strip left-half only
                     !outside && isEnd && !isStart && "left-0 right-1/2",
-                    // Outside end (no circle): full width so text is covered
                     outside && isEnd && !isStart && "inset-x-0",
                     outside && isEnd && !isStart && col === 6 && "rounded-r-full",
-                    // Same-cell start+end: full-width pill
                     isStart && isEnd && "inset-x-0 rounded-full",
                   )}
                 />
@@ -218,9 +221,20 @@ export interface CalendarProps {
 }
 
 export function Calendar({ value, onChange, className }: CalendarProps) {
+  const locale = useLocale()
   const today = new Date()
   const [year, setYear] = React.useState(value?.getFullYear() ?? today.getFullYear())
   const [month, setMonth] = React.useState(value?.getMonth() ?? today.getMonth())
+
+  // Sync view when controlled value changes externally
+  const valueTs = value?.getTime() ?? null
+  React.useEffect(() => {
+    if (value) {
+      setYear(value.getFullYear())
+      setMonth(value.getMonth())
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [valueTs])
 
   const prev = () => { const [y, m] = shiftMonth(year, month, -1); setYear(y); setMonth(m) }
   const next = () => { const [y, m] = shiftMonth(year, month, 1); setYear(y); setMonth(m) }
@@ -234,7 +248,7 @@ export function Calendar({ value, onChange, className }: CalendarProps) {
       {/* Header */}
       <div className="flex items-center justify-between mb-4 px-1">
         <span className="font-semibold text-[15px] text-foreground">
-          {MONTH_NAMES[month]} {year}
+          {getMonthName(locale, year, month)} {year}
         </span>
         <div className="flex gap-2">
           <NavButton icon={<ChevronLeft className="size-4" />} onClick={prev} />
@@ -264,24 +278,36 @@ export interface RangeCalendarProps {
 }
 
 export function RangeCalendar({ value, onChange, onApply, onCancel, className }: RangeCalendarProps) {
+  const locale = useLocale()
+  const t = useTranslations()
   const today = new Date()
   const [year, setYear] = React.useState(value?.from?.getFullYear() ?? today.getFullYear())
   const [month, setMonth] = React.useState(value?.from?.getMonth() ?? today.getMonth())
   const [hovered, setHovered] = React.useState<Date | undefined>()
   const [internal, setInternal] = React.useState<DateRange>(value ?? { from: undefined, to: undefined })
 
+  // Sync internal state and view when controlled value changes externally
+  const fromTs = value?.from?.getTime() ?? null
+  const toTs = value?.to?.getTime() ?? null
+  React.useEffect(() => {
+    setInternal(value ?? { from: undefined, to: undefined })
+    if (value?.from) {
+      setYear(value.from.getFullYear())
+      setMonth(value.from.getMonth())
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fromTs, toTs])
+
   const [nextYear, nextMonth] = shiftMonth(year, month, 1)
   const prev = () => { const [y, m] = shiftMonth(year, month, -1); setYear(y); setMonth(m) }
   const next = () => { const [y, m] = shiftMonth(year, month, 1); setYear(y); setMonth(m) }
 
   function handleSelect(d: Date) {
-    if (!internal.from || (internal.from && internal.to)) {
-      // Start new range
+    if (!internal.from || internal.to) {
       const next = { from: d, to: undefined }
       setInternal(next)
       onChange?.(next)
     } else {
-      // Set end, ensure from < to
       const range: DateRange = d < internal.from
         ? { from: d, to: internal.from }
         : { from: internal.from, to: d }
@@ -307,10 +333,10 @@ export function RangeCalendar({ value, onChange, onApply, onCancel, className }:
         <NavButton icon={<ChevronLeft className="size-4" />} onClick={prev} />
         <div className="flex flex-1">
           <span className="flex-1 text-center font-semibold text-[15px] text-foreground">
-            {MONTH_NAMES[month]} {year}
+            {getMonthName(locale, year, month)} {year}
           </span>
           <span className="flex-1 text-center font-semibold text-[15px] text-foreground">
-            {MONTH_NAMES[nextMonth]} {nextYear}
+            {getMonthName(locale, nextYear, nextMonth)} {nextYear}
           </span>
         </div>
         <NavButton icon={<ChevronRight className="size-4" />} onClick={next} />
@@ -347,13 +373,13 @@ export function RangeCalendar({ value, onChange, onApply, onCancel, className }:
       {/* Footer */}
       <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-border">
         <span className="flex-1 text-sm text-muted-foreground font-medium">{displayRange}</span>
-        <Button variant="outline" size="sm" onClick={onCancel}>Cancel</Button>
+        <Button variant="outline" size="sm" onClick={onCancel}>{t("common.cancel")}</Button>
         <Button
           size="sm"
           disabled={!internal.from || !internal.to}
           onClick={() => internal.from && internal.to && onApply?.(internal)}
         >
-          Apply
+          {t("datePicker.apply")}
         </Button>
       </div>
     </div>
@@ -370,21 +396,24 @@ export interface MonthPickerProps {
 }
 
 export function MonthPicker({ value, currentMonth, onChange, className }: MonthPickerProps) {
+  const locale = useLocale()
   const today = new Date()
   const cur = currentMonth ?? today.getMonth()
+  const year = today.getFullYear()
 
   return (
     <div className={cn(
       "w-[140px] rounded-xl bg-card py-2 [filter:drop-shadow(0_4px_9px_rgba(75,70,92,0.10))]",
       className
     )}>
-      {MONTH_NAMES.map((name, i) => {
+      {Array.from({ length: 12 }, (_, i) => {
+        const name = getMonthName(locale, year, i)
         const isActive = value === i
         const isCurrent = !isActive && i === cur
 
         return (
           <button
-            key={name}
+            key={i}
             type="button"
             onClick={() => onChange?.(i)}
             className={cn(
@@ -524,10 +553,11 @@ export function DatePicker({
   disabled,
   className,
 }: DatePickerProps) {
+  const t = useTranslations("datePicker")
   const [open, setOpen] = React.useState(false)
 
   const display = formatValue(mode, value)
-  const ph = placeholder ?? (mode === "range" ? "MM/DD/YYYY – MM/DD/YYYY" : "MM/DD/YYYY")
+  const ph = placeholder ?? (mode === "range" ? t("placeholderRange") : t("placeholder"))
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

@@ -2,6 +2,14 @@
 
 import * as React from "react"
 import { LogOut } from "lucide-react"
+import { useTranslations } from "next-intl"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { logoutAction } from "@/features/auth/actions"
 
 interface UserMenuProps {
@@ -10,50 +18,41 @@ interface UserMenuProps {
 }
 
 export function UserMenu({ email, role }: UserMenuProps) {
-  const [open, setOpen] = React.useState(false)
-  const ref = React.useRef<HTMLDivElement>(null)
-
-  React.useEffect(() => {
-    function onClickOutside(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
-    }
-    document.addEventListener("mousedown", onClickOutside)
-    return () => document.removeEventListener("mousedown", onClickOutside)
-  }, [])
+  const t = useTranslations()
 
   return (
-    <div ref={ref} className="relative">
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:brightness-90 transition-all"
-        aria-label="User menu"
-        aria-expanded={open}
-      >
-        {email.charAt(0).toUpperCase()}
-      </button>
-
-      {open && (
-        <div className="absolute right-0 top-full mt-2 w-52 overflow-hidden rounded-lg border bg-popover shadow-md z-50">
-          <div className="flex items-center gap-3 border-b px-3 py-3">
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold">
-              {email.charAt(0).toUpperCase()}
-            </div>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-medium leading-tight">{email}</p>
-              <p className="text-xs text-muted-foreground capitalize">{role ?? "User"}</p>
-            </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          className="rounded-full transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          aria-label={t("userMenu.openLabel")}
+        >
+          <Avatar size={38} status="online">
+            <AvatarFallback>{email.charAt(0).toUpperCase()}</AvatarFallback>
+          </Avatar>
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-52 overflow-hidden p-0">
+        <div className="flex items-center gap-3 border-b px-3 py-3">
+          <Avatar size={38} className="shrink-0">
+            <AvatarFallback>{email.charAt(0).toUpperCase()}</AvatarFallback>
+          </Avatar>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium leading-tight">{email}</p>
+            <p className="text-xs text-muted-foreground capitalize">{role ?? t("userMenu.defaultRole")}</p>
           </div>
-          <form action={logoutAction}>
-            <button
-              type="submit"
-              className="flex w-full items-center gap-2 px-3 py-2.5 text-sm text-destructive transition-colors hover:bg-destructive/10"
-            >
-              <LogOut className="size-4" />
-              Logout
-            </button>
+        </div>
+        <div className="py-2">
+          <form action={logoutAction} className="contents">
+            <DropdownMenuItem asChild variant="destructive">
+              <button type="submit" className="w-full">
+                <LogOut className="size-4" />
+                {t("auth.logout")}
+              </button>
+            </DropdownMenuItem>
           </form>
         </div>
-      )}
-    </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }

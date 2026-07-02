@@ -9,10 +9,9 @@ import { Footer } from "@/components/layout/footer"
 export default async function ProtectedLayout({ children }: { children: ReactNode }) {
   const session = await getSession()
 
-  // TODO: re-enable auth guard after UI review
-  // if (!session) {
-  //   redirect(ROUTES.login)
-  // }
+  if (!session) {
+    redirect(ROUTES.login)
+  }
 
   return (
     <div className="flex min-h-dvh">

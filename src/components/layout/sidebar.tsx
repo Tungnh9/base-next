@@ -44,13 +44,12 @@ export function Sidebar() {
   const pathname = usePathname()
   const { sidebarOpen, sidebarCollapsed, toggleSidebarCollapsed } = useUiStore()
 
-  if (!sidebarOpen) return null
-
   return (
     <aside
       className={cn(
         "flex shrink-0 flex-col border-r border-sidebar-border bg-sidebar transition-[width] duration-200 ease-in-out",
-        sidebarCollapsed ? "w-[72px]" : "w-[260px]"
+        sidebarCollapsed ? "w-[72px]" : "w-[260px]",
+        !sidebarOpen && "hidden"
       )}
     >
       {/* Logo area */}

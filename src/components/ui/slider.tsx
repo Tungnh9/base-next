@@ -97,17 +97,14 @@ function Slider({
   const isVertical = orientation === "vertical"
   const tt = TRACK_THICKNESS[size]
 
-  // Track displayed values for label rendering (controlled + uncontrolled)
-  const [displayVals, setDisplayVals] = React.useState<number[]>(
-    value ?? defaultValue ?? [min]
-  )
-  React.useEffect(() => {
-    if (value !== undefined) setDisplayVals(value)
-  }, [value])
+  // In controlled mode, derive labels from value directly (no stale-frame lag).
+  // In uncontrolled mode, track via localVals which handleValueChange keeps current.
+  const [localVals, setLocalVals] = React.useState<number[]>(defaultValue ?? [min])
+  const displayVals = value !== undefined ? value : localVals
 
   const handleValueChange = React.useCallback(
     (v: number[]) => {
-      setDisplayVals(v)
+      setLocalVals(v)
       onValueChange?.(v)
     },
     [onValueChange]

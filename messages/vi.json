@@ -41,5 +41,14 @@
   },
   "alert": {
     "close": "Đóng"
+  },
+  "userMenu": {
+    "openLabel": "Menu người dùng",
+    "defaultRole": "Người dùng"
+  },
+  "datePicker": {
+    "apply": "Áp dụng",
+    "placeholder": "DD/MM/YYYY",
+    "placeholderRange": "DD/MM/YYYY – DD/MM/YYYY"
   }
 }

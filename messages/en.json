@@ -41,5 +41,14 @@
   },
   "alert": {
     "close": "Close"
+  },
+  "userMenu": {
+    "openLabel": "User menu",
+    "defaultRole": "User"
+  },
+  "datePicker": {
+    "apply": "Apply",
+    "placeholder": "DD/MM/YYYY",
+    "placeholderRange": "DD/MM/YYYY – DD/MM/YYYY"
   }
 }
