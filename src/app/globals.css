@@ -150,6 +150,8 @@
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-toast-in: toast-in 0.25s ease-out;
+  --animate-toast-out: toast-out 0.2s ease-in forwards;
 
   /* Typography Scale Tokens */
   --text-h1: var(--font-size-h1);
@@ -172,6 +174,15 @@
   --text-overline: var(--font-size-overline);
 }
 
+@keyframes toast-in {
+  from { transform: translateX(calc(100% + 1rem)); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+@keyframes toast-out {
+  from { transform: translateX(0); opacity: 1; }
+  to   { transform: translateX(calc(100% + 1rem)); opacity: 0; }
+}
+
 @keyframes accordion-down {
   from { height: 0; }
   to { height: var(--radix-accordion-content-height); }
@@ -180,7 +191,6 @@
   from { height: var(--radix-accordion-content-height); }
   to { height: 0; }
 }
-
 
 /* Progress — striped indicator pattern */
 .progress-striped {
@@ -192,6 +202,7 @@
     transparent 20px
   );
 }
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

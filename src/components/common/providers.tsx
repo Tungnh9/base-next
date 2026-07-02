@@ -4,6 +4,8 @@ import { NextIntlClientProvider, type AbstractIntlMessages } from "next-intl";
 import { ThemeProvider } from "next-themes";
 import type { ReactNode } from "react";
 
+import { Toaster } from "@/components/ui/toaster";
+
 interface ProvidersProps {
   children: ReactNode;
   locale: string;
@@ -20,6 +22,7 @@ export function Providers({ children, locale, messages }: ProvidersProps) {
         disableTransitionOnChange
       >
         {children}
+        <Toaster />
       </ThemeProvider>
     </NextIntlClientProvider>
   );
