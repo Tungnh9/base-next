@@ -5,7 +5,7 @@ import { Slot } from "radix-ui"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 font-medium whitespace-nowrap tracking-[0.43px] transition-all duration-150 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-65 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  "inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 font-medium whitespace-nowrap tracking-[0.43px] transition-all duration-150 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-65 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -24,9 +24,9 @@ const buttonVariants = cva(
         dark:
           "bg-dark text-dark-foreground shadow-[0px_2px_4px_rgba(165,163,174,0.3)] enabled:hover:brightness-90 enabled:active:brightness-[0.85] focus-visible:ring-dark/20 disabled:shadow-none dark:shadow-none",
         outline:
-          "border border-primary bg-transparent text-primary enabled:hover:bg-primary/10 enabled:active:bg-primary/15 focus-visible:border-primary",
+          "border border-input bg-transparent text-foreground enabled:hover:bg-foreground/[0.08] enabled:active:bg-foreground/[0.12] focus-visible:border-primary",
         ghost:
-          "bg-primary/[0.16] text-primary enabled:hover:bg-primary/[0.24] enabled:active:bg-primary/[0.28]",
+          "text-foreground enabled:hover:bg-foreground/[0.08] enabled:active:bg-foreground/[0.12]",
         link: "text-primary underline-offset-4 enabled:hover:underline",
       },
       size: {

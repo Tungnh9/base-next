@@ -105,7 +105,7 @@ function dispatch(action: Action) {
   memoryState = reducer(memoryState, action)
   // Iterate over a snapshot so a listener that throws doesn't silently drop subsequent ones
   listeners.slice().forEach((l) => {
-    try { l(memoryState) } catch {}
+    try { l(memoryState) } catch (e) { console.error("[use-toast] listener error", e) }
   })
 }
 

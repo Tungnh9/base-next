@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import {
-  Dialog, DialogTrigger, DialogContent, DialogHeader,
+  Dialog, DialogTrigger, DialogContent, DialogHeader, DialogBody,
   DialogTitle, DialogDescription, DialogFooter, DialogClose,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
@@ -268,9 +268,11 @@ export default function FeedbackPage() {
                   This is a simple dialog. You can put any content here.
                 </DialogDescription>
               </DialogHeader>
-              <p className="text-sm text-muted-foreground">
-                Dialogs are modal overlays that interrupt the user workflow to capture information or display critical messages.
-              </p>
+              <DialogBody>
+                <p className="text-[15px] text-[var(--text-body)]">
+                  Dialogs are modal overlays that interrupt the user workflow to capture information or display critical messages.
+                </p>
+              </DialogBody>
               <DialogFooter>
                 <DialogClose asChild>
                   <Button variant="outline">Cancel</Button>
@@ -294,7 +296,7 @@ export default function FeedbackPage() {
                   Make changes to your profile here. Click save when you&apos;re done.
                 </DialogDescription>
               </DialogHeader>
-              <div className="flex flex-col gap-4">
+              <DialogBody className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1.5">
                   <Label htmlFor="dialog-name">Name</Label>
                   <Input id="dialog-name" defaultValue="John Doe" />
@@ -303,7 +305,7 @@ export default function FeedbackPage() {
                   <Label htmlFor="dialog-email">Email</Label>
                   <Input id="dialog-email" type="email" defaultValue="john@example.com" />
                 </div>
-              </div>
+              </DialogBody>
               <DialogFooter>
                 <DialogClose asChild>
                   <Button variant="outline">Cancel</Button>

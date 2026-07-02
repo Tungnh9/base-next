@@ -4,6 +4,8 @@ import {
   Star, Bell, User, Shield,
   AlertTriangle, CheckCircle, XCircle, Info, AlertCircle,
 } from "lucide-react"
+import { DatePickerDemo } from "./date-picker-demo"
+import { TableDemo } from "./table-demo"
 import {
   Avatar, AvatarImage, AvatarFallback, AvatarGroup,
   type AvatarColor, type AvatarStatus,
@@ -16,6 +18,7 @@ import {
   Progress, ProgressStack, ProgressSegment, type ProgressVariant,
 } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Carousel, type CarouselSlide } from "@/components/ui/carousel"
 import { Button } from "@/components/ui/button"
 
@@ -397,6 +400,57 @@ export default function DisplayPage() {
           </div>
         </div>
       </section>
+
+      {/* ── SKELETON ── */}
+      <section className="flex flex-col gap-10">
+        <h4>Skeleton</h4>
+
+        <div className="flex flex-col gap-3">
+          <h6>Basic shapes</h6>
+          <div className="flex flex-col gap-3 max-w-sm">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-4/5" />
+            <Skeleton className="h-4 w-3/5" />
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <h6>Card skeleton</h6>
+          <div className="flex flex-col gap-4 p-5 rounded-xl bg-card shadow-[0_4px_9px_rgba(75,70,92,0.10)] w-64">
+            <Skeleton className="h-36 w-full rounded-lg" />
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-3 w-full" />
+              <Skeleton className="h-3 w-5/6" />
+            </div>
+            <div className="flex gap-2">
+              <Skeleton className="h-8 flex-1 rounded-md" />
+              <Skeleton className="h-8 flex-1 rounded-md" />
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <h6>List skeleton</h6>
+          <div className="flex flex-col gap-4 max-w-sm">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <Skeleton className="size-10 rounded-full shrink-0" />
+                <div className="flex flex-col gap-2 flex-1">
+                  <Skeleton className="h-4 w-2/3" />
+                  <Skeleton className="h-3 w-full" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── DATE PICKER ── */}
+      <DatePickerDemo />
+
+      {/* ── TABLE + DATA TABLE ── */}
+      <TableDemo />
     </div>
   )
 }

@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { Lock, Mail, Check, X } from "lucide-react"
+import { Lock, Mail, Check, X, Star, Gift, Folder, Rocket } from "lucide-react"
+import { CustomOptionGroup, CustomOptionItem } from "@/components/ui/custom-option"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { TagInput } from "@/components/ui/tag-input"
@@ -17,6 +18,15 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio"
 import { Switch } from "@/components/ui/switch"
 import { FileUpload } from "@/components/ui/file-upload"
 import { Label } from "@/components/ui/label"
+import { Slider, type SliderVariant } from "@/components/ui/slider"
+import {
+  InputGroup,
+  InputGroupInput,
+  InputAddon,
+  InputGroupCheckbox,
+  InputGroupRadio,
+  InputGroupButton,
+} from "@/components/ui/input-group"
 
 function TagInputDemo({ variant, initialValues }: { variant: "select" | "tag"; initialValues: string[] }) {
   const [values, setValues] = useState(initialValues)
@@ -57,6 +67,178 @@ function FileUploadDemo({ multiple }: { multiple: boolean }) {
       removeLabel={(name) => `Remove ${name}`}
       className="w-full max-w-[500px]"
     />
+  )
+}
+
+const PLACEHOLDER_IMG = (color: string, label: string) =>
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="150"><rect width="200" height="150" fill="${color}"/><text x="100" y="80" font-family="sans-serif" font-size="16" fill="#fff" text-anchor="middle" dominant-baseline="middle">${label}</text></svg>`
+  )
+
+function CustomOptionDemo() {
+  const [radioValue, setRadioValue] = useState("basic")
+  const [radioImageValue, setRadioImageValue] = useState("img1")
+  const [cbDiscount, setCbDiscount] = useState(true)
+  const [cbBackup, setCbBackup] = useState(false)
+  const [cbStarted, setCbStarted] = useState(true)
+  const [cbImg, setCbImg] = useState(true)
+
+  return (
+    <section className="flex flex-col gap-10">
+      <h4>Custom Option</h4>
+
+      {/* Horizontal — Radio */}
+      <div className="flex flex-col gap-3">
+        <h6>Horizontal — Radio</h6>
+        <CustomOptionGroup value={radioValue} onValueChange={setRadioValue} className="max-w-sm">
+          <CustomOptionItem
+            value="basic"
+            label="Basic"
+            badge="Free"
+            description="Get 1 project with 1 teams members."
+          />
+          <CustomOptionItem
+            value="pro"
+            label="Pro"
+            badge="$9/mo"
+            description="Everything in Basic plus unlimited projects."
+          />
+          <CustomOptionItem
+            value="enterprise"
+            label="Enterprise"
+            badge="Custom"
+            description="Dedicated support and advanced security."
+            disabled
+          />
+        </CustomOptionGroup>
+      </div>
+
+      {/* Horizontal — Checkbox */}
+      <div className="flex flex-col gap-3">
+        <h6>Horizontal — Checkbox</h6>
+        <div className="flex flex-col gap-3 max-w-sm">
+          <CustomOptionItem
+            type="checkbox"
+            label="Discount"
+            badge="20%"
+            description="wow Get 20% off on your next purchases!"
+            checked={cbDiscount}
+            onCheckedChange={setCbDiscount}
+          />
+          <CustomOptionItem
+            type="checkbox"
+            label="Newsletter"
+            badge="Free"
+            description="Get weekly tips delivered to your inbox."
+            checked={cbBackup}
+            onCheckedChange={setCbBackup}
+          />
+        </div>
+      </div>
+
+      {/* Vertical — Radio */}
+      <div className="flex flex-col gap-3">
+        <h6>Vertical — Radio</h6>
+        <CustomOptionGroup value={radioValue} onValueChange={setRadioValue} className="grid grid-cols-3 max-w-lg">
+          <CustomOptionItem
+            value="basic"
+            variant="vertical"
+            icon={<Star />}
+            label="Starter"
+            description="For freelancers who work with multiple clients"
+          />
+          <CustomOptionItem
+            value="pro"
+            variant="vertical"
+            icon={<Gift />}
+            label="$0/mo"
+            description="Rich landing pages & 100+ components"
+          />
+          <CustomOptionItem
+            value="enterprise"
+            variant="vertical"
+            icon={<Rocket />}
+            label="Enterprise"
+            description="Whether you're new or you're a power user."
+            disabled
+          />
+        </CustomOptionGroup>
+      </div>
+
+      {/* Vertical — Checkbox */}
+      <div className="flex flex-col gap-3">
+        <h6>Vertical — Checkbox</h6>
+        <div className="grid grid-cols-3 gap-3 max-w-lg">
+          <CustomOptionItem
+            type="checkbox"
+            variant="vertical"
+            icon={<Star />}
+            label="Starter"
+            description="For freelancers who work with multiple clients"
+            checked={cbDiscount}
+            onCheckedChange={setCbDiscount}
+          />
+          <CustomOptionItem
+            type="checkbox"
+            variant="vertical"
+            icon={<Folder />}
+            label="Backup"
+            description="For freelancers who work with multiple clients"
+            checked={cbBackup}
+            onCheckedChange={setCbBackup}
+          />
+          <CustomOptionItem
+            type="checkbox"
+            variant="vertical"
+            icon={<Rocket />}
+            label="Getting Started"
+            description="Whether you're new or you're a power user."
+            checked={cbStarted}
+            onCheckedChange={setCbStarted}
+          />
+        </div>
+      </div>
+
+      {/* Image — Radio */}
+      <div className="flex flex-col gap-3">
+        <h6>Image — Radio</h6>
+        <CustomOptionGroup value={radioImageValue} onValueChange={setRadioImageValue} className="grid grid-cols-3 max-w-lg">
+          <CustomOptionItem value="img1" variant="image" image={PLACEHOLDER_IMG("#7367F0", "Option 1")} />
+          <CustomOptionItem value="img2" variant="image" image={PLACEHOLDER_IMG("#EA5455", "Option 2")} />
+          <CustomOptionItem value="img3" variant="image" image={PLACEHOLDER_IMG("#28C76F", "Option 3")} disabled />
+        </CustomOptionGroup>
+      </div>
+
+      {/* Image — Checkbox */}
+      <div className="flex flex-col gap-3">
+        <h6>Image — Checkbox</h6>
+        <div className="grid grid-cols-3 gap-3 max-w-lg">
+          <CustomOptionItem
+            type="checkbox"
+            variant="image"
+            image={PLACEHOLDER_IMG("#FF9F43", "Option A")}
+            checked={cbImg}
+            onCheckedChange={setCbImg}
+          />
+          <CustomOptionItem
+            type="checkbox"
+            variant="image"
+            image={PLACEHOLDER_IMG("#00CFE8", "Option B")}
+            checked={cbBackup}
+            onCheckedChange={setCbBackup}
+          />
+          <CustomOptionItem
+            type="checkbox"
+            variant="image"
+            image={PLACEHOLDER_IMG("#A8AAAE", "Disabled")}
+            checked={false}
+            onCheckedChange={() => {}}
+            disabled
+          />
+        </div>
+      </div>
+    </section>
   )
 }
 
@@ -390,6 +572,209 @@ export default function FormPage() {
           />
         </div>
       </section>
+
+      {/* ── SLIDER ── */}
+      <section className="flex flex-col gap-10">
+        <h4>Slider</h4>
+
+        {/* Color variants */}
+        <div className="flex flex-col gap-3">
+          <h6>Variants</h6>
+          <div className="flex flex-col gap-6 max-w-lg">
+            {(["default", "primary", "success", "danger", "warning", "info"] as SliderVariant[]).map(
+              (variant) => (
+                <div key={variant} className="flex flex-col gap-1.5">
+                  <span className="text-xs text-muted-foreground capitalize">{variant}</span>
+                  <Slider variant={variant} defaultValue={[40]} />
+                </div>
+              )
+            )}
+          </div>
+        </div>
+
+        {/* Range (two thumbs) */}
+        <div className="flex flex-col gap-3">
+          <h6>Range</h6>
+          <Slider defaultValue={[20, 80]} className="max-w-lg" />
+        </div>
+
+        {/* With value labels */}
+        <div className="flex flex-col gap-3">
+          <h6>With labels</h6>
+          <Slider defaultValue={[20, 80]} showLabel className="max-w-lg" />
+        </div>
+
+        {/* With tick marks */}
+        <div className="flex flex-col gap-3">
+          <h6>With ticks</h6>
+          <Slider defaultValue={[20, 80]} showTicks className="max-w-lg" />
+        </div>
+
+        {/* Labels + ticks */}
+        <div className="flex flex-col gap-3">
+          <h6>Labels &amp; ticks</h6>
+          <Slider defaultValue={[20, 80]} showLabel showTicks className="max-w-lg" />
+        </div>
+
+        {/* Sizes */}
+        <div className="flex flex-col gap-3">
+          <h6>Sizes</h6>
+          <div className="flex flex-col gap-4 max-w-lg">
+            <Slider size="sm"      defaultValue={[50]} />
+            <Slider size="default" defaultValue={[50]} />
+            <Slider size="lg"      defaultValue={[50]} />
+          </div>
+        </div>
+
+        {/* Disabled */}
+        <div className="flex flex-col gap-3">
+          <h6>Disabled</h6>
+          <Slider defaultValue={[30, 70]} disabled className="max-w-lg" />
+        </div>
+
+        {/* Vertical */}
+        <div className="flex flex-col gap-3">
+          <h6>Vertical</h6>
+          <div className="flex gap-10 items-start h-48">
+            <Slider orientation="vertical" defaultValue={[20, 80]} />
+            <Slider orientation="vertical" defaultValue={[20, 80]} showLabel />
+            <Slider orientation="vertical" defaultValue={[20, 80]} showTicks />
+            <Slider orientation="vertical" defaultValue={[20, 80]} showLabel showTicks />
+          </div>
+        </div>
+      </section>
+
+      {/* ── INPUT GROUP ── */}
+      <section className="space-y-6">
+        <h2 className="text-lg font-semibold">Input Group</h2>
+
+        {/* Text addons */}
+        <div className="space-y-3">
+          <p className="text-sm font-medium text-muted-foreground">Text addons</p>
+          <div className="grid gap-3 max-w-md">
+            <InputGroup>
+              <InputAddon>https://</InputAddon>
+              <InputGroupInput placeholder="example.com" />
+            </InputGroup>
+            <InputGroup>
+              <InputGroupInput placeholder="username" />
+              <InputAddon>@example.com</InputAddon>
+            </InputGroup>
+            <InputGroup>
+              <InputAddon>$</InputAddon>
+              <InputGroupInput placeholder="0.00" type="number" />
+              <InputAddon>USD</InputAddon>
+            </InputGroup>
+            <InputGroup>
+              <InputAddon>From</InputAddon>
+              <InputGroupInput placeholder="start" />
+              <InputAddon>To</InputAddon>
+              <InputGroupInput placeholder="end" />
+            </InputGroup>
+          </div>
+        </div>
+
+        {/* Sizes */}
+        <div className="space-y-3">
+          <p className="text-sm font-medium text-muted-foreground">Sizes</p>
+          <div className="grid gap-3 max-w-md">
+            <InputGroup size="sm">
+              <InputAddon>https://</InputAddon>
+              <InputGroupInput placeholder="small" />
+              <InputAddon>.com</InputAddon>
+            </InputGroup>
+            <InputGroup size="default">
+              <InputAddon>https://</InputAddon>
+              <InputGroupInput placeholder="default" />
+              <InputAddon>.com</InputAddon>
+            </InputGroup>
+            <InputGroup size="lg">
+              <InputAddon>https://</InputAddon>
+              <InputGroupInput placeholder="large" />
+              <InputAddon>.com</InputAddon>
+            </InputGroup>
+          </div>
+        </div>
+
+        {/* Checkbox addon */}
+        <div className="space-y-3">
+          <p className="text-sm font-medium text-muted-foreground">Checkbox addon</p>
+          <div className="grid gap-3 max-w-md">
+            <InputGroup>
+              <InputGroupCheckbox defaultChecked />
+              <InputGroupInput placeholder="Checked by default" />
+            </InputGroup>
+            <InputGroup>
+              <InputGroupCheckbox />
+              <InputGroupInput placeholder="Unchecked" />
+            </InputGroup>
+            <InputGroup>
+              <InputGroupCheckbox disabled defaultChecked />
+              <InputGroupInput placeholder="Disabled" disabled />
+            </InputGroup>
+          </div>
+        </div>
+
+        {/* Radio addon */}
+        <div className="space-y-3">
+          <p className="text-sm font-medium text-muted-foreground">Radio addon</p>
+          <div className="grid gap-3 max-w-md">
+            <RadioGroup defaultValue="a">
+              <InputGroup>
+                <InputGroupRadio value="a" />
+                <InputGroupInput placeholder="Option A" />
+              </InputGroup>
+              <InputGroup>
+                <InputGroupRadio value="b" />
+                <InputGroupInput placeholder="Option B" />
+              </InputGroup>
+              <InputGroup>
+                <InputGroupRadio value="c" disabled />
+                <InputGroupInput placeholder="Disabled" disabled />
+              </InputGroup>
+            </RadioGroup>
+          </div>
+        </div>
+
+        {/* Button addon */}
+        <div className="space-y-3">
+          <p className="text-sm font-medium text-muted-foreground">Button addon</p>
+          <div className="grid gap-3 max-w-md">
+            <InputGroup>
+              <InputGroupInput placeholder="Search…" />
+              <InputGroupButton>Go</InputGroupButton>
+            </InputGroup>
+            <InputGroup>
+              <InputGroupButton>Copy</InputGroupButton>
+              <InputGroupInput placeholder="Value to copy" />
+            </InputGroup>
+            <InputGroup>
+              <InputGroupButton>-</InputGroupButton>
+              <InputGroupInput placeholder="0" type="number" className="text-center" />
+              <InputGroupButton>+</InputGroupButton>
+            </InputGroup>
+          </div>
+        </div>
+
+        {/* Validation */}
+        <div className="space-y-3">
+          <p className="text-sm font-medium text-muted-foreground">Validation</p>
+          <div className="grid gap-3 max-w-md">
+            <InputGroup>
+              <InputAddon>$</InputAddon>
+              <InputGroupInput
+                placeholder="Invalid amount"
+                aria-invalid="true"
+                defaultValue="abc"
+              />
+              <InputAddon>USD</InputAddon>
+            </InputGroup>
+          </div>
+        </div>
+      </section>
+
+      {/* ── CUSTOM OPTION ── */}
+      <CustomOptionDemo />
     </div>
   )
 }

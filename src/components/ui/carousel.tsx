@@ -84,10 +84,8 @@ function Carousel({
 
   // Clamp currentIndex when the slides array shrinks so it never points out of range
   React.useEffect(() => {
-    if (count > 0 && currentIndex >= count) {
-      setCurrentIndex(count - 1)
-    }
-  }, [count, currentIndex])
+    setCurrentIndex(i => (count > 0 && i >= count ? count - 1 : i))
+  }, [count])
 
   React.useEffect(() => {
     if (!autoPlay || count < 2) return

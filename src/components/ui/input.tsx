@@ -6,7 +6,7 @@ import { FIELD_SIZE, FIELD_VALIDATION_CLASSES } from "@/lib/field-variants"
 
 const inputVariants = cva(
   cn(
-    "w-full min-w-0 border border-input bg-card outline-none transition-[color,box-shadow,background-color] selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground read-only:bg-foreground/[0.08] disabled:cursor-not-allowed disabled:opacity-50",
+    "w-full min-w-0 border border-input bg-card outline-none transition-[color,box-shadow,background-color] selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground has-[input:read-only]:bg-foreground/[0.08] disabled:cursor-not-allowed disabled:opacity-50",
     FIELD_VALIDATION_CLASSES
   ),
   {

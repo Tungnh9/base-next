@@ -5,7 +5,7 @@ export default function UiTestLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen">
       <UiTestNav />
-      <main className="p-8 max-w-3xl">
+      <main className="p-8 max-w-6xl">
         {children}
       </main>
     </div>

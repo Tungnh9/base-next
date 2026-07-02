@@ -103,8 +103,6 @@ function ButtonGroup({
       className={cn(
         "inline-flex",
         isVertical ? "flex-col" : "flex-row",
-        // Filled groups get a single unified shadow instead of per-button shadows
-        isFilled && "shadow-[0px_2px_4px_rgba(165,163,174,0.3)] dark:shadow-none",
         className,
       )}
       {...props}

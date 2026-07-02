@@ -6,6 +6,8 @@ import {
   PlusCircle, Plus, GitBranch, LifeBuoy, Cloud, ChevronRight,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import {
   Popover, PopoverTrigger, PopoverContent, PopoverTitle, PopoverBody,
@@ -170,18 +172,19 @@ export default function OverlayPage() {
               <PopoverTrigger asChild>
                 <Button className="self-start">Update Dimensions</Button>
               </PopoverTrigger>
-              <PopoverContent className="w-72">
+              <PopoverContent>
                 <PopoverTitle>Dimensions</PopoverTitle>
                 <PopoverBody>Set the dimensions for the layer.</PopoverBody>
-                <div className="flex flex-col gap-3 mt-3">
-                  <div className="flex items-center gap-3">
-                    <label className="text-sm w-14 text-muted-foreground">Width</label>
-                    <input className="flex-1 h-8 rounded-md border border-input bg-transparent px-3 text-sm" defaultValue="100%" />
+                <div className="flex flex-col gap-3 mt-4">
+                  <div className="flex flex-col gap-1.5">
+                    <Label htmlFor="pop-width">Width</Label>
+                    <Input id="pop-width" defaultValue="100%" size="sm" />
                   </div>
-                  <div className="flex items-center gap-3">
-                    <label className="text-sm w-14 text-muted-foreground">Max. width</label>
-                    <input className="flex-1 h-8 rounded-md border border-input bg-transparent px-3 text-sm" defaultValue="300px" />
+                  <div className="flex flex-col gap-1.5">
+                    <Label htmlFor="pop-max-width">Max. width</Label>
+                    <Input id="pop-max-width" defaultValue="300px" size="sm" />
                   </div>
+                  <Button size="sm" className="w-full mt-1">Apply</Button>
                 </div>
               </PopoverContent>
             </Popover>
