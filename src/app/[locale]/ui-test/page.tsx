@@ -52,6 +52,12 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import {
+  Progress,
+  ProgressStack,
+  ProgressSegment,
+  type ProgressVariant,
+} from "@/components/ui/progress";
 
 const BODY_TEXT =
   "Lemon drops chocolate cake gummies carrot cake chupa chups muffin topping. Sesame snaps icing marzipan gummi bears macaroon dragée danish caramels powder. Bear claw dragée pastry topping soufflé. Wafer gummi bears marshmallow pastry pie.";
@@ -1195,6 +1201,55 @@ export default function UiTestPage() {
             autoPlay
             interval={3000}
           />
+        </div>
+      </section>
+
+      {/* ── PROGRESS ── */}
+      <section className="flex flex-col gap-10">
+        <h4>Progress</h4>
+
+        {/* Default (solid) */}
+        <div className="flex flex-col gap-4">
+          <h6>Default</h6>
+          {(["primary", "secondary", "success", "danger", "warning", "info", "dark"] as ProgressVariant[]).map(
+            (variant) => (
+              <Progress key={variant} variant={variant} value={variant === "primary" ? 75 : variant === "secondary" ? 50 : variant === "success" ? 80 : variant === "danger" ? 45 : variant === "warning" ? 65 : variant === "info" ? 90 : 55} />
+            )
+          )}
+        </div>
+
+        {/* Striped */}
+        <div className="flex flex-col gap-4">
+          <h6>Striped</h6>
+          {(["primary", "secondary", "success", "danger", "warning", "info", "dark"] as ProgressVariant[]).map(
+            (variant) => (
+              <Progress key={variant} variant={variant} skin="striped" value={variant === "primary" ? 75 : variant === "secondary" ? 50 : variant === "success" ? 80 : variant === "danger" ? 45 : variant === "warning" ? 65 : variant === "info" ? 90 : 55} />
+            )
+          )}
+        </div>
+
+        {/* Sizes */}
+        <div className="flex flex-col gap-4">
+          <h6>Sizes</h6>
+          <Progress size="sm" value={60} />
+          <Progress size="default" value={60} />
+          <Progress size="lg" value={60} />
+        </div>
+
+        {/* Stacked */}
+        <div className="flex flex-col gap-4">
+          <h6>Stacked</h6>
+          <ProgressStack value={100}>
+            <ProgressSegment variant="primary" value={35} />
+            <ProgressSegment variant="success" value={20} />
+            <ProgressSegment variant="warning" value={15} />
+            <ProgressSegment variant="info" value={30} />
+          </ProgressStack>
+          <ProgressStack value={100}>
+            <ProgressSegment variant="primary" value={45} skin="striped" />
+            <ProgressSegment variant="danger" value={20} skin="striped" />
+            <ProgressSegment variant="warning" value={35} skin="striped" />
+          </ProgressStack>
         </div>
       </section>
     </div>
