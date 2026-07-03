@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { locales, type Locale } from "@/i18n/config"
 
@@ -19,6 +19,7 @@ export function LanguageSwitcher({ currentLocale }: { currentLocale: Locale }) {
   const [open, setOpen] = React.useState(false)
   const ref = React.useRef<HTMLDivElement>(null)
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const router = useRouter()
 
   React.useEffect(() => {
@@ -29,12 +30,22 @@ export function LanguageSwitcher({ currentLocale }: { currentLocale: Locale }) {
     return () => document.removeEventListener("mousedown", onClickOutside)
   }, [])
 
+  React.useEffect(() => {
+    if (!open) return
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false)
+    }
+    document.addEventListener("keydown", onKeyDown)
+    return () => document.removeEventListener("keydown", onKeyDown)
+  }, [open])
+
   function switchTo(locale: Locale) {
     setOpen(false)
     if (locale === currentLocale) return
     const segments = pathname.split("/")
     segments[1] = locale
-    router.push(segments.join("/"))
+    const qs = searchParams.toString()
+    router.push(segments.join("/") + (qs ? "?" + qs : ""))
   }
 
   return (

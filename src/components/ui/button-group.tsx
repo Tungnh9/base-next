@@ -2,6 +2,7 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import type { VariantProps } from "class-variance-authority"
 import { buttonVariants } from "@/components/ui/button"
+import type { ButtonSkin } from "@/components/ui/button"
 
 type ButtonVariant = NonNullable<VariantProps<typeof buttonVariants>["variant"]>
 type ButtonSize = NonNullable<VariantProps<typeof buttonVariants>["size"]>
@@ -14,11 +15,13 @@ function ButtonGroup({
   children,
   className,
   variant,
+  skin,
   size,
   orientation = "horizontal",
   ...props
 }: React.ComponentProps<"div"> & {
   variant?: ButtonVariant
+  skin?: ButtonSkin
   size?: ButtonSize
   orientation?: "horizontal" | "vertical"
 }) {
@@ -29,16 +32,26 @@ function ButtonGroup({
     className?: string
     style?: React.CSSProperties
     variant?: ButtonVariant
+    skin?: ButtonSkin
     size?: ButtonSize
   }>[]
 
   const count = validChildren.length
 
-  // When no group variant is set, infer from first child so border-collapse/separator logic
-  // works for e.g. <ButtonGroup><Button variant="outline">…</Button></ButtonGroup>
+  // Infer effective variant/skin from first child when not set on group
   const effectiveVariant = variant ?? validChildren[0]?.props.variant
-  const isFilled = effectiveVariant !== undefined && FILLED_VARIANTS.includes(effectiveVariant)
-  const isOutline = effectiveVariant === "outline"
+  const effectiveSkin = skin ?? validChildren[0]?.props.skin
+
+  // A button group is "filled" when its variant is a solid-color one AND skin is not outline/light
+  const isFilled =
+    effectiveVariant !== undefined &&
+    FILLED_VARIANTS.includes(effectiveVariant) &&
+    (effectiveSkin === undefined || effectiveSkin === "filled")
+
+  // Outline: either the neutral outline variant, or a color variant with skin="outline"
+  const isOutline =
+    effectiveVariant === "outline" ||
+    (effectiveVariant !== undefined && effectiveSkin === "outline")
 
   const styledChildren = validChildren.map((child, i) => {
     const isFirst = i === 0
@@ -90,6 +103,7 @@ function ButtonGroup({
       style: { ...child.props.style, ...radiusStyle },
       ...(isDOMElement ? {} : {
         variant: variant ?? child.props.variant,
+        skin: skin ?? child.props.skin,
         size: size ?? child.props.size,
       }),
     })

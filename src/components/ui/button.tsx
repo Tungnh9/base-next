@@ -29,6 +29,11 @@ const buttonVariants = cva(
           "text-foreground enabled:hover:bg-foreground/[0.08] enabled:active:bg-foreground/[0.12]",
         link: "text-primary underline-offset-4 enabled:hover:underline",
       },
+      skin: {
+        filled:  "",
+        outline: "",
+        light:   "",
+      },
       size: {
         // Figma Default: h=38px, px=20px, font=15px, radius=6px
         default:
@@ -52,6 +57,94 @@ const buttonVariants = cva(
           "size-12 rounded-[8px] [&_svg:not([class*='size-'])]:size-[22px]",
       },
     },
+    compoundVariants: [
+      // ── outline skin ─────────────────────────────────────────────────────────
+      {
+        variant: "default",
+        skin: "outline",
+        className:
+          "border border-primary bg-transparent text-primary shadow-none enabled:hover:bg-primary/[0.08] enabled:hover:brightness-100 enabled:active:bg-primary/[0.12] enabled:active:brightness-100 focus-visible:ring-primary/20",
+      },
+      {
+        variant: "secondary",
+        skin: "outline",
+        className:
+          "border border-secondary bg-transparent text-secondary shadow-none enabled:hover:bg-secondary/[0.08] enabled:hover:brightness-100 enabled:active:bg-secondary/[0.12] enabled:active:brightness-100 focus-visible:ring-secondary/20",
+      },
+      {
+        variant: "destructive",
+        skin: "outline",
+        className:
+          "border border-destructive bg-transparent text-destructive shadow-none enabled:hover:bg-destructive/[0.08] enabled:hover:brightness-100 enabled:active:bg-destructive/[0.12] enabled:active:brightness-100 focus-visible:ring-destructive/20",
+      },
+      {
+        variant: "success",
+        skin: "outline",
+        className:
+          "border border-success bg-transparent text-success shadow-none enabled:hover:bg-success/[0.08] enabled:hover:brightness-100 enabled:active:bg-success/[0.12] enabled:active:brightness-100 focus-visible:ring-success/20",
+      },
+      {
+        variant: "warning",
+        skin: "outline",
+        className:
+          "border border-warning bg-transparent text-warning shadow-none enabled:hover:bg-warning/[0.08] enabled:hover:brightness-100 enabled:active:bg-warning/[0.12] enabled:active:brightness-100 focus-visible:ring-warning/20",
+      },
+      {
+        variant: "info",
+        skin: "outline",
+        className:
+          "border border-info bg-transparent text-info shadow-none enabled:hover:bg-info/[0.08] enabled:hover:brightness-100 enabled:active:bg-info/[0.12] enabled:active:brightness-100 focus-visible:ring-info/20",
+      },
+      {
+        variant: "dark",
+        skin: "outline",
+        className:
+          "border border-foreground bg-transparent text-foreground shadow-none enabled:hover:bg-foreground/[0.08] enabled:hover:brightness-100 enabled:active:bg-foreground/[0.12] enabled:active:brightness-100 focus-visible:ring-foreground/20",
+      },
+      // ── light skin ───────────────────────────────────────────────────────────
+      {
+        variant: "default",
+        skin: "light",
+        className:
+          "bg-primary/10 text-primary shadow-none enabled:hover:bg-primary/[0.15] enabled:hover:brightness-100 enabled:active:bg-primary/[0.20] enabled:active:brightness-100 focus-visible:ring-primary/20",
+      },
+      {
+        variant: "secondary",
+        skin: "light",
+        className:
+          "bg-secondary/10 text-secondary shadow-none enabled:hover:bg-secondary/[0.15] enabled:hover:brightness-100 enabled:active:bg-secondary/[0.20] enabled:active:brightness-100 focus-visible:ring-secondary/20",
+      },
+      {
+        variant: "destructive",
+        skin: "light",
+        className:
+          "bg-destructive/10 text-destructive shadow-none enabled:hover:bg-destructive/[0.15] enabled:hover:brightness-100 enabled:active:bg-destructive/[0.20] enabled:active:brightness-100 focus-visible:ring-destructive/20",
+      },
+      {
+        variant: "success",
+        skin: "light",
+        className:
+          "bg-success/10 text-success shadow-none enabled:hover:bg-success/[0.15] enabled:hover:brightness-100 enabled:active:bg-success/[0.20] enabled:active:brightness-100 focus-visible:ring-success/20",
+      },
+      {
+        variant: "warning",
+        skin: "light",
+        className:
+          "bg-warning/10 text-warning shadow-none enabled:hover:bg-warning/[0.15] enabled:hover:brightness-100 enabled:active:bg-warning/[0.20] enabled:active:brightness-100 focus-visible:ring-warning/20",
+      },
+      {
+        variant: "info",
+        skin: "light",
+        className:
+          "bg-info/10 text-info shadow-none enabled:hover:bg-info/[0.15] enabled:hover:brightness-100 enabled:active:bg-info/[0.20] enabled:active:brightness-100 focus-visible:ring-info/20",
+      },
+      {
+        variant: "dark",
+        skin: "light",
+        className:
+          "bg-foreground/10 text-foreground shadow-none enabled:hover:bg-foreground/[0.15] enabled:hover:brightness-100 enabled:active:bg-foreground/[0.20] enabled:active:brightness-100 focus-visible:ring-foreground/20",
+      },
+    ],
     defaultVariants: {
       variant: "default",
       size: "default",
@@ -59,9 +152,12 @@ const buttonVariants = cva(
   }
 )
 
+type ButtonSkin = NonNullable<VariantProps<typeof buttonVariants>["skin"]>
+
 function Button({
   className,
   variant = "default",
+  skin,
   size = "default",
   asChild = false,
   ...props
@@ -75,11 +171,13 @@ function Button({
     <Comp
       data-slot="button"
       data-variant={variant}
+      data-skin={skin}
       data-size={size}
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(buttonVariants({ variant, skin, size, className }))}
       {...props}
     />
   )
 }
 
 export { Button, buttonVariants }
+export type { ButtonSkin }

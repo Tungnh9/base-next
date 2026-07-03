@@ -23,6 +23,7 @@ const badgeVariants = cva(
       },
       skin: {
         filled: "",
+        glow:   "",
         light:  "",
         dot:    "",
       },
@@ -48,6 +49,14 @@ const badgeVariants = cva(
       { variant: "warning",   skin: "light", className: "bg-warning/10     text-warning" },
       { variant: "info",      skin: "light", className: "bg-info/10        text-info" },
       { variant: "dark",      skin: "light", className: "bg-foreground/10  text-foreground" },
+      // glow — filled + colored box-shadow
+      { variant: "primary",   skin: "glow", className: "bg-primary     text-white [box-shadow:0_0_8px_2px_color-mix(in_srgb,var(--color-primary)_40%,transparent)]" },
+      { variant: "secondary", skin: "glow", className: "bg-secondary   text-white [box-shadow:0_0_8px_2px_color-mix(in_srgb,var(--color-secondary)_40%,transparent)]" },
+      { variant: "success",   skin: "glow", className: "bg-success     text-white [box-shadow:0_0_8px_2px_color-mix(in_srgb,var(--color-success)_40%,transparent)]" },
+      { variant: "danger",    skin: "glow", className: "bg-destructive text-white [box-shadow:0_0_8px_2px_color-mix(in_srgb,var(--color-destructive)_40%,transparent)]" },
+      { variant: "warning",   skin: "glow", className: "bg-warning     text-white [box-shadow:0_0_8px_2px_color-mix(in_srgb,var(--color-warning)_40%,transparent)]" },
+      { variant: "info",      skin: "glow", className: "bg-info        text-white [box-shadow:0_0_8px_2px_color-mix(in_srgb,var(--color-info)_40%,transparent)]" },
+      { variant: "dark",      skin: "glow", className: "bg-foreground  text-background [box-shadow:0_0_8px_2px_color-mix(in_srgb,var(--color-foreground)_40%,transparent)]" },
       // dot — transparent background, colored text only
       { variant: "primary",   skin: "dot", className: "text-primary" },
       { variant: "secondary", skin: "dot", className: "text-secondary" },

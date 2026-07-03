@@ -58,9 +58,11 @@ function AccordionTrigger({
   className,
   children,
   icon,
+  showIcon = true,
   ...props
 }: React.ComponentProps<typeof AccordionPrimitive.Trigger> & {
   icon?: React.ReactNode
+  showIcon?: boolean
 }) {
   const { variant } = React.useContext(AccordionContext)
   const isAdvance = variant === "advance"
@@ -89,7 +91,9 @@ function AccordionTrigger({
         )}>
           {children}
         </span>
-        <ChevronRight className="size-5 shrink-0 text-foreground transition-transform duration-200 group-data-[state=open]/item:rotate-90" />
+        {showIcon && (
+          <ChevronRight className="size-5 shrink-0 text-foreground transition-transform duration-200 group-data-[state=open]/item:rotate-90" />
+        )}
       </AccordionPrimitive.Trigger>
     </AccordionPrimitive.Header>
   )
