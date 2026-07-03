@@ -14,6 +14,8 @@ type AvatarColor = "primary" | "secondary" | "success" | "danger" | "warning" | 
 type AvatarSkin = "filled" | "light"
 // Figma "Status Indicator": bottom-right dot, ringed with the card background.
 type AvatarStatus = "online" | "offline" | "busy" | "away"
+// Figma "Shapes": three border-radius options.
+type AvatarShape = "square" | "rounded" | "round"
 
 const AVATAR_SIZE_CLASSES: Record<AvatarSize, string> = {
   26: "size-[26px]",
@@ -46,6 +48,12 @@ const AVATAR_STATUS_SIZE_CLASSES: Record<AvatarSize, string> = {
   72: "size-[23px]",
 }
 
+const AVATAR_SHAPE_CLASSES: Record<AvatarShape, string> = {
+  square:  "rounded-[4px]",
+  rounded: "rounded-[8px]",
+  round:   "rounded-full",
+}
+
 // Light skin uses /10 opacity to match Badge's "light" variant tint convention.
 const AVATAR_COLOR_CLASSES: Record<AvatarColor, Record<AvatarSkin, string>> = {
   primary:   { filled: "bg-primary text-white",     light: "bg-primary/10 text-primary" },
@@ -63,26 +71,32 @@ const AVATAR_STATUS_CLASSES: Record<AvatarStatus, string> = {
   away: "bg-warning",
 }
 
-// Propagates resolved size from Avatar (or AvatarGroup) to AvatarFallback so
-// callers don't need to pass the same size to both components.
-const AvatarSizeContext = React.createContext<AvatarSize>(38)
+// Propagates resolved size and shape from Avatar (or AvatarGroup) to children.
+const AvatarContext = React.createContext<{ size: AvatarSize; shape: AvatarShape }>({
+  size: 38,
+  shape: "round",
+})
 
 type AvatarProps = React.ComponentProps<typeof AvatarPrimitive.Root> & {
   size?: AvatarSize
+  shape?: AvatarShape
   status?: AvatarStatus
 }
 
 // Root is wrapped in a plain relative element because Root itself needs
 // overflow-hidden to clip the image, which would also clip the status dot.
-function Avatar({ className, size, status, ...props }: AvatarProps) {
-  const contextSize = React.useContext(AvatarSizeContext)
-  const resolvedSize = size ?? contextSize
+function Avatar({ className, size, shape, status, ...props }: AvatarProps) {
+  const ctx = React.useContext(AvatarContext)
+  const resolvedSize = size ?? ctx.size
+  const resolvedShape = shape ?? ctx.shape
+  const shapeClass = AVATAR_SHAPE_CLASSES[resolvedShape]
+
   return (
-    <AvatarSizeContext.Provider value={resolvedSize}>
+    <AvatarContext.Provider value={{ size: resolvedSize, shape: resolvedShape }}>
       <div className={cn("relative inline-flex shrink-0", AVATAR_SIZE_CLASSES[resolvedSize])}>
         <AvatarPrimitive.Root
           data-slot="avatar"
-          className={cn("flex size-full shrink-0 overflow-hidden rounded-full", className)}
+          className={cn("flex size-full shrink-0 overflow-hidden", shapeClass, className)}
           {...props}
         />
         {status && (
@@ -97,7 +111,7 @@ function Avatar({ className, size, status, ...props }: AvatarProps) {
           />
         )}
       </div>
-    </AvatarSizeContext.Provider>
+    </AvatarContext.Provider>
   )
 }
 
@@ -124,13 +138,15 @@ function AvatarFallback({
   skin = "filled",
   ...props
 }: AvatarFallbackProps) {
-  const contextSize = React.useContext(AvatarSizeContext)
-  const resolvedSize = size ?? contextSize
+  const ctx = React.useContext(AvatarContext)
+  const resolvedSize = size ?? ctx.size
+  const shapeClass = AVATAR_SHAPE_CLASSES[ctx.shape]
   return (
     <AvatarPrimitive.Fallback
       data-slot="avatar-fallback"
       className={cn(
-        "flex size-full items-center justify-center rounded-full font-semibold",
+        "flex size-full items-center justify-center font-semibold",
+        shapeClass,
         AVATAR_TEXT_CLASSES[resolvedSize],
         AVATAR_COLOR_CLASSES[color][skin],
         className
@@ -142,6 +158,7 @@ function AvatarFallback({
 
 type AvatarGroupProps = React.ComponentProps<"div"> & {
   size?: AvatarSize
+  shape?: AvatarShape
   /** Caps how many avatars render before collapsing the rest into a "+N" badge. */
   max?: number
 }
@@ -149,19 +166,20 @@ type AvatarGroupProps = React.ComponentProps<"div"> & {
 // Figma "Avatar Group": avatars overlap by ~21% of their size with a card-colored
 // border between them. z-index is set explicitly (rather than relying on DOM
 // order) so later avatars always paint over earlier ones, matching the design.
-function AvatarGroup({ className, size = 38, max, children, ...props }: AvatarGroupProps) {
+function AvatarGroup({ className, size = 38, shape = "round", max, children, ...props }: AvatarGroupProps) {
   const items = React.Children.toArray(children)
   const visible = max != null ? items.slice(0, max) : items
   const overflowCount = items.length - visible.length
   const overlapPx = -Math.round(size * 0.21)
+  const shapeClass = AVATAR_SHAPE_CLASSES[shape]
 
   return (
-    <AvatarSizeContext.Provider value={size}>
+    <AvatarContext.Provider value={{ size, shape }}>
       <div data-slot="avatar-group" className={cn("flex items-center", className)} {...props}>
         {visible.map((child, index) => (
           <div
             key={(child as React.ReactElement).key ?? index}
-            className="rounded-full border-2 border-card"
+            className={cn("border-2 border-card", shapeClass)}
             style={{ marginLeft: index === 0 ? 0 : overlapPx, zIndex: index }}
           >
             {child}
@@ -171,7 +189,8 @@ function AvatarGroup({ className, size = 38, max, children, ...props }: AvatarGr
           <div
             data-slot="avatar-group-count"
             className={cn(
-              "flex shrink-0 items-center justify-center rounded-full border-2 border-card bg-muted font-semibold text-text-body",
+              "flex shrink-0 items-center justify-center border-2 border-card bg-muted font-semibold text-text-body",
+              shapeClass,
               AVATAR_SIZE_CLASSES[size],
               AVATAR_TEXT_CLASSES[size]
             )}
@@ -181,9 +200,9 @@ function AvatarGroup({ className, size = 38, max, children, ...props }: AvatarGr
           </div>
         )}
       </div>
-    </AvatarSizeContext.Provider>
+    </AvatarContext.Provider>
   )
 }
 
 export { Avatar, AvatarImage, AvatarFallback, AvatarGroup }
-export type { AvatarProps, AvatarFallbackProps, AvatarGroupProps, AvatarSize, AvatarColor, AvatarSkin, AvatarStatus }
+export type { AvatarProps, AvatarFallbackProps, AvatarGroupProps, AvatarSize, AvatarColor, AvatarSkin, AvatarStatus, AvatarShape }

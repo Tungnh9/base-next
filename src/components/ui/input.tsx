@@ -102,5 +102,109 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
   )
 })
 
-export { Input, inputVariants }
-export type { InputProps }
+// ─── Floating Label Input ─────────────────────────────────────────────────────
+
+type FloatingLabelInputProps = Omit<InputProps, "placeholder"> & {
+  /** Animated floating label — replaces placeholder, floats above border on focus/fill */
+  label: string
+  /** Helper text shown below the input; colored red on error, green on valid */
+  helperText?: string
+}
+
+const FloatingLabelInput = React.forwardRef<HTMLInputElement, FloatingLabelInputProps>(
+  function FloatingLabelInput(
+    {
+      label,
+      helperText,
+      id,
+      size = "default",
+      isValid,
+      "aria-invalid": ariaInvalid,
+      onFocus: onFocusProp,
+      onBlur: onBlurProp,
+      onChange: onChangeProp,
+      value,
+      defaultValue,
+      className,
+      ...rest
+    },
+    ref
+  ) {
+    const genId = React.useId()
+    const resolvedId = id ?? genId
+    const [focused, setFocused] = React.useState(false)
+    const [hasValue, setHasValue] = React.useState(
+      value !== undefined ? String(value).length > 0 : !!defaultValue
+    )
+
+    // Sync floating state with controlled value changes
+    React.useEffect(() => {
+      if (value !== undefined) setHasValue(String(value).length > 0)
+    }, [value])
+
+    const isFloating = focused || hasValue
+
+    return (
+      <div className={cn("flex flex-col", className)}>
+        <div className="relative">
+          <Input
+            ref={ref}
+            id={resolvedId}
+            size={size}
+            isValid={isValid}
+            aria-invalid={ariaInvalid}
+            value={value}
+            defaultValue={defaultValue}
+            onFocus={(e) => {
+              setFocused(true)
+              onFocusProp?.(e)
+            }}
+            onBlur={(e) => {
+              setFocused(false)
+              onBlurProp?.(e)
+            }}
+            onChange={(e) => {
+              if (value === undefined) setHasValue(e.target.value.length > 0)
+              onChangeProp?.(e)
+            }}
+            {...rest}
+          />
+          {/* Label floats above the top border when focused or filled */}
+          <label
+            htmlFor={resolvedId}
+            style={{
+              top: isFloating ? 0 : "50%",
+              transform: isFloating
+                ? "translateX(4px) translateY(-50%)"
+                : "translateY(-50%)",
+              fontSize: isFloating ? "11px" : "15px",
+            }}
+            className={cn(
+              "pointer-events-none absolute left-3 bg-card px-1 leading-none transition-all duration-150",
+              isFloating && focused ? "text-primary" : "text-muted-foreground"
+            )}
+          >
+            {label}
+          </label>
+        </div>
+        {helperText && (
+          <p
+            className={cn(
+              "mt-1.5 text-[13px] leading-[18px]",
+              ariaInvalid
+                ? "text-destructive"
+                : isValid
+                ? "text-success"
+                : "text-muted-foreground"
+            )}
+          >
+            {helperText}
+          </p>
+        )}
+      </div>
+    )
+  }
+)
+
+export { Input, inputVariants, FloatingLabelInput }
+export type { InputProps, FloatingLabelInputProps }

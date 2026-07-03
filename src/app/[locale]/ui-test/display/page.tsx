@@ -8,7 +8,7 @@ import { DatePickerDemo } from "./date-picker-demo"
 import { TableDemo } from "./table-demo"
 import {
   Avatar, AvatarImage, AvatarFallback, AvatarGroup,
-  type AvatarColor, type AvatarStatus,
+  type AvatarColor, type AvatarStatus, type AvatarShape,
 } from "@/components/ui/avatar"
 import { Badge, type BadgeVariant } from "@/components/ui/badge"
 import {
@@ -191,6 +191,21 @@ export default function DisplayPage() {
                 <AvatarImage src={PLACEHOLDER_PHOTO} alt="User avatar" />
                 <AvatarFallback size={38}>PI</AvatarFallback>
               </Avatar>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <h6>Shapes</h6>
+          <div className="flex flex-wrap items-end gap-4">
+            {(["square", "rounded", "round"] as AvatarShape[]).map(shape => (
+              <div key={shape} className="flex flex-col items-center gap-2">
+                <Avatar size={48} shape={shape}>
+                  <AvatarImage src={PLACEHOLDER_PHOTO} alt="User avatar" />
+                  <AvatarFallback color="primary">PI</AvatarFallback>
+                </Avatar>
+                <span className="text-xs text-muted-foreground capitalize">{shape}</span>
+              </div>
             ))}
           </div>
         </div>

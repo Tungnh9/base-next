@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Lock, Mail, Check, X, Star, Gift, Folder, Rocket } from "lucide-react"
 import { CustomOptionGroup, CustomOptionItem } from "@/components/ui/custom-option"
-import { Input } from "@/components/ui/input"
+import { Input, FloatingLabelInput } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { TagInput } from "@/components/ui/tag-input"
 import {
@@ -13,9 +13,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio"
-import { Switch } from "@/components/ui/switch"
+import { Checkbox, type CheckboxColor } from "@/components/ui/checkbox"
+import { RadioGroup, RadioGroupItem, type RadioColor } from "@/components/ui/radio"
+import { Switch, type SwitchColor } from "@/components/ui/switch"
 import { FileUpload } from "@/components/ui/file-upload"
 import { Label } from "@/components/ui/label"
 import { Slider, type SliderVariant } from "@/components/ui/slider"
@@ -298,6 +298,16 @@ export default function FormPage() {
         </div>
 
         <div className="flex flex-col gap-3">
+          <h6>Floating Label</h6>
+          <div className="flex flex-wrap items-start gap-4">
+            <FloatingLabelInput label="Full Name" className="w-[220px]" />
+            <FloatingLabelInput label="Email" helperText="We'll never share your email." className="w-[220px]" />
+            <FloatingLabelInput label="Valid field" isValid helperText="Looks good!" className="w-[220px]" />
+            <FloatingLabelInput label="Invalid field" aria-invalid helperText="This field is required." className="w-[220px]" />
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3">
           <h6>Multiple Select</h6>
           <TagInputDemo variant="select" initialValues={["Option 1", "Option 2"]} />
         </div>
@@ -428,6 +438,18 @@ export default function FormPage() {
         </div>
 
         <div className="flex flex-col gap-3">
+          <h6>Colors</h6>
+          <div className="flex flex-wrap gap-x-6 gap-y-3">
+            {(["primary", "secondary", "success", "danger", "warning", "info", "dark"] as CheckboxColor[]).map(color => (
+              <div key={color} className="flex items-center gap-1.5">
+                <Checkbox id={`cb-${color}`} defaultChecked color={color} />
+                <Label htmlFor={`cb-${color}`} className="text-[15px] text-foreground capitalize">{color}</Label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3">
           <h6>Invalid</h6>
           <div className="flex items-center gap-1.5">
             <Checkbox id="cb-invalid" aria-invalid />
@@ -489,6 +511,20 @@ export default function FormPage() {
         </div>
 
         <div className="flex flex-col gap-3">
+          <h6>Colors</h6>
+          <div className="flex flex-wrap gap-x-6 gap-y-3">
+            {(["primary", "secondary", "success", "danger", "warning", "info", "dark"] as RadioColor[]).map(color => (
+              <RadioGroup key={color} defaultValue="checked">
+                <div className="flex items-center gap-1.5">
+                  <RadioGroupItem value="checked" id={`radio-${color}`} color={color} />
+                  <Label htmlFor={`radio-${color}`} className="text-[15px] text-foreground capitalize">{color}</Label>
+                </div>
+              </RadioGroup>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3">
           <h6>Invalid</h6>
           <RadioGroup>
             <div className="flex items-center gap-1.5">
@@ -522,6 +558,18 @@ export default function FormPage() {
               <Switch id="switch-disabled-checked" disabled defaultChecked />
               <Label htmlFor="switch-disabled-checked" className="text-[15px] text-foreground">Disabled Checked</Label>
             </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <h6>Colors</h6>
+          <div className="flex flex-wrap gap-x-6 gap-y-3">
+            {(["primary", "secondary", "success", "danger", "warning", "info", "dark"] as SwitchColor[]).map(color => (
+              <div key={color} className="flex items-center gap-2">
+                <Switch id={`switch-${color}`} defaultChecked color={color} />
+                <Label htmlFor={`switch-${color}`} className="text-[15px] text-foreground capitalize">{color}</Label>
+              </div>
+            ))}
           </div>
         </div>
 
