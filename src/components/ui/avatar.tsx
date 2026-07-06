@@ -49,19 +49,19 @@ const AVATAR_STATUS_SIZE_CLASSES: Record<AvatarSize, string> = {
 }
 
 const AVATAR_SHAPE_CLASSES: Record<AvatarShape, string> = {
-  square:  "rounded-[4px]",
+  square: "rounded-[4px]",
   rounded: "rounded-[8px]",
-  round:   "rounded-full",
+  round: "rounded-full",
 }
 
 // Light skin uses /10 opacity to match Badge's "light" variant tint convention.
 const AVATAR_COLOR_CLASSES: Record<AvatarColor, Record<AvatarSkin, string>> = {
-  primary:   { filled: "bg-primary text-white",     light: "bg-primary/10 text-primary" },
-  secondary: { filled: "bg-secondary text-white",   light: "bg-secondary/10 text-secondary" },
-  success:   { filled: "bg-success text-white",     light: "bg-success/10 text-success" },
-  danger:    { filled: "bg-destructive text-white", light: "bg-destructive/10 text-destructive" },
-  warning:   { filled: "bg-warning text-white",     light: "bg-warning/10 text-warning" },
-  info:      { filled: "bg-info text-white",        light: "bg-info/10 text-info" },
+  primary: { filled: "bg-primary text-white", light: "bg-primary/10 text-primary" },
+  secondary: { filled: "bg-secondary text-white", light: "bg-secondary/10 text-secondary" },
+  success: { filled: "bg-success text-white", light: "bg-success/10 text-success" },
+  danger: { filled: "bg-destructive text-white", light: "bg-destructive/10 text-destructive" },
+  warning: { filled: "bg-warning text-white", light: "bg-warning/10 text-warning" },
+  info: { filled: "bg-info text-white", light: "bg-info/10 text-info" },
 }
 
 const AVATAR_STATUS_CLASSES: Record<AvatarStatus, string> = {
@@ -104,7 +104,7 @@ function Avatar({ className, size, shape, status, ...props }: AvatarProps) {
             aria-hidden="true"
             data-slot="avatar-status"
             className={cn(
-              "absolute right-0 bottom-0 rounded-full border-2 border-card",
+              "border-card absolute right-0 bottom-0 rounded-full border-2",
               AVATAR_STATUS_SIZE_CLASSES[resolvedSize],
               AVATAR_STATUS_CLASSES[status]
             )}
@@ -166,7 +166,14 @@ type AvatarGroupProps = React.ComponentProps<"div"> & {
 // Figma "Avatar Group": avatars overlap by ~21% of their size with a card-colored
 // border between them. z-index is set explicitly (rather than relying on DOM
 // order) so later avatars always paint over earlier ones, matching the design.
-function AvatarGroup({ className, size = 38, shape = "round", max, children, ...props }: AvatarGroupProps) {
+function AvatarGroup({
+  className,
+  size = 38,
+  shape = "round",
+  max,
+  children,
+  ...props
+}: AvatarGroupProps) {
   const items = React.Children.toArray(children)
   const visible = max != null ? items.slice(0, max) : items
   const overflowCount = items.length - visible.length
@@ -179,7 +186,7 @@ function AvatarGroup({ className, size = 38, shape = "round", max, children, ...
         {visible.map((child, index) => (
           <div
             key={(child as React.ReactElement).key ?? index}
-            className={cn("border-2 border-card", shapeClass)}
+            className={cn("border-card overflow-hidden border-2", shapeClass)}
             style={{ marginLeft: index === 0 ? 0 : overlapPx, zIndex: index }}
           >
             {child}
@@ -189,7 +196,7 @@ function AvatarGroup({ className, size = 38, shape = "round", max, children, ...
           <div
             data-slot="avatar-group-count"
             className={cn(
-              "flex shrink-0 items-center justify-center border-2 border-card bg-muted font-semibold text-text-body",
+              "border-card bg-muted text-text-body flex shrink-0 items-center justify-center border-2 font-semibold",
               shapeClass,
               AVATAR_SIZE_CLASSES[size],
               AVATAR_TEXT_CLASSES[size]
@@ -205,4 +212,13 @@ function AvatarGroup({ className, size = 38, shape = "round", max, children, ...
 }
 
 export { Avatar, AvatarImage, AvatarFallback, AvatarGroup }
-export type { AvatarProps, AvatarFallbackProps, AvatarGroupProps, AvatarSize, AvatarColor, AvatarSkin, AvatarStatus, AvatarShape }
+export type {
+  AvatarProps,
+  AvatarFallbackProps,
+  AvatarGroupProps,
+  AvatarSize,
+  AvatarColor,
+  AvatarSkin,
+  AvatarStatus,
+  AvatarShape,
+}

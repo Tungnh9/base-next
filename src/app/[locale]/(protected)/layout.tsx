@@ -14,9 +14,9 @@ export default async function ProtectedLayout({ children }: { children: ReactNod
   }
 
   return (
-    <div className="flex min-h-dvh">
+    <div className="bg-background flex min-h-dvh gap-[26px] pr-[26px]">
       <Sidebar />
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col gap-[26px] pt-4">
         <Header />
         <main className="flex-1 p-6">{children}</main>
         <Footer />

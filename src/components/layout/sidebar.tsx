@@ -2,139 +2,134 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
-import {
-  LayoutDashboard,
-  BarChart2,
-  Calendar,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react"
+import { useParams, usePathname } from "next/navigation"
+import { LayoutDashboard, ChevronLeft, ChevronRight, Menu } from "lucide-react"
 import { useUiStore } from "@/stores"
 import { cn } from "@/lib/utils"
-
-interface NavItem {
-  label: string
-  href: string
-  icon: React.ComponentType<{ className?: string }>
-  badge?: number
-}
-
-interface NavSection {
-  title?: string
-  items: NavItem[]
-}
-
-const NAV: NavSection[] = [
-  {
-    items: [
-      { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    ],
-  },
-  {
-    title: "Apps & Pages",
-    items: [
-      { label: "Analytics", href: "/analytics", icon: BarChart2 },
-      { label: "Calendar", href: "/calendar", icon: Calendar },
-    ],
-  },
-]
+import { Separator } from "@/components/ui/separator"
+import { NAV } from "@/config/nav"
 
 export function Sidebar() {
   const pathname = usePathname()
-  const { sidebarOpen, sidebarCollapsed, toggleSidebarCollapsed } = useUiStore()
+  const { locale } = useParams<{ locale: string }>()
+  const { sidebarCollapsed, toggleSidebarCollapsed, sidebarOpen, toggleSidebar, setSidebarOpen } =
+    useUiStore()
 
   return (
-    <aside
-      className={cn(
-        "flex shrink-0 flex-col border-r border-sidebar-border bg-sidebar transition-[width] duration-200 ease-in-out",
-        sidebarCollapsed ? "w-[72px]" : "w-[260px]",
-        !sidebarOpen && "hidden"
+    <>
+      {/* Mobile hamburger — visible only when sidebar is hidden on small screens */}
+      {!sidebarOpen && (
+        <button
+          type="button"
+          onClick={toggleSidebar}
+          aria-label="Open sidebar"
+          className="bg-sidebar fixed top-4 left-4 z-50 flex size-9 items-center justify-center rounded-md shadow-md lg:hidden"
+        >
+          <Menu className="text-sidebar-foreground size-5" />
+        </button>
       )}
-    >
-      {/* Logo area */}
-      <div
+      {/* Overlay for mobile */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+      <aside
         className={cn(
-          "flex h-[60px] shrink-0 items-center border-b border-sidebar-border px-4",
-          sidebarCollapsed ? "justify-center" : "justify-between"
+          "bg-sidebar sticky top-0 flex h-dvh shrink-0 flex-col shadow-[0px_2px_4px_0px_rgba(165,163,174,0.3)] transition-[width] duration-200 ease-in-out",
+          "fixed inset-y-0 left-0 z-50 lg:relative lg:z-auto",
+          sidebarOpen ? "flex" : "hidden lg:flex",
+          sidebarCollapsed ? "w-[84px]" : "w-[260px]"
         )}
       >
-        {sidebarCollapsed ? (
-          <button
-            onClick={toggleSidebarCollapsed}
-            className="flex size-8 items-center justify-center rounded-md text-sidebar-foreground transition-colors hover:bg-sidebar-accent"
-            aria-label="Expand sidebar"
-          >
-            <ChevronRight className="size-4" />
-          </button>
-        ) : (
-          <>
-            <Link
-              href="/"
-              className="flex items-center gap-2 font-semibold text-sidebar-foreground"
-            >
-              <LayoutDashboard className="size-5 shrink-0 text-sidebar-primary" />
-              <span>App</span>
-            </Link>
+        {/* Logo area */}
+        <div
+          className={cn(
+            "flex shrink-0 items-center py-4",
+            sidebarCollapsed
+              ? "justify-center px-[18px]"
+              : "justify-between py-5 pr-[14px] pl-[18px]"
+          )}
+        >
+          {sidebarCollapsed ? (
             <button
               onClick={toggleSidebarCollapsed}
-              className="flex size-6 items-center justify-center rounded-full border border-sidebar-border text-sidebar-foreground transition-colors hover:bg-sidebar-accent"
-              aria-label="Collapse sidebar"
+              className="border-sidebar-border text-sidebar-foreground hover:bg-sidebar-accent flex size-5 items-center justify-center rounded-full border transition-colors"
+              aria-label="Expand sidebar"
             >
-              <ChevronLeft className="size-3.5" />
+              <ChevronRight className="size-3" />
             </button>
-          </>
-        )}
-      </div>
+          ) : (
+            <>
+              <Link
+                href={`/${locale}`}
+                className="text-sidebar-foreground flex items-center gap-2 text-[22px] leading-6 font-bold"
+              >
+                <LayoutDashboard className="text-sidebar-primary size-5 shrink-0" />
+                <span>App</span>
+              </Link>
+              <button
+                onClick={toggleSidebarCollapsed}
+                className="border-sidebar-border text-sidebar-foreground hover:bg-sidebar-accent flex size-5 items-center justify-center rounded-full border transition-colors"
+                aria-label="Collapse sidebar"
+              >
+                <ChevronLeft className="size-3" />
+              </button>
+            </>
+          )}
+        </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto py-2">
-        {NAV.map((section, i) => (
-          <div
-            key={i}
-            className={cn(i > 0 ? "mt-4" : "mt-2")}
-          >
-            {!sidebarCollapsed && section.title && (
-              <p className="mx-4 mb-1 text-[10px] font-semibold uppercase tracking-wider text-sidebar-foreground/50">
-                {section.title}
-              </p>
-            )}
-            <ul className={cn("flex flex-col gap-0.5", sidebarCollapsed ? "px-2" : "px-3")}>
-              {section.items.map((item) => {
-                const isActive =
-                  pathname === item.href || pathname.startsWith(item.href + "/")
-                return (
-                  <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      title={sidebarCollapsed ? item.label : undefined}
-                      className={cn(
-                        "flex items-center gap-3 rounded-md py-2 text-sm font-medium transition-colors",
-                        sidebarCollapsed ? "justify-center px-2" : "px-3",
-                        isActive
-                          ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                          : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                      )}
-                    >
-                      <item.icon className="size-[18px] shrink-0" />
-                      {!sidebarCollapsed && (
-                        <>
-                          <span className="flex-1 truncate">{item.label}</span>
-                          {item.badge !== undefined && (
-                            <span className="flex size-5 items-center justify-center rounded-full bg-sidebar-primary text-[10px] font-bold text-sidebar-primary-foreground">
-                              {item.badge}
-                            </span>
-                          )}
-                        </>
-                      )}
-                    </Link>
-                  </li>
-                )
-              })}
-            </ul>
-          </div>
-        ))}
-      </nav>
-    </aside>
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto py-2">
+          {NAV.map((section, i) => (
+            <div key={i} className="mt-2">
+              {section.title &&
+                (sidebarCollapsed ? (
+                  <Separator className="mx-auto my-3 w-6" />
+                ) : (
+                  <p className="text-muted-foreground px-[30px] pt-5 pb-1.5 text-[11px] uppercase">
+                    {section.title}
+                  </p>
+                ))}
+              <ul className="flex flex-col gap-1 px-3.5">
+                {section.items.map((item) => {
+                  const href = `/${locale}${item.href}`
+                  const isActive = pathname === href || pathname.startsWith(href + "/")
+                  return (
+                    <li key={item.href}>
+                      <Link
+                        href={href}
+                        title={sidebarCollapsed ? item.label : undefined}
+                        className={cn(
+                          "flex items-center gap-2 rounded-[6px] py-[9px] text-[15px] transition-colors",
+                          sidebarCollapsed ? "justify-center px-[10px]" : "px-4",
+                          isActive
+                            ? "text-sidebar-primary-foreground bg-[linear-gradient(29deg,var(--color-sidebar-primary)_22%,color-mix(in_srgb,var(--color-sidebar-primary)_70%,transparent)_76%)] shadow-[0px_2px_6px_0px_color-mix(in_srgb,var(--color-sidebar-primary)_48%,transparent)]"
+                            : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                        )}
+                      >
+                        <item.icon className="size-[22px] shrink-0" />
+                        {!sidebarCollapsed && (
+                          <>
+                            <span className="flex-1 truncate">{item.label}</span>
+                            {item.badge !== undefined && (
+                              <span className="bg-sidebar-primary/16 text-sidebar-primary flex size-[22px] items-center justify-center rounded-full text-[13px] font-semibold">
+                                {item.badge}
+                              </span>
+                            )}
+                          </>
+                        )}
+                      </Link>
+                    </li>
+                  )
+                })}
+              </ul>
+            </div>
+          ))}
+        </nav>
+      </aside>
+    </>
   )
 }

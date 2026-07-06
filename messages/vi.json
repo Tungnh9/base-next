@@ -44,11 +44,55 @@
   },
   "userMenu": {
     "openLabel": "Menu người dùng",
-    "defaultRole": "Người dùng"
+    "defaultRole": "Người dùng",
+    "myProfile": "Trang cá nhân",
+    "setting": "Cài đặt",
+    "billing": "Thanh toán",
+    "help": "Trợ giúp",
+    "faq": "Câu hỏi thường gặp",
+    "pricing": "Bảng giá"
   },
   "datePicker": {
     "apply": "Áp dụng",
     "placeholder": "DD/MM/YYYY",
     "placeholderRange": "DD/MM/YYYY – DD/MM/YYYY"
+  },
+  "notifications": {
+    "openLabel": "Thông báo",
+    "title": "Thông báo",
+    "markAllRead": "Đánh dấu đã đọc tất cả",
+    "dismiss": "Xóa thông báo",
+    "viewAll": "Xem tất cả thông báo",
+    "demo": {
+      "achievement": {
+        "title": "Chúc mừng!",
+        "description": "Bạn vừa đạt huy hiệu thành viên tháng",
+        "time": "1 giờ trước"
+      },
+      "connection": {
+        "title": "Nguyễn Văn A",
+        "description": "Đã chấp nhận lời mời kết nối",
+        "time": "12 giờ trước"
+      },
+      "report": {
+        "title": "Báo cáo hệ thống",
+        "description": "Báo cáo tháng 7 đã sẵn sàng để xem",
+        "time": "24/07, 10:30"
+      }
+    }
+  },
+  "shortcuts": {
+    "openLabel": "Lối tắt",
+    "title": "Lối tắt",
+    "items": {
+      "dashboard": { "label": "Dashboard", "sublabel": "Tổng quan" },
+      "analytics": { "label": "Analytics", "sublabel": "Phân tích" },
+      "calendar": { "label": "Lịch", "sublabel": "Lịch làm việc" }
+    }
+  },
+  "search": {
+    "placeholder": "Tìm kiếm (Ctrl+/)",
+    "quickNav": "Điều hướng nhanh",
+    "noResults": "Không tìm thấy kết quả"
   }
 }

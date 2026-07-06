@@ -44,11 +44,55 @@
   },
   "userMenu": {
     "openLabel": "User menu",
-    "defaultRole": "User"
+    "defaultRole": "User",
+    "myProfile": "My Profile",
+    "setting": "Setting",
+    "billing": "Billing",
+    "help": "Help",
+    "faq": "FAQ",
+    "pricing": "Pricing"
   },
   "datePicker": {
     "apply": "Apply",
     "placeholder": "DD/MM/YYYY",
     "placeholderRange": "DD/MM/YYYY – DD/MM/YYYY"
+  },
+  "notifications": {
+    "openLabel": "Notifications",
+    "title": "Notification",
+    "markAllRead": "Mark all as read",
+    "dismiss": "Dismiss notification",
+    "viewAll": "View all notifications",
+    "demo": {
+      "achievement": {
+        "title": "Congratulations!",
+        "description": "You just earned the member of the month badge",
+        "time": "1 hour ago"
+      },
+      "connection": {
+        "title": "Nguyen Van A",
+        "description": "Accepted your connection request",
+        "time": "12 hours ago"
+      },
+      "report": {
+        "title": "System Report",
+        "description": "July report is ready to view",
+        "time": "24/07, 10:30"
+      }
+    }
+  },
+  "shortcuts": {
+    "openLabel": "Shortcuts",
+    "title": "Shortcuts",
+    "items": {
+      "dashboard": { "label": "Dashboard", "sublabel": "Overview" },
+      "analytics": { "label": "Analytics", "sublabel": "Statistics" },
+      "calendar": { "label": "Calendar", "sublabel": "Schedule" }
+    }
+  },
+  "search": {
+    "placeholder": "Search (Ctrl+/)",
+    "quickNav": "Quick navigation",
+    "noResults": "No results found"
   }
 }

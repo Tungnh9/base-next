@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { Button } from "@/components/ui/button"
 import { locales, type Locale } from "@/i18n/config"
 
 const LOCALE_LABELS: Record<Locale, string> = {
@@ -50,26 +49,26 @@ export function LanguageSwitcher({ currentLocale }: { currentLocale: Locale }) {
 
   return (
     <div ref={ref} className="relative">
-      <Button
-        variant="ghost"
-        size="icon"
+      <button
+        type="button"
         onClick={() => setOpen((v) => !v)}
         aria-label="Change language"
         aria-expanded={open}
+        className="flex size-[26px] items-center justify-center rounded-full transition-opacity hover:opacity-80"
       >
-        <span aria-hidden="true" className="text-base leading-none">
+        <span aria-hidden="true" className="text-[22px] leading-none">
           {LOCALE_FLAGS[currentLocale]}
         </span>
-      </Button>
+      </button>
 
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-36 overflow-hidden rounded-lg border bg-popover shadow-md">
+        <div className="bg-popover absolute top-full right-0 z-50 mt-2 w-36 overflow-hidden rounded-lg border shadow-md">
           {locales.map((locale) => (
             <button
               key={locale}
               onClick={() => switchTo(locale)}
-              className={`flex w-full items-center px-3 py-2 text-sm transition-colors hover:bg-foreground/[0.08] ${
-                locale === currentLocale ? "font-semibold text-primary" : "text-foreground"
+              className={`hover:bg-foreground/[0.08] flex w-full items-center px-3 py-2 text-sm transition-colors ${
+                locale === currentLocale ? "text-primary font-semibold" : "text-foreground"
               }`}
             >
               {LOCALE_LABELS[locale]}
