@@ -3,7 +3,8 @@
 import * as React from "react"
 import Link from "next/link"
 import { useParams, usePathname } from "next/navigation"
-import { LayoutDashboard, ChevronLeft, ChevronRight, Menu } from "lucide-react"
+import Image from "next/image"
+import { ChevronLeft, ChevronRight, Menu } from "lucide-react"
 import { useUiStore } from "@/stores"
 import { cn } from "@/lib/utils"
 import { Separator } from "@/components/ui/separator"
@@ -67,7 +68,7 @@ export function Sidebar() {
                 href={`/${locale}`}
                 className="text-sidebar-foreground flex items-center gap-2 text-[22px] leading-6 font-bold"
               >
-                <LayoutDashboard className="text-sidebar-primary size-5 shrink-0" />
+                <Image src="/logo.svg" alt="Logo" width={28} height={19} priority />
                 <span>App</span>
               </Link>
               <button

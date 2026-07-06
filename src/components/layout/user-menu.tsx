@@ -4,7 +4,7 @@ import * as React from "react"
 import { CreditCard, DollarSign, Info, LifeBuoy, LogOut, Settings, UserCheck } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,12 +17,13 @@ import { logoutAction } from "@/features/auth/actions"
 interface UserMenuProps {
   email: string
   role?: string
+  avatar?: string
 }
 
 const itemClassName =
   "gap-2 rounded-[6px] px-4 py-[7px] text-[15px] text-foreground [&_svg]:text-foreground"
 
-export function UserMenu({ email, role }: UserMenuProps) {
+export function UserMenu({ email, role, avatar }: UserMenuProps) {
   const t = useTranslations()
 
   return (
@@ -33,6 +34,7 @@ export function UserMenu({ email, role }: UserMenuProps) {
           aria-label={t("userMenu.openLabel")}
         >
           <Avatar size={38} status="online">
+            {avatar && <AvatarImage src={avatar} alt={email} />}
             <AvatarFallback>{email.charAt(0).toUpperCase()}</AvatarFallback>
           </Avatar>
         </button>
@@ -40,6 +42,7 @@ export function UserMenu({ email, role }: UserMenuProps) {
       <DropdownMenuContent align="end" className="w-[230px] overflow-hidden p-0 py-2">
         <div className="flex items-center gap-3 px-4 py-2">
           <Avatar size={38} status="online" className="shrink-0">
+            {avatar && <AvatarImage src={avatar} alt={email} />}
             <AvatarFallback>{email.charAt(0).toUpperCase()}</AvatarFallback>
           </Avatar>
           <div className="min-w-0">

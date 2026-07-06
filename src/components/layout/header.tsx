@@ -23,7 +23,9 @@ export async function Header() {
           <ThemeToggle />
           <ShortcutsDropdown />
           <NotificationDropdown />
-          {session && <UserMenu email={session.email} role={session.role} />}
+          {session && (
+            <UserMenu email={session.email} role={session.role} avatar="/images/avatars/avt1.png" />
+          )}
         </div>
       </header>
     </div>
