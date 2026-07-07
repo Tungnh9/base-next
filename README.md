@@ -55,8 +55,13 @@ base-next/
     │       ├── layout.tsx        # Cung cấp NextIntlClientProvider cho toàn app
     │       ├── page.tsx          # Trang chủ
     │       ├── (auth)/           # Route group: trang xác thực (không bảo vệ)
+    │       │   ├── layout.tsx            # Lavender background + 4 decorative shapes, card 450px
     │       │   ├── login/page.tsx
-    │       │   └── register/page.tsx
+    │       │   ├── register/page.tsx
+    │       │   ├── forgot-password/page.tsx
+    │       │   ├── reset-password/page.tsx    # Reads ?token&email from searchParams
+    │       │   ├── verify-email/page.tsx      # Reads ?email, Skip + Resend actions
+    │       │   └── two-step-verification/page.tsx  # OTP 6-box, reads ?phone, demo code 230320
     │       ├── (protected)/      # Route group: yêu cầu đăng nhập
     │       │   ├── layout.tsx    # Server check session → redirect /login nếu chưa login
     │       │   └── dashboard/page.tsx
@@ -91,13 +96,21 @@ base-next/
     ├── features/                 # Feature-sliced: mỗi tính năng là 1 module độc lập
     │   └── auth/                 # Module xác thực
     │       ├── types.ts          # User, Session, LoginCredentials, AuthResponse...
-    │       ├── schemas.ts        # Zod: loginSchema, registerSchema
-    │       ├── actions.ts        # Server Actions: loginAction, logoutAction
-    │       ├── api.ts            # authApi.login(), authApi.me(), authApi.logout()
+    │       ├── schemas.ts        # Zod schemas + factory fns cho tất cả auth forms
+    │       ├── actions.ts        # Server Actions: login, register, forgotPassword, resetPassword,
+    │       │                     #   twoStepVerification, resendVerificationEmail, resendTwoStepCode
+    │       ├── api.ts            # authApi: tất cả auth endpoints
+    │       ├── services.ts       # authService: business logic, sign JWT, set cookie
     │       ├── hooks/
-    │       │   └── use-auth.ts   # useLoginAction() — bọc useActionState
+    │       │   └── use-auth.ts   # useLoginAction, useRegisterAction, useForgotPasswordAction...
     │       └── components/
-    │           └── login-form.tsx
+    │           ├── login-form.tsx
+    │           ├── register-form.tsx
+    │           ├── forgot-password-form.tsx
+    │           ├── reset-password-form.tsx
+    │           ├── verify-email-resend.tsx   # Client component cho nút Resend
+    │           ├── two-step-form.tsx         # OTP form với auto-advance
+    │           └── otp-input.tsx             # 6-box OTP input (auto-advance, paste, backspace)
     │
     ├── lib/                      # Tiện ích thuần — không phụ thuộc vào React
     │   ├── env.ts                # Zod validate biến môi trường lúc build
@@ -232,7 +245,8 @@ Chạy trước khi bất kỳ component nào render. Verify JWT từ session co
 ```
 proxy.ts
 ├── Bỏ qua: /_next/*, /favicon.ico, file tĩnh
-├── PUBLIC_PATHS: locale-prefixed paths (/vi/login, /en/login, ...)  ← thêm path public tại đây
+├── PUBLIC_PATHS: /login, /register, /forgot-password, /reset-password,
+│               /verify-email, /two-step-verification  ← thêm path public tại đây
 ├── Unauthenticated → redirect /[locale]/login?callbackUrl=...
 └── Dùng jose để verify JWT (không cần DB call)
 ```
