@@ -1,4 +1,6 @@
-export default function AuthLayout({ children }: { children: React.ReactNode }) {
+import type { ReactNode } from "react"
+
+export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-svh items-center justify-center overflow-hidden bg-[#ECEEF7] px-4 py-12">
       {/* Inner wrapper — shapes are positioned relative to the card, not the viewport */}

@@ -1,9 +1,8 @@
 import Image from "next/image"
-import { redirect } from "next/navigation"
-import { getTranslations, getLocale } from "next-intl/server"
+import { getTranslations } from "next-intl/server"
 import type { Metadata } from "next"
 import { Button } from "@/components/ui/button"
-import { ROUTES } from "@/lib/constants"
+import { skipVerificationAction } from "@/features/auth/actions"
 import { VerifyEmailResend } from "@/features/auth/components/verify-email-resend"
 
 type Props = {
@@ -19,12 +18,6 @@ export default async function VerifyEmailPage({ searchParams }: Props) {
   const t = await getTranslations("auth")
   const { email = "" } = await searchParams
   const appName = process.env.NEXT_PUBLIC_APP_NAME ?? "App"
-
-  async function skipAction() {
-    "use server"
-    const locale = await getLocale()
-    redirect(`/${locale}${ROUTES.dashboard}`)
-  }
 
   return (
     <div className="relative z-10 flex w-full max-w-[450px] flex-col gap-6 rounded-md bg-white p-8 shadow-[0px_4px_9px_rgba(75,70,92,0.1)]">
@@ -47,7 +40,7 @@ export default async function VerifyEmailPage({ searchParams }: Props) {
         </div>
 
         <div className="flex flex-col gap-4">
-          <form action={skipAction}>
+          <form action={skipVerificationAction}>
             <Button type="submit" className="w-full">
               {t("skipForNow")}
             </Button>

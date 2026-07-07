@@ -103,6 +103,11 @@ export async function logoutAction(): Promise<void> {
   redirect(`/${locale}${authService.getLogoutRedirect()}`)
 }
 
+export async function skipVerificationAction(): Promise<void> {
+  const locale = await getLocale()
+  redirect(`/${locale}${ROUTES.dashboard}`)
+}
+
 export async function twoStepVerificationAction(
   _prevState: ActionState,
   formData: FormData
@@ -113,8 +118,8 @@ export async function twoStepVerificationAction(
     return { error: "invalidVerificationCode" }
   }
 
-  // Demo mode: accept code 230320
-  if (code !== "230320") {
+  const isDemoCode = process.env.NODE_ENV === "development" && code === "230320"
+  if (!isDemoCode) {
     try {
       await authService.verifyTwoStep(code)
     } catch {
