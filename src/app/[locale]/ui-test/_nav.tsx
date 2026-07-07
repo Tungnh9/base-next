@@ -11,6 +11,7 @@ const TABS = [
   { label: "Feedback", slug: "feedback" },
   { label: "Navigation", slug: "navigation" },
   { label: "Overlay", slug: "overlay" },
+  { label: "Editor", slug: "editor" },
 ]
 
 export function UiTestNav() {
@@ -18,9 +19,9 @@ export function UiTestNav() {
   const { locale } = useParams<{ locale: string }>()
 
   return (
-    <nav className="sticky top-0 z-10 bg-background border-b flex flex-wrap gap-1 px-8 py-3">
-      <span className="self-center mr-2 text-sm font-semibold text-foreground">UI Test</span>
-      {TABS.map(tab => {
+    <nav className="bg-background sticky top-0 z-10 flex flex-wrap gap-1 border-b px-8 py-3">
+      <span className="text-foreground mr-2 self-center text-sm font-semibold">UI Test</span>
+      {TABS.map((tab) => {
         const href = `/${locale}/ui-test/${tab.slug}`
         const isActive = pathname.includes(`/ui-test/${tab.slug}`)
         return (
@@ -28,7 +29,7 @@ export function UiTestNav() {
             key={tab.slug}
             href={href}
             className={cn(
-              "px-4 py-1.5 rounded-md text-sm font-medium transition-colors",
+              "rounded-md px-4 py-1.5 text-sm font-medium transition-colors",
               isActive
                 ? "bg-primary text-primary-foreground"
                 : "text-muted-foreground hover:text-foreground hover:bg-accent"

@@ -108,5 +108,77 @@
     "placeholder": "Search (Ctrl+/)",
     "quickNav": "Quick navigation",
     "noResults": "No results found"
+  },
+  "editor": {
+    "placeholder": "Start writing...",
+    "heading": {
+      "paragraph": "Paragraph",
+      "h1": "Heading 1",
+      "h2": "Heading 2",
+      "h3": "Heading 3",
+      "h4": "Heading 4",
+      "blockquote": "Quote",
+      "codeBlock": "Code block"
+    },
+    "color": {
+      "removeColor": "Remove color",
+      "removeHighlight": "Remove highlight"
+    },
+    "toolbar": {
+      "undo": "Undo (Ctrl+Z)",
+      "redo": "Redo (Ctrl+Y)",
+      "bold": "Bold (Ctrl+B)",
+      "italic": "Italic (Ctrl+I)",
+      "underline": "Underline (Ctrl+U)",
+      "strike": "Strikethrough",
+      "code": "Inline code",
+      "codeBlock": "Code block",
+      "heading": "Block type",
+      "blockquote": "Blockquote",
+      "bulletList": "Bullet list",
+      "orderedList": "Ordered list",
+      "taskList": "Task list",
+      "link": "Add link",
+      "image": "Insert image",
+      "table": "Insert table",
+      "alignLeft": "Align left",
+      "alignCenter": "Align center",
+      "alignRight": "Align right",
+      "alignJustify": "Justify",
+      "textColor": "Text color",
+      "highlight": "Highlight",
+      "clearFormat": "Clear formatting",
+      "horizontalRule": "Horizontal rule"
+    },
+    "link": {
+      "title": "Add link",
+      "open": "Open link",
+      "remove": "Remove link"
+    },
+    "image": {
+      "title": "Insert image",
+      "uploadTab": "Upload",
+      "urlTab": "From URL",
+      "urlPlaceholder": "https://example.com/image.png",
+      "insertBtn": "Insert image",
+      "uploading": "Uploading...",
+      "uploadError": "Upload failed",
+      "uploadTitle": "Drop image here",
+      "uploadSubtitle": "Or click to select a file (max 5MB)"
+    },
+    "table": {
+      "insert": "Insert 3×3 table",
+      "addRowBefore": "Add row before",
+      "addRowAfter": "Add row after",
+      "deleteRow": "Delete row",
+      "addColBefore": "Add column before",
+      "addColAfter": "Add column after",
+      "deleteCol": "Delete column",
+      "deleteTable": "Delete table",
+      "mergeCells": "Merge cells",
+      "splitCell": "Split cell"
+    },
+    "characters": "{count} characters",
+    "charactersMax": "{count}/{max} characters"
   }
 }
