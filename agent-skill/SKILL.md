@@ -88,6 +88,7 @@ ASSUMPTIONS:
 **Dùng khi:** Bắt đầu session mới hoặc switch sang task khác.
 
 **Bước 1 — Load context cốt lõi:**
+
 ```
 Đọc theo thứ tự:
 1. CLAUDE.md        → Rules project-wide
@@ -97,6 +98,7 @@ ASSUMPTIONS:
 ```
 
 **Bước 2 — Xác định context của task:**
+
 ```
 Task liên quan đến feature X?
 → Đọc src/features/[X]/ nếu đã tồn tại
@@ -111,6 +113,7 @@ Task liên quan đến auth?
 ```
 
 **Bước 3 — Nhận diện version Next.js:**
+
 ```
 ⚠️ Đây là Next.js 16 — có breaking changes so với 14/15.
 - middleware.ts → KHÔNG dùng, thay bằng proxy.ts
@@ -131,13 +134,16 @@ Trước khi viết code, tạo spec tối thiểu:
 ## Feature: [Tên]
 
 ### Objective
+
 [Tính năng này làm gì? User cần gì?]
 
 ### Scope
+
 - Sẽ làm: [...]
 - Không làm lần này: [...]
 
 ### Files sẽ thay đổi
+
 - [ ] src/features/[name]/types.ts
 - [ ] src/features/[name]/schemas.ts
 - [ ] src/features/[name]/api.ts hoặc actions.ts
@@ -146,6 +152,7 @@ Trước khi viết code, tạo spec tối thiểu:
 - [ ] messages/vi.json + messages/en.json
 
 ### Acceptance Criteria
+
 - [ ] [Điều kiện cụ thể, testable]
 - [ ] [Điều kiện cụ thể, testable]
 ```
@@ -169,14 +176,18 @@ src/features/[feature-name]/
 ```
 
 **Route page — shell mỏng, không logic:**
+
 ```tsx
 // src/app/[locale]/(protected)/[feature]/page.tsx
-import { FeatureList } from "@/features/[feature]/components/[feature]-list";
+import { FeatureList } from "@/features/[feature]/components/[feature]-list"
 
 export default function FeaturePage() {
-  return <FeatureList />;
+  return <FeatureList />
 }
 ```
+
+**Scaffold tự động:** `bash agent-skill/scripts/scaffold-feature.sh <feature-name>`
+Tạo đủ types.ts, schemas.ts, api.ts, actions.ts, components/, route page.tsx.
 
 ### Phase 3: Implement theo vertical slices
 
@@ -244,14 +255,14 @@ export const [ComponentName]: FC<[ComponentName]Props> = ({
 
 ### Rules
 
-| Rule | Đúng | Sai |
-|------|------|-----|
-| Export | Named export | Default export |
-| String | `t("key")` | `"Tiêu đề"` hardcode |
-| ClassName | `cn("a", condition && "b")` | String concatenation |
-| Icon | `import { X } from "lucide-react"` | Emoji hoặc SVG inline |
-| State global | Zustand store | useState xuyên component |
-| Type | Explicit interface | `any` hoặc `object` |
+| Rule         | Đúng                               | Sai                      |
+| ------------ | ---------------------------------- | ------------------------ |
+| Export       | Named export                       | Default export           |
+| String       | `t("key")`                         | `"Tiêu đề"` hardcode     |
+| ClassName    | `cn("a", condition && "b")`        | String concatenation     |
+| Icon         | `import { X } from "lucide-react"` | Emoji hoặc SVG inline    |
+| State global | Zustand store                      | useState xuyên component |
+| Type         | Explicit interface                 | `any` hoặc `object`      |
 
 ### shadcn/ui Component
 
@@ -259,10 +270,10 @@ Dùng component có sẵn trước khi tạo mới:
 
 ```tsx
 // ✅ Dùng shadcn
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Toast } from "@/components/ui/toast"; // dùng sonner
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { Toast } from "@/components/ui/toast" // dùng sonner
 
 // Thêm component mới từ shadcn — hỏi trước
 // npx shadcn@latest add [component-name]
@@ -358,20 +369,20 @@ const PUBLIC_PATHS = [
   "/en/login",
   "/vi/register",
   "/en/register",
-  "/vi/[route-mới]",  // ← Thêm đây
+  "/vi/[route-mới]", // ← Thêm đây
   "/en/[route-mới]",
-];
+]
 ```
 
 ### Session handling
 
 ```ts
 // Đọc session — dùng helper có sẵn
-import { getSession } from "@/lib/auth";
+import { getSession } from "@/lib/auth"
 
 // Trong Server Component
-const session = await getSession();
-if (!session) redirect("/login");
+const session = await getSession()
+if (!session) redirect("/login")
 
 // KHÔNG tự đọc cookie trực tiếp — dùng getSession()
 ```
@@ -447,6 +458,9 @@ const t = useTranslations("HomePage");
 3. Kiểm tra proxy.ts có cần update PUBLIC_PATHS không
 4. next-intl tự xử lý routing
 ```
+
+**Verify i18n sync:** `bash agent-skill/scripts/check-i18n.sh`
+Output JSON với danh sách keys thiếu ở mỗi ngôn ngữ.
 
 ---
 
@@ -532,15 +546,15 @@ Bước 5 — GUARD
 
 ```ts
 // ❌ Patch lỗi TS bằng any
-const data: any = response;
+const data: any = response
 
 // ✅ Dùng type guard
 function isUser(data: unknown): data is User {
-  return typeof data === "object" && data !== null && "id" in data;
+  return typeof data === "object" && data !== null && "id" in data
 }
 
 // ✅ Dùng unknown + assert
-const data = response as unknown as User; // chỉ khi chắc chắn về shape
+const data = response as unknown as User // chỉ khi chắc chắn về shape
 ```
 
 ### Next.js 16 specific errors
@@ -581,6 +595,13 @@ Nếu sau 2 lần thử vẫn không reproduce được lỗi → DỪNG, báo c
 [ ] Không có file .env.local hoặc secret trong staged files
 [ ] git diff --staged → review lại một lần cuối
 ```
+
+**Script tự động:** `bash agent-skill/scripts/pre-commit-check.sh`
+Chạy lint + build + secret scan + i18n check, output JSON.
+
+> `npm run build` và README sync check được enforce bởi Husky **pre-push** hook.
+> Nếu system files thay đổi mà README.md chưa cập nhật, push sẽ bị block.
+> Bypass (chỉ khi biết chắc không cần update docs): `git push --no-verify`
 
 ### Commit message format
 
