@@ -52,7 +52,32 @@ export const authService = {
     return ROUTES.login
   },
 
+  async forgotPassword(email: string): Promise<void> {
+    const { error } = await authApi.forgotPassword({ email })
+    if (error) throw new AuthError(error.message, "FORGOT_PASSWORD_FAILED")
+  },
+
+  async resetPassword(data: { password: string; token: string }): Promise<void> {
+    const { error } = await authApi.resetPassword(data)
+    if (error) throw new AuthError(error.message, "RESET_PASSWORD_FAILED")
+  },
+
   async logout(): Promise<void> {
     await clearSessionCookie()
+  },
+
+  async resendVerificationEmail(email: string): Promise<void> {
+    const { error } = await authApi.resendVerificationEmail({ email })
+    if (error) throw new AuthError(error.message, "RESEND_FAILED")
+  },
+
+  async verifyTwoStep(code: string): Promise<void> {
+    const { error } = await authApi.verifyTwoStep({ code })
+    if (error) throw new AuthError(error.message, "VERIFY_TWO_STEP_FAILED")
+  },
+
+  async resendTwoStepCode(): Promise<void> {
+    const { error } = await authApi.resendTwoStepCode()
+    if (error) throw new AuthError(error.message, "RESEND_FAILED")
   },
 }

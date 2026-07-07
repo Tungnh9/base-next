@@ -3,7 +3,16 @@ import { jwtVerify } from "jose"
 import { locales, defaultLocale } from "@/i18n/config"
 
 // Path segments (without locale prefix) that don't require auth
-const PUBLIC_PATHS = ["/login", "/register", "/api/health", "/ui-test"]
+const PUBLIC_PATHS = [
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/reset-password",
+  "/verify-email",
+  "/two-step-verification",
+  "/api/health",
+  "/ui-test",
+]
 // URL prefixes to skip entirely (static assets)
 const SKIP_PREFIXES = ["/_next", "/favicon.ico"]
 
