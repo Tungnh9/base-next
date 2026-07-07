@@ -16,6 +16,7 @@ Next.js 16 base template — scalable, production-ready, dùng được cho mọ
 | Tables        | TanStack Table v8                  |
 | Icons         | lucide-react                       |
 | Notifications | Sonner + shadcn Toast (Radix)      |
+| Rich Text     | TipTap v3 (ProseMirror)            |
 
 ---
 
@@ -66,10 +67,17 @@ base-next/
     │           ├── feedback/     # Alert, Toast, Sonner, Dialog
     │           ├── navigation/   # Breadcrumb, Pagination, Accordion
     │           ├── overlay/      # Tooltip, Popover, DropdownMenu
-    │           └── display/      # Card, Avatar, Badge, Progress, Carousel, Table...
+    │           ├── display/      # Card, Avatar, Badge, Progress, Carousel, Table...
+    │           └── editor/       # RichTextEditor + RichTextViewer demo
     │
     ├── components/
     │   ├── ui/                   # shadcn/ui primitives (xem mục UI Components)
+    │   ├── editor/               # WYSIWYG rich text editor (TipTap v3)
+    │   │   ├── index.ts          # Barrel exports: RichTextEditor, RichTextViewer
+    │   │   ├── extensions.ts     # createExtensions() — cấu hình tất cả TipTap extensions
+    │   │   ├── rich-text-editor.tsx   # Main editor component ("use client")
+    │   │   ├── rich-text-viewer.tsx   # SSR-safe read-only renderer
+    │   │   └── toolbar/          # Toolbar sub-components
     │   ├── layout/               # Layout dùng chung toàn app
     │   │   ├── header.tsx        # Server component: search, locale switcher, notifications, user menu
     │   │   ├── sidebar.tsx       # Client component: collapsible nav, dùng Zustand
@@ -78,7 +86,7 @@ base-next/
     │   │   ├── sidebar-toggle-button.tsx
     │   │   └── user-menu.tsx     # Radix DropdownMenu với Logout action
     │   └── common/
-    │       └── providers.tsx     # NextIntlClientProvider + ThemeProvider + Toaster
+    │       └── providers.tsx     # NextIntlClientProvider + ThemeProvider + TooltipProvider + Toaster
     │
     ├── features/                 # Feature-sliced: mỗi tính năng là 1 module độc lập
     │   └── auth/                 # Module xác thực
@@ -191,6 +199,26 @@ Tất cả nằm trong `src/components/ui/`. Demo tại `/[locale]/ui-test/`.
 | `data-table`   | TanStack Table với column sorting, row selection                     |
 | `theme-toggle` | Dark/Light/System switcher                                           |
 
+### Rich Text Editor
+
+`src/components/editor/` — dùng TipTap v3 (ProseMirror).
+
+```tsx
+import { RichTextEditor, RichTextViewer } from "@/components/editor"
+import type { JSONContent } from "@tiptap/react"
+
+// Controlled editor (lưu dạng JSON)
+const [content, setContent] = useState<JSONContent>()
+<RichTextEditor value={content} onChange={setContent} />
+
+// Read-only viewer (Server Component)
+<RichTextViewer content={content} />
+```
+
+Toolbar: Undo/Redo · Heading · Bold/Italic/Underline/Strike/Code · Text color · Highlight · Alignment · Lists · Checklist · Link · Image (upload + URL) · Table · HR · Clear format.
+
+Upload ảnh: `POST /api/upload` — validate image/*, max 5MB, lưu vào `public/uploads/`. **Production**: thay bằng S3/R2.
+
 ---
 
 ## Bảo vệ route
@@ -204,10 +232,12 @@ Chạy trước khi bất kỳ component nào render. Verify JWT từ session co
 ```
 proxy.ts
 ├── Bỏ qua: /_next/*, /favicon.ico, file tĩnh
-├── PUBLIC_PATHS: /login, /register, /api/health  ← thêm path public tại đây
+├── PUBLIC_PATHS: locale-prefixed paths (/vi/login, /en/login, ...)  ← thêm path public tại đây
 ├── Unauthenticated → redirect /[locale]/login?callbackUrl=...
 └── Dùng jose để verify JWT (không cần DB call)
 ```
+
+> `PUBLIC_PATHS` phải bao gồm cả prefix locale. Ví dụ: `"/vi/login"` và `"/en/login"` — không phải chỉ `"/login"`.
 
 ### Tầng 2 — `(protected)/layout.tsx` (server component)
 
