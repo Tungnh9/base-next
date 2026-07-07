@@ -638,24 +638,24 @@ refactor/[what]            → refactor
 chore/[task]               → maintenance
 ```
 
-### Quy trình đầy đủ: Commit → Review → Push
+### Quy trình đầy đủ: Review → Pre-commit → Commit → Push
 
 ```
-Bước 1 — Pre-commit
+Bước 1 — Code Review (KHÔNG SKIP)
+  Spawn agent với subagent_type="code-reviewer" (hoặc general-purpose)
+  Prompt: "Review các thay đổi hiện tại theo 5 review-gates trong SKILL.md.
+           Báo cáo: PASS/FAIL từng gate, issue cụ thể (file:line), severity."
+  → Nếu FAIL: fix issues → review lại từ đầu
+  → Nếu PASS: tiếp tục bước 2
+
+Bước 2 — Pre-commit
   npm run lint && npm run build
   Kiểm tra staged: không có .env.local, không có secret
   git diff --staged
 
-Bước 2 — Commit
+Bước 3 — Commit
   git add [files cụ thể]
   git commit -m "<type>(<scope>): <mô tả>"
-
-Bước 3 — Code Review (KHÔNG SKIP)
-  Spawn agent với subagent_type="code-reviewer" (hoặc general-purpose)
-  Prompt: "Review diff của commit vừa tạo theo 5 review-gates trong SKILL.md.
-           Báo cáo: PASS/FAIL từng gate, issue cụ thể (file:line), severity."
-  → Nếu FAIL: fix → re-commit → review lại (không push khi còn issue)
-  → Nếu PASS: tiếp tục bước 4
 
 Bước 4 — Push
   git push origin [branch]
