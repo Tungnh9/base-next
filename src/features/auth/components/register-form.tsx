@@ -13,22 +13,36 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { useLoginAction } from "../hooks/use-auth"
-import { createLoginSchema, type LoginInput } from "../schemas"
+import { useRegisterAction } from "../hooks/use-auth"
+import { createRegisterSchema, type RegisterInput } from "../schemas"
 
-export function LoginForm() {
+export function RegisterForm() {
   const tAuth = useTranslations("auth")
   const tVal = useTranslations("validation")
-  const { state, action, isPending } = useLoginAction()
+  const { state, action, isPending } = useRegisterAction()
 
-  const form = useForm<LoginInput>({
-    resolver: zodResolver(createLoginSchema(tVal)),
-    defaultValues: { email: "", password: "" },
+  const form = useForm<RegisterInput>({
+    resolver: zodResolver(createRegisterSchema(tVal)),
+    defaultValues: { name: "", email: "", password: "", confirmPassword: "" },
   })
 
   return (
     <Form {...form}>
       <form action={action} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{tAuth("name")}</FormLabel>
+              <FormControl>
+                <Input type="text" autoComplete="name" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <FormField
           control={form.control}
           name="email"
@@ -50,7 +64,21 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>{tAuth("password")}</FormLabel>
               <FormControl>
-                <Input type="password" autoComplete="current-password" {...field} />
+                <Input type="password" autoComplete="new-password" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{tAuth("confirmPassword")}</FormLabel>
+              <FormControl>
+                <Input type="password" autoComplete="new-password" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -60,7 +88,7 @@ export function LoginForm() {
         {state.error && <p className="text-destructive text-sm">{tAuth(state.error as never)}</p>}
 
         <Button type="submit" className="w-full" disabled={isPending}>
-          {isPending ? tAuth("loading") : tAuth("login")}
+          {isPending ? tAuth("loading") : tAuth("register")}
         </Button>
       </form>
     </Form>

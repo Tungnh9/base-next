@@ -8,11 +8,7 @@ import { cn } from "@/lib/utils"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export type CarouselVariant =
-  | "slide-only"
-  | "with-control"
-  | "with-indicator"
-  | "with-caption"
+export type CarouselVariant = "slide-only" | "with-control" | "with-indicator" | "with-caption"
 
 export interface CarouselSlide {
   image: string
@@ -66,12 +62,12 @@ function Carousel({
 
   const prev = React.useCallback(() => {
     if (count === 0) return
-    setCurrentIndex(i => (i - 1 + count) % count)
+    setCurrentIndex((i) => (i - 1 + count) % count)
   }, [count])
 
   const next = React.useCallback(() => {
     if (count === 0) return
-    setCurrentIndex(i => (i + 1) % count)
+    setCurrentIndex((i) => (i + 1) % count)
   }, [count])
 
   const goTo = React.useCallback(
@@ -84,7 +80,8 @@ function Carousel({
 
   // Clamp currentIndex when the slides array shrinks so it never points out of range
   React.useEffect(() => {
-    setCurrentIndex(i => (count > 0 && i >= count ? count - 1 : i))
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCurrentIndex((i) => (count > 0 && i >= count ? count - 1 : i))
   }, [count])
 
   React.useEffect(() => {
@@ -102,8 +99,7 @@ function Carousel({
   )
 
   const showControls = variant !== "slide-only"
-  const showIndicators =
-    variant === "with-indicator" || variant === "with-caption"
+  const showIndicators = variant === "with-indicator" || variant === "with-caption"
   const showCaption = variant === "with-caption"
   const current = slides[currentIndex]
 
@@ -114,8 +110,12 @@ function Carousel({
         aria-roledescription="carousel"
         aria-label={label}
         className={cn("relative w-full overflow-hidden rounded-md", className)}
-        onMouseEnter={() => { isPausedRef.current = true }}
-        onMouseLeave={() => { isPausedRef.current = false }}
+        onMouseEnter={() => {
+          isPausedRef.current = true
+        }}
+        onMouseLeave={() => {
+          isPausedRef.current = false
+        }}
       >
         {/* Visually hidden — text content changes on each slide, triggering screen reader announcement.
             CSS transform on the slide strip does not mutate DOM text, so aria-live there is ineffective. */}
@@ -136,10 +136,7 @@ function Carousel({
         {showIndicators && <CarouselIndicators />}
 
         {showCaption && (
-          <CarouselCaption
-            label={current?.label}
-            description={current?.description}
-          />
+          <CarouselCaption label={current?.label} description={current?.description} />
         )}
       </div>
     </CarouselContext.Provider>
@@ -189,18 +186,19 @@ function CarouselItem({
       role="group"
       aria-roledescription="slide"
       {...props}
-      className={cn("relative flex-[0_0_100%] h-full", className)}
+      className={cn("relative h-full flex-[0_0_100%]", className)}
     >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={slide.image}
         alt={slide.alt ?? ""}
-        className="absolute inset-0 size-full object-cover pointer-events-none select-none"
+        className="pointer-events-none absolute inset-0 size-full object-cover select-none"
         draggable={false}
       />
 
       {showTitle && slide.title && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <p className="text-[38px] font-semibold leading-[52px] text-white whitespace-nowrap drop-shadow-md">
+          <p className="text-[38px] leading-[52px] font-semibold whitespace-nowrap text-white drop-shadow-md">
             {slide.title}
           </p>
         </div>
@@ -228,15 +226,17 @@ function CarouselNavButton({
       onClick={isPrev ? prev : next}
       aria-label={isPrev ? t("prevSlide") : t("nextSlide")}
       className={cn(
-        "absolute top-0 z-10 h-full flex items-center transition-colors cursor-pointer",
+        "absolute top-0 z-10 flex h-full cursor-pointer items-center transition-colors",
         "text-white/70 hover:text-white",
-        isPrev ? "left-0 pl-5 pr-2" : "right-0 pr-5 pl-2",
+        isPrev ? "left-0 pr-2 pl-5" : "right-0 pr-5 pl-2",
         className
       )}
     >
-      {isPrev
-        ? <ChevronLeft className="size-[30px]" strokeWidth={1.5} />
-        : <ChevronRight className="size-[30px]" strokeWidth={1.5} />}
+      {isPrev ? (
+        <ChevronLeft className="size-[30px]" strokeWidth={1.5} />
+      ) : (
+        <ChevronRight className="size-[30px]" strokeWidth={1.5} />
+      )}
     </button>
   )
 }
@@ -260,7 +260,7 @@ function CarouselIndicators({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex items-end gap-2",
+        "absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-end gap-2",
         className
       )}
     >
@@ -272,7 +272,7 @@ function CarouselIndicators({ className }: { className?: string }) {
           aria-label={t("goToSlide", { index: i + 1 })}
           aria-pressed={i === currentIndex}
           className={cn(
-            "h-[5px] w-[35px] rounded-[6px] transition-all duration-300 cursor-pointer",
+            "h-[5px] w-[35px] cursor-pointer rounded-[6px] transition-all duration-300",
             i === currentIndex ? "bg-white hover:opacity-80" : "bg-white/40 hover:bg-white/65"
           )}
         />
@@ -296,18 +296,14 @@ function CarouselCaption({
   return (
     <div
       className={cn(
-        "absolute bottom-[51px] left-[60px] right-[60px] z-10",
+        "absolute right-[60px] bottom-[51px] left-[60px] z-10",
         "flex flex-col gap-2 text-center text-white",
         className
       )}
     >
-      {label && (
-        <p className="text-[18px] font-semibold leading-[24px]">{label}</p>
-      )}
+      {label && <p className="text-[18px] leading-[24px] font-semibold">{label}</p>}
       {description && (
-        <p className="text-[15px] font-normal leading-[22px] opacity-90">
-          {description}
-        </p>
+        <p className="text-[15px] leading-[22px] font-normal opacity-90">{description}</p>
       )}
     </div>
   )

@@ -2,25 +2,44 @@
 
 import { useState } from "react"
 import {
-  Settings, User, LogOut, CreditCard, Mail, MessageSquare,
-  PlusCircle, Plus, GitBranch, LifeBuoy, Cloud, ChevronRight,
+  Settings,
+  User,
+  LogOut,
+  CreditCard,
+  Mail,
+  MessageSquare,
+  PlusCircle,
+  Plus,
+  GitBranch,
+  LifeBuoy,
+  Cloud,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
 import {
-  Popover, PopoverTrigger, PopoverContent, PopoverTitle, PopoverBody,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverTitle,
+  PopoverBody,
 } from "@/components/ui/popover"
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip"
 import {
-  Tooltip, TooltipTrigger, TooltipContent, TooltipProvider,
-} from "@/components/ui/tooltip"
-import {
-  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
-  DropdownMenuItem, DropdownMenuCheckboxItem, DropdownMenuRadioGroup,
-  DropdownMenuRadioItem, DropdownMenuLabel, DropdownMenuSeparator,
-  DropdownMenuShortcut, DropdownMenuGroup, DropdownMenuSub,
-  DropdownMenuSubTrigger, DropdownMenuSubContent,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuCheckboxItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuGroup,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu"
 
 function DropdownCheckboxDemo() {
@@ -31,7 +50,9 @@ function DropdownCheckboxDemo() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm">Checkbox Items</Button>
+        <Button variant="outline" size="sm">
+          Checkbox Items
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
         <DropdownMenuLabel>Appearance</DropdownMenuLabel>
@@ -39,7 +60,11 @@ function DropdownCheckboxDemo() {
         <DropdownMenuCheckboxItem checked={showStatusBar} onCheckedChange={setShowStatusBar}>
           Status Bar
         </DropdownMenuCheckboxItem>
-        <DropdownMenuCheckboxItem checked={showActivityBar} onCheckedChange={setShowActivityBar} disabled>
+        <DropdownMenuCheckboxItem
+          checked={showActivityBar}
+          onCheckedChange={setShowActivityBar}
+          disabled
+        >
           Activity Bar
         </DropdownMenuCheckboxItem>
         <DropdownMenuCheckboxItem checked={showPanel} onCheckedChange={setShowPanel}>
@@ -56,7 +81,9 @@ function DropdownRadioDemo() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm">Radio Items</Button>
+        <Button variant="outline" size="sm">
+          Radio Items
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
         <DropdownMenuLabel>Panel Position</DropdownMenuLabel>
@@ -95,7 +122,9 @@ export default function OverlayPage() {
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon"><Settings /></Button>
+                  <Button variant="ghost" size="icon">
+                    <Settings />
+                  </Button>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Settings</p>
@@ -104,7 +133,9 @@ export default function OverlayPage() {
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button size="icon"><User /></Button>
+                  <Button size="icon">
+                    <User />
+                  </Button>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>View profile</p>
@@ -116,10 +147,12 @@ export default function OverlayPage() {
           <div className="flex flex-col gap-3">
             <h6>Placements</h6>
             <div className="flex flex-wrap items-center gap-4">
-              {(["top", "right", "bottom", "left"] as const).map(side => (
+              {(["top", "right", "bottom", "left"] as const).map((side) => (
                 <Tooltip key={side}>
                   <TooltipTrigger asChild>
-                    <Button variant="outline" size="sm">{side}</Button>
+                    <Button variant="outline" size="sm">
+                      {side}
+                    </Button>
                   </TooltipTrigger>
                   <TooltipContent side={side}>
                     <p>Tooltip on {side}</p>
@@ -152,10 +185,12 @@ export default function OverlayPage() {
           <div className="flex flex-col gap-3">
             <h6>Placements</h6>
             <div className="flex flex-wrap gap-4">
-              {(["top", "right", "bottom", "left"] as const).map(side => (
+              {(["top", "right", "bottom", "left"] as const).map((side) => (
                 <Popover key={side}>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" size="sm">{side}</Button>
+                    <Button variant="outline" size="sm">
+                      {side}
+                    </Button>
                   </PopoverTrigger>
                   <PopoverContent side={side}>
                     <PopoverTitle>Popover — {side}</PopoverTitle>
@@ -175,7 +210,7 @@ export default function OverlayPage() {
               <PopoverContent>
                 <PopoverTitle>Dimensions</PopoverTitle>
                 <PopoverBody>Set the dimensions for the layer.</PopoverBody>
-                <div className="flex flex-col gap-3 mt-4">
+                <div className="mt-4 flex flex-col gap-3">
                   <div className="flex flex-col gap-1.5">
                     <Label htmlFor="pop-width">Width</Label>
                     <Input id="pop-width" defaultValue="100%" size="sm" />
@@ -184,7 +219,9 @@ export default function OverlayPage() {
                     <Label htmlFor="pop-max-width">Max. width</Label>
                     <Input id="pop-max-width" defaultValue="300px" size="sm" />
                   </div>
-                  <Button size="sm" className="w-full mt-1">Apply</Button>
+                  <Button size="sm" className="mt-1 w-full">
+                    Apply
+                  </Button>
                 </div>
               </PopoverContent>
             </Popover>
@@ -199,7 +236,9 @@ export default function OverlayPage() {
             <h6>Basic</h6>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="self-start">Open Menu</Button>
+                <Button variant="outline" className="self-start">
+                  Open Menu
+                </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
@@ -229,24 +268,40 @@ export default function OverlayPage() {
             <h6>With Groups</h6>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="self-start">Open Menu</Button>
+                <Button variant="outline" className="self-start">
+                  Open Menu
+                </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56">
                 <DropdownMenuGroup>
                   <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                  <DropdownMenuItem><Plus /> New file</DropdownMenuItem>
-                  <DropdownMenuItem><PlusCircle /> New folder</DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Plus /> New file
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <PlusCircle /> New folder
+                  </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuLabel>Share</DropdownMenuLabel>
-                  <DropdownMenuItem><Mail /> Email</DropdownMenuItem>
-                  <DropdownMenuItem><MessageSquare /> Message</DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Mail /> Email
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <MessageSquare /> Message
+                  </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem><GitBranch /> GitHub</DropdownMenuItem>
-                <DropdownMenuItem><LifeBuoy /> Support</DropdownMenuItem>
-                <DropdownMenuItem disabled><Cloud /> API (disabled)</DropdownMenuItem>
+                <DropdownMenuItem>
+                  <GitBranch /> GitHub
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <LifeBuoy /> Support
+                </DropdownMenuItem>
+                <DropdownMenuItem disabled>
+                  <Cloud /> API (disabled)
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -263,11 +318,17 @@ export default function OverlayPage() {
             <h6>Sub Menu</h6>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="self-start">Open Menu</Button>
+                <Button variant="outline" className="self-start">
+                  Open Menu
+                </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56">
-                <DropdownMenuItem><User /> Profile</DropdownMenuItem>
-                <DropdownMenuItem><CreditCard /> Billing</DropdownMenuItem>
+                <DropdownMenuItem>
+                  <User /> Profile
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <CreditCard /> Billing
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger>
@@ -281,7 +342,9 @@ export default function OverlayPage() {
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem><LogOut /> Log out</DropdownMenuItem>
+                <DropdownMenuItem>
+                  <LogOut /> Log out
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

@@ -19,7 +19,10 @@ const CustomOptionContext = React.createContext<CustomOptionContextValue>({ type
 
 // ─── Group ────────────────────────────────────────────────────────────────────
 
-interface CustomOptionGroupProps extends Omit<React.ComponentProps<typeof RadioGroupPrimitive.Root>, "asChild"> {
+interface CustomOptionGroupProps extends Omit<
+  React.ComponentProps<typeof RadioGroupPrimitive.Root>,
+  "asChild"
+> {
   /** "radio" renders a single-select RadioGroup; "checkbox" wraps children in a plain div */
   type?: CustomOptionType
   className?: string
@@ -51,6 +54,42 @@ function CustomOptionGroup({
         {children}
       </RadioGroupPrimitive.Root>
     </CustomOptionContext.Provider>
+  )
+}
+
+// ─── Indicator sub-components (module-level to satisfy react-hooks/static-components) ──
+
+function RadioCircle({ className: cls }: { className?: string }) {
+  return (
+    <span
+      aria-hidden
+      className={cn(
+        "inline-flex size-[18px] shrink-0 rounded-full",
+        "border-muted-foreground/60 border-[1.5px]",
+        "group-data-[state=checked]:border-primary group-data-[state=checked]:border-[5px]",
+        "group-data-[state=checked]:bg-card group-data-[state=checked]:shadow-[0px_2px_4px_rgba(165,163,174,0.3)]",
+        cls
+      )}
+    />
+  )
+}
+
+function CheckboxBox({ checked, className: cls }: { checked?: boolean; className?: string }) {
+  return (
+    <span
+      aria-hidden
+      data-state={checked ? "checked" : "unchecked"}
+      className={cn(
+        "inline-flex shrink-0 items-center justify-center",
+        "size-[18px] rounded-[4px] border-[1.5px]",
+        "border-muted-foreground/60 bg-transparent",
+        "data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground",
+        "data-[state=checked]:shadow-[0px_2px_2px_rgba(165,163,174,0.3)]",
+        cls
+      )}
+    >
+      {checked && <CheckIcon className="size-3.5" />}
+    </span>
   )
 }
 
@@ -104,44 +143,12 @@ function CustomOptionItem({
     "disabled:cursor-[no-drop] disabled:opacity-50",
     "data-[disabled]:cursor-[no-drop] data-[disabled]:opacity-50",
     disabled && "cursor-[no-drop] opacity-50",
-    className,
-  )
-
-  // ── Radio circle indicator (visual only — parent button handles interaction) ─
-  const RadioCircle = ({ className: cls }: { className?: string }) => (
-    <span
-      aria-hidden
-      className={cn(
-        "inline-flex shrink-0 size-[18px] rounded-full",
-        "border-[1.5px] border-muted-foreground/60",
-        "group-data-[state=checked]:border-[5px] group-data-[state=checked]:border-primary",
-        "group-data-[state=checked]:bg-card group-data-[state=checked]:shadow-[0px_2px_4px_rgba(165,163,174,0.3)]",
-        cls,
-      )}
-    />
-  )
-
-  // ── Checkbox indicator ────────────────────────────────────────────────────
-  const CheckboxBox = ({ className: cls }: { className?: string }) => (
-    <span
-      aria-hidden
-      data-state={checked ? "checked" : "unchecked"}
-      className={cn(
-        "inline-flex shrink-0 items-center justify-center",
-        "size-[18px] rounded-[4px] border-[1.5px]",
-        "border-muted-foreground/60 bg-transparent",
-        "data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground",
-        "data-[state=checked]:shadow-[0px_2px_2px_rgba(165,163,174,0.3)]",
-        cls,
-      )}
-    >
-      {checked && <CheckIcon className="size-3.5" />}
-    </span>
+    className
   )
 
   // Badge element
   const BadgeEl = badge ? (
-    <span className="ml-auto shrink-0 rounded bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+    <span className="bg-muted text-muted-foreground ml-auto shrink-0 rounded px-2 py-0.5 text-xs font-medium">
       {badge}
     </span>
   ) : null
@@ -152,21 +159,20 @@ function CustomOptionItem({
   if (variant === "horizontal") {
     const inner = (
       <div className="flex items-start gap-3 p-4">
-        {type === "radio"
-          ? <RadioCircle className="mt-0.5" />
-          : <CheckboxBox className="mt-0.5" />
-        }
-        <div className="flex flex-1 flex-col gap-1 min-w-0">
+        {type === "radio" ? (
+          <RadioCircle className="mt-0.5" />
+        ) : (
+          <CheckboxBox checked={checked} className="mt-0.5" />
+        )}
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
           {(label || badge) && (
             <div className="flex items-center gap-2">
-              {label && (
-                <span className="font-medium leading-none text-foreground">{label}</span>
-              )}
+              {label && <span className="text-foreground leading-none font-medium">{label}</span>}
               {BadgeEl}
             </div>
           )}
           {description && (
-            <p className="text-sm leading-normal text-muted-foreground">{description}</p>
+            <p className="text-muted-foreground text-sm leading-normal">{description}</p>
           )}
         </div>
       </div>
@@ -181,7 +187,7 @@ function CustomOptionItem({
           className={cn(
             sharedCardClass,
             "group w-full text-left",
-            "data-[state=checked]:border-primary data-[state=checked]:shadow-sm",
+            "data-[state=checked]:border-primary data-[state=checked]:shadow-sm"
           )}
         >
           {inner}
@@ -207,21 +213,14 @@ function CustomOptionItem({
   if (variant === "vertical") {
     const inner = (
       <div className="flex flex-col items-center gap-4 px-4 py-6 text-center">
-        {icon && (
-          <div className="text-primary [&>svg]:size-8">{icon}</div>
-        )}
+        {icon && <div className="text-primary [&>svg]:size-8">{icon}</div>}
         <div className="flex flex-col gap-1">
-          {label && (
-            <span className="font-semibold leading-tight text-foreground">{label}</span>
-          )}
+          {label && <span className="text-foreground leading-tight font-semibold">{label}</span>}
           {description && (
-            <p className="text-sm leading-normal text-muted-foreground">{description}</p>
+            <p className="text-muted-foreground text-sm leading-normal">{description}</p>
           )}
         </div>
-        {type === "radio"
-          ? <RadioCircle />
-          : <CheckboxBox />
-        }
+        {type === "radio" ? <RadioCircle /> : <CheckboxBox checked={checked} />}
       </div>
     )
 
@@ -234,7 +233,7 @@ function CustomOptionItem({
           className={cn(
             sharedCardClass,
             "group w-full",
-            "data-[state=checked]:border-primary data-[state=checked]:shadow-sm",
+            "data-[state=checked]:border-primary data-[state=checked]:shadow-sm"
           )}
         >
           {inner}
@@ -262,14 +261,10 @@ function CustomOptionItem({
       <>
         {image && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={image}
-            alt={imageAlt ?? label ?? ""}
-            className="h-full w-full object-cover"
-          />
+          <img src={image} alt={imageAlt ?? label ?? ""} className="h-full w-full object-cover" />
         )}
         {type === "checkbox" && (
-          <CheckboxBox className="absolute right-3 top-3" />
+          <CheckboxBox checked={checked} className="absolute top-3 right-3" />
         )}
       </>
     )
@@ -283,7 +278,7 @@ function CustomOptionItem({
           className={cn(
             sharedCardClass,
             "group aspect-[4/3] overflow-hidden p-0",
-            "data-[state=checked]:border-primary data-[state=checked]:shadow-sm",
+            "data-[state=checked]:border-primary data-[state=checked]:shadow-sm"
           )}
         >
           {inner}
@@ -298,7 +293,7 @@ function CustomOptionItem({
         className={cn(
           sharedCardClass,
           "aspect-[4/3] overflow-hidden p-0",
-          checked && "border-primary shadow-sm",
+          checked && "border-primary shadow-sm"
         )}
         onClick={() => !disabled && onCheckedChange?.(!checked)}
       >

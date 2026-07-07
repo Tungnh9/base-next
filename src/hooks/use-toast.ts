@@ -32,10 +32,10 @@ export interface ToastOptions {
 
 export type ToasterToast = Required<Pick<ToastOptions, "id" | "open">> & ToastOptions
 
-const ADD_TOAST    = "ADD_TOAST"    as const
+const ADD_TOAST = "ADD_TOAST" as const
 const UPDATE_TOAST = "UPDATE_TOAST" as const
 const DISMISS_TOAST = "DISMISS_TOAST" as const
-const REMOVE_TOAST  = "REMOVE_TOAST"  as const
+const REMOVE_TOAST = "REMOVE_TOAST" as const
 
 type Action =
   | { type: typeof ADD_TOAST; toast: ToasterToast }
@@ -70,9 +70,7 @@ function reducer(state: State, action: Action): State {
     case UPDATE_TOAST:
       return {
         ...state,
-        toasts: state.toasts.map((t) =>
-          t.id === action.toast.id ? { ...t, ...action.toast } : t
-        ),
+        toasts: state.toasts.map((t) => (t.id === action.toast.id ? { ...t, ...action.toast } : t)),
       }
     case DISMISS_TOAST: {
       const { toastId } = action
@@ -83,17 +81,13 @@ function reducer(state: State, action: Action): State {
       }
       return {
         ...state,
-        toasts: state.toasts.map((t) =>
-          !toastId || t.id === toastId ? { ...t, open: false } : t
-        ),
+        toasts: state.toasts.map((t) => (!toastId || t.id === toastId ? { ...t, open: false } : t)),
       }
     }
     case REMOVE_TOAST:
       return {
         ...state,
-        toasts: action.toastId
-          ? state.toasts.filter((t) => t.id !== action.toastId)
-          : [],
+        toasts: action.toastId ? state.toasts.filter((t) => t.id !== action.toastId) : [],
       }
   }
 }
@@ -105,7 +99,11 @@ function dispatch(action: Action) {
   memoryState = reducer(memoryState, action)
   // Iterate over a snapshot so a listener that throws doesn't silently drop subsequent ones
   listeners.slice().forEach((l) => {
-    try { l(memoryState) } catch (e) { console.error("[use-toast] listener error", e) }
+    try {
+      l(memoryState)
+    } catch (e) {
+      console.error("[use-toast] listener error", e)
+    }
   })
 }
 
@@ -118,7 +116,7 @@ function genId(): string {
 function toast(options: Omit<ToastOptions, "id">) {
   const id = genId()
 
-  const update  = (o: Partial<ToastOptions>) => dispatch({ type: UPDATE_TOAST,  toast: { ...o, id } })
+  const update = (o: Partial<ToastOptions>) => dispatch({ type: UPDATE_TOAST, toast: { ...o, id } })
   const dismiss = () => dispatch({ type: DISMISS_TOAST, toastId: id })
 
   dispatch({
@@ -126,10 +124,13 @@ function toast(options: Omit<ToastOptions, "id">) {
     toast: {
       ...options,
       id,
-      type:    options.type    ?? "simple",
+      type: options.type ?? "simple",
       variant: options.variant ?? "default",
       open: true,
-      onOpenChange: (open) => { options.onOpenChange?.(open); if (!open) dismiss() },
+      onOpenChange: (open) => {
+        options.onOpenChange?.(open)
+        if (!open) dismiss()
+      },
     },
   })
 
@@ -142,6 +143,7 @@ function useToast() {
   React.useEffect(() => {
     listeners.push(setState)
     // Sync any dispatches that fired between render and this effect
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setState(memoryState)
     return () => {
       const index = listeners.indexOf(setState)

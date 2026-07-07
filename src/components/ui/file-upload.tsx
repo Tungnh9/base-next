@@ -110,6 +110,7 @@ function FileUpload({
 
   return (
     <div className={cn("flex flex-col gap-3", className)} {...props}>
+      {/* eslint-disable-next-line jsx-a11y/role-supports-aria-props */}
       <div
         role="button"
         tabIndex={disabled ? -1 : 0}
@@ -125,20 +126,22 @@ function FileUpload({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={cn(
-          "flex min-h-[200px] cursor-pointer flex-col items-center justify-center gap-4 rounded-[6px] border border-dashed border-border px-6 py-10 text-center outline-none transition-colors",
-          "focus-visible:border-primary focus-visible:ring-[3px] focus-visible:ring-ring/50",
-          "data-[invalid=true]:border-destructive data-[invalid=true]:ring-[3px] data-[invalid=true]:ring-destructive/20 dark:data-[invalid=true]:ring-destructive/40",
+          "border-border flex min-h-[200px] cursor-pointer flex-col items-center justify-center gap-4 rounded-[6px] border border-dashed px-6 py-10 text-center transition-colors outline-none",
+          "focus-visible:border-primary focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+          "data-[invalid=true]:border-destructive data-[invalid=true]:ring-destructive/20 dark:data-[invalid=true]:ring-destructive/40 data-[invalid=true]:ring-[3px]",
           isDragging && "border-primary bg-primary/[0.04]",
           disabled && "cursor-not-allowed opacity-50"
         )}
       >
-        <span className="flex shrink-0 items-center justify-center rounded-[6px] bg-foreground/[0.08] p-[10px]">
-          <Upload className="size-7 text-foreground" strokeWidth={1.5} />
+        <span className="bg-foreground/[0.08] flex shrink-0 items-center justify-center rounded-[6px] p-[10px]">
+          <Upload className="text-foreground size-7" strokeWidth={1.5} />
         </span>
         {(title || subtitle) && (
           <div className="flex flex-col gap-1">
-            {title && <p className="text-[22px] leading-[30px] font-semibold text-foreground">{title}</p>}
-            {subtitle && <p className="text-[15px] leading-[22px] text-text-body">{subtitle}</p>}
+            {title && (
+              <p className="text-foreground text-[22px] leading-[30px] font-semibold">{title}</p>
+            )}
+            {subtitle && <p className="text-text-body text-[15px] leading-[22px]">{subtitle}</p>}
           </div>
         )}
         <input
@@ -164,15 +167,19 @@ function FileUpload({
           {files.map((file, index) => (
             <li
               key={`${file.name}-${file.size}-${file.lastModified}-${index}`}
-              className="flex items-center justify-between gap-3 rounded-[6px] border border-border bg-card px-3 py-2"
+              className="border-border bg-card flex items-center justify-between gap-3 rounded-[6px] border px-3 py-2"
             >
               <div className="flex min-w-0 items-center gap-3">
-                <span className="flex shrink-0 items-center justify-center rounded-[6px] bg-foreground/[0.08] p-2">
-                  <FileIcon className="size-4 text-foreground" />
+                <span className="bg-foreground/[0.08] flex shrink-0 items-center justify-center rounded-[6px] p-2">
+                  <FileIcon className="text-foreground size-4" />
                 </span>
                 <div className="flex min-w-0 flex-col">
-                  <span className="truncate text-[14px] font-medium text-foreground">{file.name}</span>
-                  <span className="text-[13px] text-muted-foreground">{formatFileSize(file.size)}</span>
+                  <span className="text-foreground truncate text-[14px] font-medium">
+                    {file.name}
+                  </span>
+                  <span className="text-muted-foreground text-[13px]">
+                    {formatFileSize(file.size)}
+                  </span>
                 </div>
               </div>
               <button
@@ -180,7 +187,7 @@ function FileUpload({
                 onClick={() => handleRemove(index)}
                 disabled={disabled}
                 aria-label={removeLabel?.(file.name)}
-                className="shrink-0 rounded-[4px] p-1.5 text-muted-foreground outline-none transition-colors hover:bg-foreground/[0.08] hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
+                className="text-muted-foreground hover:bg-foreground/[0.08] hover:text-foreground shrink-0 rounded-[4px] p-1.5 transition-colors outline-none disabled:pointer-events-none disabled:opacity-50"
               >
                 <X className="size-4" />
               </button>

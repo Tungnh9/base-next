@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { ChevronLeft, ChevronRight, CalendarDays, Clock3 } from "lucide-react"
+import { ChevronLeft, ChevronRight, CalendarDays } from "lucide-react"
 import { useLocale, useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -63,8 +63,8 @@ export interface DateRange {
 }
 
 export interface TimeValue {
-  hours: number    // 1–12
-  minutes: number  // 0–59
+  hours: number // 1–12
+  minutes: number // 0–59
   period: "AM" | "PM"
 }
 
@@ -84,8 +84,8 @@ function NavButton({
       type="button"
       onClick={onClick}
       className={cn(
-        "size-7 rounded-full border border-border flex items-center justify-center",
-        "text-muted-foreground hover:bg-primary/10 hover:text-primary hover:border-primary transition-colors cursor-pointer",
+        "border-border flex size-7 items-center justify-center rounded-full border",
+        "text-muted-foreground hover:bg-primary/10 hover:text-primary hover:border-primary cursor-pointer transition-colors",
         className
       )}
     >
@@ -109,7 +109,15 @@ interface MonthGridProps {
 }
 
 function MonthGrid({
-  year, month, mode, selected, rangeFrom, rangeTo, hovered, onSelect, onHover,
+  year,
+  month,
+  mode,
+  selected,
+  rangeFrom,
+  rangeTo,
+  hovered,
+  onSelect,
+  onHover,
 }: MonthGridProps) {
   const locale = useLocale()
   const dayLabels = getDayLabels(locale)
@@ -137,9 +145,12 @@ function MonthGrid({
   return (
     <div>
       {/* Day header row */}
-      <div className="grid grid-cols-7 mb-1">
-        {dayLabels.map(d => (
-          <div key={d} className="h-9 flex items-center justify-center text-xs font-medium text-muted-foreground">
+      <div className="mb-1 grid grid-cols-7">
+        {dayLabels.map((d) => (
+          <div
+            key={d}
+            className="text-muted-foreground flex h-9 items-center justify-center text-xs font-medium"
+          >
             {d}
           </div>
         ))}
@@ -151,17 +162,17 @@ function MonthGrid({
           const t = date.getTime()
           const isStart = mode === "range" && effFrom && isSameDay(date, effFrom)
           const isEnd = mode === "range" && effTo && isSameDay(date, effTo)
-          const inRange = mode === "range" && effFrom && effTo &&
-            t > effFrom.getTime() && t < effTo.getTime()
+          const inRange =
+            mode === "range" && effFrom && effTo && t > effFrom.getTime() && t < effTo.getTime()
           const isSel = mode === "single" && selected && isSameDay(date, selected)
-          const isActive = mode === "single" ? isSel : (isStart || isEnd)
+          const isActive = mode === "single" ? isSel : isStart || isEnd
           const isTodayCell = !outside && isToday(date)
           const col = i % 7
 
           return (
             <div
               key={i}
-              className="relative h-9 flex items-center justify-center"
+              className="relative flex h-9 items-center justify-center"
               onMouseEnter={() => mode === "range" && !outside && onHover?.(date)}
               onMouseLeave={() => mode === "range" && onHover?.(undefined)}
             >
@@ -169,16 +180,16 @@ function MonthGrid({
               {mode === "range" && (isStart || isEnd || inRange) && (
                 <div
                   className={cn(
-                    "absolute inset-y-[3px] bg-primary/[.16]",
+                    "bg-primary/[.16] absolute inset-y-[3px]",
                     inRange && "inset-x-0",
                     inRange && col === 0 && "rounded-l-full",
                     inRange && col === 6 && "rounded-r-full",
-                    !outside && isStart && !isEnd && "left-1/2 right-0",
+                    !outside && isStart && !isEnd && "right-0 left-1/2",
                     outside && isStart && !isEnd && "inset-x-0",
-                    !outside && isEnd && !isStart && "left-0 right-1/2",
+                    !outside && isEnd && !isStart && "right-1/2 left-0",
                     outside && isEnd && !isStart && "inset-x-0",
                     outside && isEnd && !isStart && col === 6 && "rounded-r-full",
-                    isStart && isEnd && "inset-x-0 rounded-full",
+                    isStart && isEnd && "inset-x-0 rounded-full"
                   )}
                 />
               )}
@@ -189,18 +200,18 @@ function MonthGrid({
                   type="button"
                   onClick={() => onSelect(date)}
                   className={cn(
-                    "relative z-10 size-9 rounded-full flex items-center justify-center",
-                    "text-[15px] select-none transition-colors",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
+                    "relative z-10 flex size-9 items-center justify-center rounded-full",
+                    "text-[15px] transition-colors select-none",
+                    "focus-visible:ring-ring/50 focus-visible:ring-2 focus-visible:outline-none",
                     !isActive && "cursor-pointer",
-                    isTodayCell && !isActive && "ring-2 ring-primary text-primary font-semibold",
-                    isActive && "bg-primary text-primary-foreground font-semibold cursor-pointer",
+                    isTodayCell && !isActive && "ring-primary text-primary font-semibold ring-2",
+                    isActive && "bg-primary text-primary-foreground cursor-pointer font-semibold"
                   )}
                 >
                   {date.getDate()}
                 </button>
               ) : (
-                <span className="size-9 rounded-full flex items-center justify-center text-[15px] text-muted-foreground/40 select-none">
+                <span className="text-muted-foreground/40 flex size-9 items-center justify-center rounded-full text-[15px] select-none">
                   {date.getDate()}
                 </span>
               )}
@@ -230,24 +241,35 @@ export function Calendar({ value, onChange, className }: CalendarProps) {
   const valueTs = value?.getTime() ?? null
   React.useEffect(() => {
     if (value) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setYear(value.getFullYear())
       setMonth(value.getMonth())
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [valueTs])
 
-  const prev = () => { const [y, m] = shiftMonth(year, month, -1); setYear(y); setMonth(m) }
-  const next = () => { const [y, m] = shiftMonth(year, month, 1); setYear(y); setMonth(m) }
+  const prev = () => {
+    const [y, m] = shiftMonth(year, month, -1)
+    setYear(y)
+    setMonth(m)
+  }
+  const next = () => {
+    const [y, m] = shiftMonth(year, month, 1)
+    setYear(y)
+    setMonth(m)
+  }
 
   return (
-    <div className={cn(
-      "w-[280px] rounded-xl bg-card p-4",
-      "[filter:drop-shadow(0_4px_9px_rgba(75,70,92,0.10))]",
-      className
-    )}>
+    <div
+      className={cn(
+        "bg-card w-[280px] rounded-xl p-4",
+        "[filter:drop-shadow(0_4px_9px_rgba(75,70,92,0.10))]",
+        className
+      )}
+    >
       {/* Header */}
-      <div className="flex items-center justify-between mb-4 px-1">
-        <span className="font-semibold text-[15px] text-foreground">
+      <div className="mb-4 flex items-center justify-between px-1">
+        <span className="text-foreground text-[15px] font-semibold">
           {getMonthName(locale, year, month)} {year}
         </span>
         <div className="flex gap-2">
@@ -261,7 +283,7 @@ export function Calendar({ value, onChange, className }: CalendarProps) {
         month={month}
         mode="single"
         selected={value}
-        onSelect={d => onChange?.(d)}
+        onSelect={(d) => onChange?.(d)}
       />
     </div>
   )
@@ -277,19 +299,28 @@ export interface RangeCalendarProps {
   className?: string
 }
 
-export function RangeCalendar({ value, onChange, onApply, onCancel, className }: RangeCalendarProps) {
+export function RangeCalendar({
+  value,
+  onChange,
+  onApply,
+  onCancel,
+  className,
+}: RangeCalendarProps) {
   const locale = useLocale()
   const t = useTranslations()
   const today = new Date()
   const [year, setYear] = React.useState(value?.from?.getFullYear() ?? today.getFullYear())
   const [month, setMonth] = React.useState(value?.from?.getMonth() ?? today.getMonth())
   const [hovered, setHovered] = React.useState<Date | undefined>()
-  const [internal, setInternal] = React.useState<DateRange>(value ?? { from: undefined, to: undefined })
+  const [internal, setInternal] = React.useState<DateRange>(
+    value ?? { from: undefined, to: undefined }
+  )
 
   // Sync internal state and view when controlled value changes externally
   const fromTs = value?.from?.getTime() ?? null
   const toTs = value?.to?.getTime() ?? null
   React.useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setInternal(value ?? { from: undefined, to: undefined })
     if (value?.from) {
       setYear(value.from.getFullYear())
@@ -299,8 +330,16 @@ export function RangeCalendar({ value, onChange, onApply, onCancel, className }:
   }, [fromTs, toTs])
 
   const [nextYear, nextMonth] = shiftMonth(year, month, 1)
-  const prev = () => { const [y, m] = shiftMonth(year, month, -1); setYear(y); setMonth(m) }
-  const next = () => { const [y, m] = shiftMonth(year, month, 1); setYear(y); setMonth(m) }
+  const prev = () => {
+    const [y, m] = shiftMonth(year, month, -1)
+    setYear(y)
+    setMonth(m)
+  }
+  const next = () => {
+    const [y, m] = shiftMonth(year, month, 1)
+    setYear(y)
+    setMonth(m)
+  }
 
   function handleSelect(d: Date) {
     if (!internal.from || internal.to) {
@@ -308,9 +347,8 @@ export function RangeCalendar({ value, onChange, onApply, onCancel, className }:
       setInternal(next)
       onChange?.(next)
     } else {
-      const range: DateRange = d < internal.from
-        ? { from: d, to: internal.from }
-        : { from: internal.from, to: d }
+      const range: DateRange =
+        d < internal.from ? { from: d, to: internal.from } : { from: internal.from, to: d }
       setInternal(range)
       onChange?.(range)
     }
@@ -324,18 +362,20 @@ export function RangeCalendar({ value, onChange, onApply, onCancel, className }:
         : ""
 
   return (
-    <div className={cn(
-      "rounded-xl bg-card [filter:drop-shadow(0_4px_9px_rgba(75,70,92,0.10))] overflow-hidden",
-      className
-    )}>
+    <div
+      className={cn(
+        "bg-card overflow-hidden rounded-xl [filter:drop-shadow(0_4px_9px_rgba(75,70,92,0.10))]",
+        className
+      )}
+    >
       {/* Dual-month header */}
-      <div className="flex items-center px-4 pt-4 pb-2 gap-2">
+      <div className="flex items-center gap-2 px-4 pt-4 pb-2">
         <NavButton icon={<ChevronLeft className="size-4" />} onClick={prev} />
         <div className="flex flex-1">
-          <span className="flex-1 text-center font-semibold text-[15px] text-foreground">
+          <span className="text-foreground flex-1 text-center text-[15px] font-semibold">
             {getMonthName(locale, year, month)} {year}
           </span>
-          <span className="flex-1 text-center font-semibold text-[15px] text-foreground">
+          <span className="text-foreground flex-1 text-center text-[15px] font-semibold">
             {getMonthName(locale, nextYear, nextMonth)} {nextYear}
           </span>
         </div>
@@ -343,7 +383,7 @@ export function RangeCalendar({ value, onChange, onApply, onCancel, className }:
       </div>
 
       {/* Two month grids */}
-      <div className="flex px-4 pb-2 gap-0 divide-x divide-border">
+      <div className="divide-border flex gap-0 divide-x px-4 pb-2">
         <div className="flex-1 pr-4">
           <MonthGrid
             year={year}
@@ -371,9 +411,11 @@ export function RangeCalendar({ value, onChange, onApply, onCancel, className }:
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-border">
-        <span className="flex-1 text-sm text-muted-foreground font-medium">{displayRange}</span>
-        <Button variant="outline" size="sm" onClick={onCancel}>{t("common.cancel")}</Button>
+      <div className="border-border flex items-center justify-end gap-2 border-t px-4 py-3">
+        <span className="text-muted-foreground flex-1 text-sm font-medium">{displayRange}</span>
+        <Button variant="outline" size="sm" onClick={onCancel}>
+          {t("common.cancel")}
+        </Button>
         <Button
           size="sm"
           disabled={!internal.from || !internal.to}
@@ -389,8 +431,8 @@ export function RangeCalendar({ value, onChange, onApply, onCancel, className }:
 // ─── Month Picker ─────────────────────────────────────────────────────────────
 
 export interface MonthPickerProps {
-  value?: number           // 0–11
-  currentMonth?: number    // 0–11, highlights with light style
+  value?: number // 0–11
+  currentMonth?: number // 0–11, highlights with light style
   onChange?: (month: number) => void
   className?: string
 }
@@ -402,10 +444,12 @@ export function MonthPicker({ value, currentMonth, onChange, className }: MonthP
   const year = today.getFullYear()
 
   return (
-    <div className={cn(
-      "w-[140px] rounded-xl bg-card py-2 [filter:drop-shadow(0_4px_9px_rgba(75,70,92,0.10))]",
-      className
-    )}>
+    <div
+      className={cn(
+        "bg-card w-[140px] rounded-xl py-2 [filter:drop-shadow(0_4px_9px_rgba(75,70,92,0.10))]",
+        className
+      )}
+    >
       {Array.from({ length: 12 }, (_, i) => {
         const name = getMonthName(locale, year, i)
         const isActive = value === i
@@ -417,10 +461,10 @@ export function MonthPicker({ value, currentMonth, onChange, className }: MonthP
             type="button"
             onClick={() => onChange?.(i)}
             className={cn(
-              "w-full px-4 py-2 text-[15px] text-center transition-colors rounded-[6px] cursor-pointer",
+              "w-full cursor-pointer rounded-[6px] px-4 py-2 text-center text-[15px] transition-colors",
               !isActive && !isCurrent && "text-foreground hover:bg-accent",
               isCurrent && "bg-primary/[.16] text-primary font-medium",
-              isActive && "bg-primary text-primary-foreground font-semibold",
+              isActive && "bg-primary text-primary-foreground font-semibold"
             )}
           >
             {name}
@@ -469,14 +513,17 @@ function TimeSegment({
         type="text"
         inputMode="numeric"
         value={draft}
-        onChange={e => setDraft(e.target.value.replace(/\D/g, "").slice(0, 2))}
+        onChange={(e) => setDraft(e.target.value.replace(/\D/g, "").slice(0, 2))}
         onBlur={() => commit(draft || String(value))}
-        onKeyDown={e => {
+        onKeyDown={(e) => {
           if (e.key === "Enter") commit(draft || String(value))
-          if (e.key === "Escape") { setEditing(false); setDraft("") }
+          if (e.key === "Escape") {
+            setEditing(false)
+            setDraft("")
+          }
         }}
         className={cn(
-          "w-10 h-10 rounded-md border border-primary bg-transparent text-center font-semibold text-[17px] text-foreground outline-none",
+          "border-primary text-foreground h-10 w-10 rounded-md border bg-transparent text-center text-[17px] font-semibold outline-none",
           className
         )}
       />
@@ -486,10 +533,13 @@ function TimeSegment({
   return (
     <button
       type="button"
-      onClick={() => { setEditing(true); setDraft("") }}
+      onClick={() => {
+        setEditing(true)
+        setDraft("")
+      }}
       className={cn(
-        "w-10 h-10 rounded-md border border-border flex items-center justify-center",
-        "font-semibold text-[17px] text-foreground hover:border-primary transition-colors select-none cursor-pointer",
+        "border-border flex h-10 w-10 items-center justify-center rounded-md border",
+        "text-foreground hover:border-primary cursor-pointer text-[17px] font-semibold transition-colors select-none",
         className
       )}
     >
@@ -505,18 +555,20 @@ export function TimePicker({ value, onChange, className }: TimePickerProps) {
   const set = (patch: Partial<TimeValue>) => onChange?.({ ...t, ...patch })
 
   return (
-    <div className={cn(
-      "inline-flex items-center gap-1.5 rounded-xl bg-card px-4 py-3",
-      "[filter:drop-shadow(0_4px_9px_rgba(75,70,92,0.10))]",
-      className
-    )}>
-      <TimeSegment value={t.hours} min={1} max={12} onChange={v => set({ hours: v })} />
-      <span className="text-[17px] font-bold text-muted-foreground">:</span>
-      <TimeSegment value={t.minutes} min={0} max={59} onChange={v => set({ minutes: v })} />
+    <div
+      className={cn(
+        "bg-card inline-flex items-center gap-1.5 rounded-xl px-4 py-3",
+        "[filter:drop-shadow(0_4px_9px_rgba(75,70,92,0.10))]",
+        className
+      )}
+    >
+      <TimeSegment value={t.hours} min={1} max={12} onChange={(v) => set({ hours: v })} />
+      <span className="text-muted-foreground text-[17px] font-bold">:</span>
+      <TimeSegment value={t.minutes} min={0} max={59} onChange={(v) => set({ minutes: v })} />
       <button
         type="button"
         onClick={() => set({ period: t.period === "AM" ? "PM" : "AM" })}
-        className="ml-1 w-10 h-10 rounded-md border border-border flex items-center justify-center font-semibold text-[15px] text-foreground hover:border-primary hover:text-primary transition-colors cursor-pointer"
+        className="border-border text-foreground hover:border-primary hover:text-primary ml-1 flex h-10 w-10 cursor-pointer items-center justify-center rounded-md border text-[15px] font-semibold transition-colors"
       >
         {t.period}
       </button>
@@ -566,22 +618,22 @@ export function DatePicker({
           type="button"
           disabled={disabled}
           className={cn(
-            "inline-flex items-center gap-2 h-[38px] rounded-md border border-input bg-transparent",
-            "px-3 text-sm text-foreground cursor-pointer transition-colors",
-            "hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
+            "border-input inline-flex h-[38px] items-center gap-2 rounded-md border bg-transparent",
+            "text-foreground cursor-pointer px-3 text-sm transition-colors",
+            "hover:border-primary focus-visible:ring-ring/50 focus-visible:ring-2 focus-visible:outline-none",
             "disabled:cursor-not-allowed disabled:opacity-50",
             !display && "text-muted-foreground",
             mode === "range" ? "w-[260px]" : "w-[180px]",
             className
           )}
         >
-          <CalendarDays className="size-4 shrink-0 text-muted-foreground" />
-          <span className="flex-1 text-left truncate">{display || ph}</span>
+          <CalendarDays className="text-muted-foreground size-4 shrink-0" />
+          <span className="flex-1 truncate text-left">{display || ph}</span>
         </button>
       </PopoverTrigger>
       <PopoverContent
         className={cn(
-          "p-0 w-auto [filter:drop-shadow(0_4px_9px_rgba(75,70,92,0.10))] border-none bg-transparent",
+          "w-auto border-none bg-transparent p-0 [filter:drop-shadow(0_4px_9px_rgba(75,70,92,0.10))]"
         )}
         align="start"
         sideOffset={6}
@@ -589,13 +641,19 @@ export function DatePicker({
         {mode === "single" ? (
           <Calendar
             value={value as Date | undefined}
-            onChange={d => { onChange?.(d); setOpen(false) }}
+            onChange={(d) => {
+              onChange?.(d)
+              setOpen(false)
+            }}
           />
         ) : (
           <RangeCalendar
             value={value as DateRange | undefined}
-            onChange={r => onChange?.(r)}
-            onApply={r => { onChange?.(r); setOpen(false) }}
+            onChange={(r) => onChange?.(r)}
+            onApply={(r) => {
+              onChange?.(r)
+              setOpen(false)
+            }}
             onCancel={() => setOpen(false)}
           />
         )}

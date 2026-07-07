@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useParams, usePathname } from "next/navigation"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight, Menu } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { useUiStore } from "@/stores"
 import { cn } from "@/lib/utils"
 import { Separator } from "@/components/ui/separator"
@@ -13,6 +14,7 @@ import { NAV } from "@/config/nav"
 export function Sidebar() {
   const pathname = usePathname()
   const { locale } = useParams<{ locale: string }>()
+  const t = useTranslations()
   const { sidebarCollapsed, toggleSidebarCollapsed, sidebarOpen, toggleSidebar, setSidebarOpen } =
     useUiStore()
 
@@ -91,18 +93,19 @@ export function Sidebar() {
                   <Separator className="mx-auto my-3 w-6" />
                 ) : (
                   <p className="text-muted-foreground px-[30px] pt-5 pb-1.5 text-[11px] uppercase">
-                    {section.title}
+                    {t(section.title as never)}
                   </p>
                 ))}
               <ul className="flex flex-col gap-1 px-3.5">
                 {section.items.map((item) => {
                   const href = `/${locale}${item.href}`
                   const isActive = pathname === href || pathname.startsWith(href + "/")
+                  const label = t(item.label as never)
                   return (
                     <li key={item.href}>
                       <Link
                         href={href}
-                        title={sidebarCollapsed ? item.label : undefined}
+                        title={sidebarCollapsed ? label : undefined}
                         className={cn(
                           "flex items-center gap-2 rounded-[6px] py-[9px] text-[15px] transition-colors",
                           sidebarCollapsed ? "justify-center px-[10px]" : "px-4",
@@ -114,7 +117,7 @@ export function Sidebar() {
                         <item.icon className="size-[22px] shrink-0" />
                         {!sidebarCollapsed && (
                           <>
-                            <span className="flex-1 truncate">{item.label}</span>
+                            <span className="flex-1 truncate">{label}</span>
                             {item.badge !== undefined && (
                               <span className="bg-sidebar-primary/16 text-sidebar-primary flex size-[22px] items-center justify-center rounded-full text-[13px] font-semibold">
                                 {item.badge}

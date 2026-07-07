@@ -7,7 +7,7 @@ function Card({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card"
       className={cn(
-        "flex flex-col rounded-xl bg-card text-card-foreground overflow-hidden shadow-card",
+        "bg-card text-card-foreground shadow-card flex flex-col overflow-hidden rounded-xl",
         className
       )}
       {...props}
@@ -15,12 +15,9 @@ function Card({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
-function CardImage({
-  className,
-  alt = "",
-  ...props
-}: React.ComponentProps<"img">) {
+function CardImage({ className, alt = "", ...props }: React.ComponentProps<"img">) {
   return (
+    // eslint-disable-next-line @next/next/no-img-element
     <img
       data-slot="card-image"
       alt={alt}
@@ -41,20 +38,14 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="card-title"
-      className={cn("font-semibold", className)}
-      {...props}
-    />
-  )
+  return <div data-slot="card-title" className={cn("font-semibold", className)} {...props} />
 }
 
 function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-description"
-      className={cn("text-sm text-muted-foreground", className)}
+      className={cn("text-muted-foreground text-sm", className)}
       {...props}
     />
   )
@@ -62,11 +53,7 @@ function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
 
 function CardContent({ className, ...props }: React.ComponentProps<"div">) {
   return (
-    <div
-      data-slot="card-content"
-      className={cn("flex flex-col gap-3 p-6", className)}
-      {...props}
-    />
+    <div data-slot="card-content" className={cn("flex flex-col gap-3 p-6", className)} {...props} />
   )
 }
 

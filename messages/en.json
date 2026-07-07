@@ -17,16 +17,30 @@
     "email": "Email",
     "password": "Password",
     "confirmPassword": "Confirm password",
+    "name": "Full name",
     "forgotPassword": "Forgot password?",
     "loginSuccess": "Logged in successfully",
     "logoutSuccess": "Logged out successfully",
+    "loginFailed": "Login failed, please try again",
+    "registerFailed": "Registration failed, please try again",
+    "registerSuccess": "Registration successful",
     "invalidCredentials": "Invalid email or password",
     "noAccount": "Don't have an account?",
-    "hasAccount": "Already have an account?"
+    "hasAccount": "Already have an account?",
+    "loading": "Signing in..."
+  },
+  "validation": {
+    "emailInvalid": "Invalid email address",
+    "passwordMin": "Password must be at least 6 characters",
+    "nameMin": "Name must be at least 2 characters",
+    "passwordMismatch": "Passwords do not match"
   },
   "nav": {
     "home": "Home",
-    "dashboard": "Dashboard"
+    "dashboard": "Dashboard",
+    "analytics": "Analytics",
+    "calendar": "Calendar",
+    "sectionAppsAndPages": "Apps & Pages"
   },
   "errors": {
     "notFound": "Page not found",

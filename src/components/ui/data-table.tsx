@@ -13,8 +13,12 @@ import {
 import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
-  Table, TableHeader, TableBody, TableRow,
-  TableHead, TableCell,
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
 } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
 
@@ -82,10 +86,9 @@ function DataTable<TData>({
     enableSorting: false,
   }
 
-  const allColumns: ColumnDef<TData>[] = selectable
-    ? [selectionColumn, ...columns]
-    : columns
+  const allColumns: ColumnDef<TData>[] = selectable ? [selectionColumn, ...columns] : columns
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns: allColumns,
@@ -108,12 +111,7 @@ function DataTable<TData>({
   })
 
   return (
-    <Table
-      striped={striped}
-      hoverable={hoverable}
-      bordered={bordered}
-      className={className}
-    >
+    <Table striped={striped} hoverable={hoverable} bordered={bordered} className={className}>
       <TableHeader>
         {table.getHeaderGroups().map((headerGroup) => (
           <TableRow key={headerGroup.id} className="hover:bg-transparent">
@@ -124,21 +122,19 @@ function DataTable<TData>({
               return (
                 <TableHead
                   key={header.id}
-                  className={cn(
-                    header.column.id === "__select__" && "w-10 pr-3",
-                  )}
+                  className={cn(header.column.id === "__select__" && "w-10 pr-3")}
                 >
                   {header.isPlaceholder ? null : canSort ? (
                     <button
                       type="button"
                       onClick={header.column.getToggleSortingHandler()}
-                      className="inline-flex items-center gap-1 hover:text-foreground transition-colors focus-visible:outline-none"
+                      className="hover:text-foreground inline-flex items-center gap-1 transition-colors focus-visible:outline-none"
                     >
                       {flexRender(header.column.columnDef.header, header.getContext())}
                       {sorted === "asc" ? (
-                        <ChevronUp className="size-3.5 text-primary" />
+                        <ChevronUp className="text-primary size-3.5" />
                       ) : sorted === "desc" ? (
-                        <ChevronDown className="size-3.5 text-primary" />
+                        <ChevronDown className="text-primary size-3.5" />
                       ) : (
                         <ChevronsUpDown className="size-3.5 opacity-50" />
                       )}
@@ -164,14 +160,8 @@ function DataTable<TData>({
               {row.getVisibleCells().map((cell) => (
                 <TableCell
                   key={cell.id}
-                  className={cn(
-                    cell.column.id === "__select__" && "w-10 pr-3",
-                  )}
-                  onClick={
-                    cell.column.id === "__select__"
-                      ? (e) => e.stopPropagation()
-                      : undefined
-                  }
+                  className={cn(cell.column.id === "__select__" && "w-10 pr-3")}
+                  onClick={cell.column.id === "__select__" ? (e) => e.stopPropagation() : undefined}
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </TableCell>
@@ -182,7 +172,7 @@ function DataTable<TData>({
           <TableRow className="hover:bg-transparent">
             <TableCell
               colSpan={allColumns.length}
-              className="h-24 text-center text-muted-foreground"
+              className="text-muted-foreground h-24 text-center"
             >
               {emptyMessage}
             </TableCell>

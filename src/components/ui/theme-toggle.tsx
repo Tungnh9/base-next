@@ -2,16 +2,12 @@
 
 import { Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
-import { useUiStore } from "@/stores/ui-store"
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme()
-  const setZustandTheme = useUiStore((s) => s.setTheme)
 
   const toggle = () => {
-    const next = theme === "dark" ? "light" : "dark"
-    setTheme(next)
-    setZustandTheme(next)
+    setTheme(theme === "dark" ? "light" : "dark")
   }
 
   return (

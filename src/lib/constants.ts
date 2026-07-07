@@ -3,6 +3,8 @@ export const ROUTES = {
   login: "/login",
   register: "/register",
   dashboard: "/dashboard",
-} as const;
+  analytics: "/analytics",
+  calendar: "/calendar",
+} as const
 
-export type Route = (typeof ROUTES)[keyof typeof ROUTES];
+export type Route = (typeof ROUTES)[keyof typeof ROUTES]

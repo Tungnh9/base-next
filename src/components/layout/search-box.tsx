@@ -14,7 +14,10 @@ export function SearchBox() {
   const t = useTranslations()
   const { locale } = useParams<{ locale: string }>()
 
-  const filtered = NAV_ITEMS.filter((r) => r.label.toLowerCase().includes(query.toLowerCase()))
+  const filtered = NAV_ITEMS.filter((r) => {
+    const label = t(r.label as never)
+    return label.toLowerCase().includes(query.toLowerCase())
+  })
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -52,7 +55,7 @@ export function SearchBox() {
                 className="text-foreground hover:bg-accent flex items-center gap-2 rounded-[6px] px-4 py-2 text-[15px] transition-colors"
               >
                 <r.icon className="text-muted-foreground size-[18px]" />
-                {r.label}
+                {t(r.label as never)}
               </Link>
             ))
           )}
