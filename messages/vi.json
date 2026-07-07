@@ -65,6 +65,7 @@
     "didntGetEmail": "Không nhận được email?",
     "resend": "Gửi lại",
     "resendSuccess": "Đã gửi! Kiểm tra hộp thư của bạn.",
+    "resendCodeSuccess": "Đã gửi! Kiểm tra điện thoại của bạn.",
     "resendFailed": "Gửi lại thất bại, vui lòng thử lại",
     "twoStepTitle": "Xác minh hai bước 💬",
     "twoStepSubtitle": "Chúng tôi đã gửi mã xác minh đến điện thoại của bạn. Nhập mã từ điện thoại vào ô bên dưới.",

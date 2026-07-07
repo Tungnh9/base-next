@@ -80,7 +80,7 @@ export function ForgotPasswordForm() {
           )}
         />
 
-        {state.error && <p className="text-destructive text-sm">{tAuth(state.error as never)}</p>}
+        {state.error && <p className="text-destructive text-sm">{tAuth(state.error)}</p>}
 
         <Button type="submit" className="mt-1 w-full" disabled={isPending}>
           {isPending ? tAuth("sendResetLinkLoading") : tAuth("sendResetLink")}

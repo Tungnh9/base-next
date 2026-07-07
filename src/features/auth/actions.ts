@@ -3,11 +3,26 @@
 import { redirect } from "next/navigation"
 import { getLocale } from "next-intl/server"
 import { ROUTES } from "@/lib/constants"
-import { loginSchema, registerSchema, forgotPasswordSchema, resetPasswordSchema } from "./schemas"
+import {
+  loginSchema,
+  registerSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+  otpSchema,
+} from "./schemas"
 import { authService } from "./services"
 
+export type AuthErrorCode =
+  | "loginFailed"
+  | "invalidCredentials"
+  | "registerFailed"
+  | "resetPasswordFailed"
+  | "forgotPasswordFailed"
+  | "resendFailed"
+  | "invalidVerificationCode"
+
 export interface ActionState {
-  error?: string
+  error?: AuthErrorCode
   success?: boolean
 }
 
@@ -63,7 +78,7 @@ export async function forgotPasswordAction(
   const raw = { email: formData.get("email") as string }
 
   const parsed = forgotPasswordSchema.safeParse(raw)
-  if (!parsed.success) return { error: "invalidCredentials" }
+  if (!parsed.success) return { error: "forgotPasswordFailed" }
 
   try {
     await authService.forgotPassword(parsed.data.email)
@@ -112,11 +127,11 @@ export async function twoStepVerificationAction(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  const code = formData.get("code") as string
-
-  if (!code || code.length !== 6 || !/^\d{6}$/.test(code)) {
+  const parsed = otpSchema.safeParse(formData.get("code"))
+  if (!parsed.success) {
     return { error: "invalidVerificationCode" }
   }
+  const code = parsed.data
 
   const isDemoCode = process.env.NODE_ENV === "development" && code === "230320"
   if (!isDemoCode) {

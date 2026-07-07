@@ -65,6 +65,7 @@
     "didntGetEmail": "Didn't get the email?",
     "resend": "Resend",
     "resendSuccess": "Sent! Check your inbox.",
+    "resendCodeSuccess": "Sent! Check your phone.",
     "resendFailed": "Failed to resend, please try again",
     "twoStepTitle": "Two-Step Verification 💬",
     "twoStepSubtitle": "We sent a verification code to your mobile. Enter the code from the mobile in the field below.",

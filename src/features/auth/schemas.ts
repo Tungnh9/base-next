@@ -69,6 +69,11 @@ export type ResetPasswordFormInput = {
   confirmPassword: string
 }
 
+export const otpSchema = z
+  .string()
+  .length(6)
+  .regex(/^\d{6}$/)
+
 export function createRegisterSchema(t: (key: string) => string) {
   return z.object({
     username: z.string().min(2, t("usernameMin")),
