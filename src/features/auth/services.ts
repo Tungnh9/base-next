@@ -24,6 +24,7 @@ export const authService = {
       userId: data.user.id,
       email: data.user.email,
       role: data.user.role,
+      accessToken: data.token,
     })
     await setSessionCookie(token)
   },
@@ -38,6 +39,7 @@ export const authService = {
       userId: data.user.id,
       email: data.user.email,
       role: data.user.role,
+      accessToken: data.token,
     })
     await setSessionCookie(token)
   },

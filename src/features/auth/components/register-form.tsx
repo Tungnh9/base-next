@@ -26,9 +26,15 @@ export function RegisterForm() {
     defaultValues: { name: "", email: "", password: "", confirmPassword: "" },
   })
 
+  function onSubmit(data: RegisterInput) {
+    const fd = new FormData()
+    Object.entries(data).forEach(([k, v]) => fd.set(k, String(v)))
+    action(fd)
+  }
+
   return (
     <Form {...form}>
-      <form action={action} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="name"

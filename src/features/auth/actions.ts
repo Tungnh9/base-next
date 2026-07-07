@@ -1,6 +1,7 @@
 "use server"
 
 import { redirect } from "next/navigation"
+import { getLocale } from "next-intl/server"
 import { loginSchema, registerSchema } from "./schemas"
 import { authService } from "./services"
 
@@ -27,7 +28,8 @@ export async function loginAction(
     return { error: "loginFailed" }
   }
 
-  redirect(authService.getLoginRedirect())
+  const locale = await getLocale()
+  redirect(`/${locale}${authService.getLoginRedirect()}`)
 }
 
 export async function registerAction(
@@ -50,10 +52,12 @@ export async function registerAction(
     return { error: "registerFailed" }
   }
 
-  redirect(authService.getLoginRedirect())
+  const locale = await getLocale()
+  redirect(`/${locale}${authService.getLoginRedirect()}`)
 }
 
 export async function logoutAction(): Promise<void> {
+  const locale = await getLocale()
   await authService.logout()
-  redirect(authService.getLogoutRedirect())
+  redirect(`/${locale}${authService.getLogoutRedirect()}`)
 }

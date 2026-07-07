@@ -1,5 +1,6 @@
 import type { ReactNode } from "react"
 import { redirect } from "next/navigation"
+import { getLocale } from "next-intl/server"
 import { getSession } from "@/lib/auth"
 import { ROUTES } from "@/lib/constants"
 import { Header } from "@/components/layout/header"
@@ -7,10 +8,10 @@ import { Sidebar } from "@/components/layout/sidebar"
 import { Footer } from "@/components/layout/footer"
 
 export default async function ProtectedLayout({ children }: { children: ReactNode }) {
-  const session = await getSession()
+  const [session, locale] = await Promise.all([getSession(), getLocale()])
 
   if (!session) {
-    redirect(ROUTES.login)
+    redirect(`/${locale}${ROUTES.login}`)
   }
 
   return (
