@@ -247,7 +247,7 @@ Chạy trước khi bất kỳ component nào render. Verify JWT từ session co
 
 ```
 src/proxy.ts
-├── Bỏ qua: /_next/*, /favicon.ico, file tĩnh
+├── Bỏ qua: /_next/*, /favicon.ico, file tĩnh có extension (.svg, .png, ...)
 ├── PUBLIC_PATHS: /login, /register, /forgot-password, /reset-password,
 │               /verify-email, /two-step-verification  ← thêm path public tại đây
 ├── Unauthenticated → redirect /[locale]/login?callbackUrl=...
