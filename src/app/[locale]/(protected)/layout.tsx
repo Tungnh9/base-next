@@ -1,14 +1,18 @@
 import type { ReactNode } from "react"
 import { redirect } from "next/navigation"
-import { getLocale } from "next-intl/server"
 import { getSession } from "@/lib/auth"
 import { ROUTES } from "@/lib/constants"
 import { Header } from "@/components/layout/header"
 import { Sidebar } from "@/components/layout/sidebar"
 import { Footer } from "@/components/layout/footer"
 
-export default async function ProtectedLayout({ children }: { children: ReactNode }) {
-  const [session, locale] = await Promise.all([getSession(), getLocale()])
+interface ProtectedLayoutProps {
+  children: ReactNode
+  params: Promise<{ locale: string }>
+}
+
+export default async function ProtectedLayout({ children, params }: ProtectedLayoutProps) {
+  const [session, { locale }] = await Promise.all([getSession(), params])
 
   if (!session) {
     redirect(`/${locale}${ROUTES.login}`)

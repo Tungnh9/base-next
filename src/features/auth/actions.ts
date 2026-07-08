@@ -11,6 +11,7 @@ import {
   otpSchema,
 } from "./schemas"
 import { authService } from "./services"
+import { signToken, setSessionCookie } from "@/lib/auth"
 
 export type AuthErrorCode =
   | "loginFailed"
@@ -38,14 +39,19 @@ export async function loginAction(
   const parsed = loginSchema.safeParse(raw)
   if (!parsed.success) return { error: "invalidCredentials" }
 
+  let result: { requiresTwoFactor: boolean; twoFactorPhone?: string }
   try {
-    await authService.login(parsed.data)
+    result = await authService.login(parsed.data)
   } catch {
     return { error: "loginFailed" }
   }
 
   const locale = await getLocale()
-  redirect(`/${locale}${authService.getLoginRedirect()}`)
+  if (result.requiresTwoFactor) {
+    const phone = result.twoFactorPhone ? `?phone=${encodeURIComponent(result.twoFactorPhone)}` : ""
+    redirect(`/${locale}${ROUTES.twoStepVerification}${phone}`)
+  }
+  redirect(`/${locale}${ROUTES.dashboard}`)
 }
 
 export async function registerAction(
@@ -68,7 +74,7 @@ export async function registerAction(
   }
 
   const locale = await getLocale()
-  redirect(`/${locale}${authService.getLoginRedirect()}`)
+  redirect(`/${locale}${ROUTES.verifyEmail}?email=${encodeURIComponent(raw.email)}`)
 }
 
 export async function forgotPasswordAction(
@@ -134,7 +140,15 @@ export async function twoStepVerificationAction(
   const code = parsed.data
 
   const isDemoCode = process.env.NODE_ENV === "development" && code === "230320"
-  if (!isDemoCode) {
+  if (isDemoCode) {
+    const demoToken = await signToken({
+      userId: "demo-user",
+      email: "demo@localhost",
+      role: "user",
+      accessToken: "demo-access-token",
+    })
+    await setSessionCookie(demoToken)
+  } else {
     try {
       await authService.verifyTwoStep(code)
     } catch {

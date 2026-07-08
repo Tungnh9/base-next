@@ -15,4 +15,6 @@ export interface Session {
 export interface AuthResponse {
   token: string
   user: User
+  requiresTwoFactor?: boolean
+  twoFactorPhone?: string
 }

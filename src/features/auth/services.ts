@@ -14,19 +14,28 @@ export class AuthError extends Error {
 }
 
 export const authService = {
-  async login(credentials: LoginInput): Promise<void> {
+  async login(
+    credentials: LoginInput
+  ): Promise<{ requiresTwoFactor: boolean; twoFactorPhone?: string }> {
     const { data, error } = await authApi.login(credentials)
 
     if (error) throw new AuthError(error.message, "LOGIN_FAILED")
     if (!data?.user) throw new AuthError("Unexpected response from server", "INVALID_RESPONSE")
 
-    const token = await signToken({
-      userId: data.user.id,
-      email: data.user.email,
-      role: data.user.role,
-      accessToken: data.token,
-    })
-    await setSessionCookie(token)
+    if (!data.requiresTwoFactor) {
+      const token = await signToken({
+        userId: data.user.id,
+        email: data.user.email,
+        role: data.user.role,
+        accessToken: data.token,
+      })
+      await setSessionCookie(token)
+    }
+
+    return {
+      requiresTwoFactor: data.requiresTwoFactor ?? false,
+      twoFactorPhone: data.twoFactorPhone,
+    }
   },
 
   async register(credentials: RegisterInput): Promise<void> {

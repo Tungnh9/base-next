@@ -34,7 +34,6 @@ npm run dev                  # http://localhost:3000 → redirect /vi
 
 ```
 base-next/
-├── proxy.ts                      # Auth guard tầng 1 (Next.js 16 — thay thế middleware.ts)
 ├── components.json               # shadcn/ui config
 ├── .env.example                  # Template biến môi trường (commit vào git)
 ├── .env.local                    # Giá trị thực — KHÔNG commit
@@ -44,6 +43,7 @@ base-next/
 │   └── en.json                   # Tiếng Anh
 │
 └── src/
+    ├── proxy.ts                  # Auth guard tầng 1 (Next.js 16 — thay thế middleware.ts)
     ├── app/                      # Next.js App Router — chỉ chứa file routing
     │   ├── layout.tsx            # Root layout: <html lang> tự động theo locale
     │   ├── page.tsx              # Redirect / → /vi
@@ -243,7 +243,7 @@ Dự án dùng **2 tầng bảo vệ**:
 Chạy trước khi bất kỳ component nào render. Verify JWT từ session cookie, redirect trước khi trang được xử lý.
 
 ```
-proxy.ts
+src/proxy.ts
 ├── Bỏ qua: /_next/*, /favicon.ico, file tĩnh
 ├── PUBLIC_PATHS: /login, /register, /forgot-password, /reset-password,
 │               /verify-email, /two-step-verification  ← thêm path public tại đây
@@ -251,7 +251,7 @@ proxy.ts
 └── Dùng jose để verify JWT (không cần DB call)
 ```
 
-> `PUBLIC_PATHS` phải bao gồm cả prefix locale. Ví dụ: `"/vi/login"` và `"/en/login"` — không phải chỉ `"/login"`.
+> `PUBLIC_PATHS` dùng path **không có** locale prefix — proxy tự `stripLocale()` trước khi so sánh.
 
 ### Tầng 2 — `(protected)/layout.tsx` (server component)
 
@@ -263,7 +263,7 @@ const session = await getSession()
 if (!session) redirect(ROUTES.login)
 ```
 
-**Thêm public path:** chỉnh mảng `PUBLIC_PATHS` trong `proxy.ts`.
+**Thêm public path:** chỉnh mảng `PUBLIC_PATHS` trong `src/proxy.ts`.
 
 ---
 
