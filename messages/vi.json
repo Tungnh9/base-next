@@ -30,9 +30,13 @@
     "noAccount": "Chưa có tài khoản?",
     "hasAccount": "Đã có tài khoản?",
     "loading": "Đang đăng nhập...",
+    "loggingIn": "Đang đăng nhập",
     "welcomeTitle": "Chào mừng! 👋",
     "welcomeSubtitle": "Vui lòng đăng nhập và tiếp tục hành trình",
     "emailOrUsername": "Email hoặc Tên đăng nhập",
+    "emailOrUsernamePlaceholder": "user@gmail.com",
+    "usernamePlaceholder": "username",
+    "registerEmailPlaceholder": "username@gmail.com",
     "newOnPlatform": "Mới tham gia?",
     "createAccount": "Tạo tài khoản",
     "orContinueWith": "hoặc",
@@ -74,7 +78,9 @@
     "verifyMyAccount": "Xác minh tài khoản",
     "verifyingAccount": "Đang xác minh...",
     "invalidVerificationCode": "Mã xác minh không đúng",
-    "didntGetCode": "Không nhận được mã?"
+    "didntGetCode": "Không nhận được mã?",
+    "forgotPasswordVerifyTitle": "Xác thực email 📧",
+    "forgotPasswordVerifySubtitle": "Nhập mã 6 chữ số đã được gửi đến email của bạn"
   },
   "validation": {
     "emailInvalid": "Email không hợp lệ",

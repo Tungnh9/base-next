@@ -9,6 +9,7 @@ export const ROUTES = {
   resetPassword: "/reset-password",
   verifyEmail: "/verify-email",
   twoStepVerification: "/two-step-verification",
+  forgotPasswordVerify: "/forgot-password-verify",
 } as const
 
 export type Route = (typeof ROUTES)[keyof typeof ROUTES]

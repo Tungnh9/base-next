@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { useTranslations } from "next-intl"
+import { useRouter } from "next/navigation"
+import { useTranslations, useLocale } from "next-intl"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Eye, EyeOff } from "lucide-react"
@@ -21,23 +22,45 @@ import { ROUTES } from "@/lib/constants"
 import { useLoginAction } from "../hooks/use-auth"
 import { createLoginSchema, type LoginInput } from "../schemas"
 
+function AnimatedEllipsis() {
+  const [count, setCount] = useState(1)
+  useEffect(() => {
+    const id = setInterval(() => setCount((c) => (c % 3) + 1), 500)
+    return () => clearInterval(id)
+  }, [])
+  // fixed width prevents layout shift as dot count changes
+  return <span className="inline-block w-[18px] text-left">{".".repeat(count)}</span>
+}
+
 export function LoginForm() {
   const tAuth = useTranslations("auth")
   const tVal = useTranslations("validation")
+  const locale = useLocale()
+  const router = useRouter()
   const { state, action, isPending } = useLoginAction()
   const [showPassword, setShowPassword] = useState(false)
+  // Latch: set true on submit, stays true until navigation (unmount) or error (state.error resets derived value)
+  const [isNavigating, setIsNavigating] = useState(false)
+  const showLoading = isPending || (isNavigating && !state.error)
+
   const form = useForm<LoginInput>({
     resolver: zodResolver(createLoginSchema(tVal)),
     defaultValues: { email: "", password: "" },
   })
 
   useEffect(() => {
-    if (state.error) {
+    if (state.success) {
+      router.push(`/${locale}${ROUTES.dashboard}`)
+    } else if (state.requiresTwoFactor) {
+      const phone = state.twoFactorPhone ? `?phone=${encodeURIComponent(state.twoFactorPhone)}` : ""
+      router.push(`/${locale}${ROUTES.twoStepVerification}${phone}`)
+    } else if (state.error) {
       toast.error(tAuth(state.error))
     }
-  }, [state.error, state, tAuth])
+  }, [state, locale, router, tAuth])
 
   function onSubmit(data: LoginInput) {
+    setIsNavigating(true)
     const fd = new FormData()
     Object.entries(data).forEach(([k, v]) => fd.set(k, String(v)))
     action(fd)
@@ -55,7 +78,12 @@ export function LoginForm() {
                 {tAuth("emailOrUsername")}
               </FormLabel>
               <FormControl>
-                <Input type="email" placeholder="john.doe" autoComplete="email" {...field} />
+                <Input
+                  type="email"
+                  placeholder={tAuth("emailOrUsernamePlaceholder")}
+                  autoComplete="email"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -72,44 +100,50 @@ export function LoginForm() {
                   {tAuth("password")}
                 </FormLabel>
                 <Link
-                  href={ROUTES.forgotPassword}
+                  href={`/${locale}${ROUTES.forgotPassword}`}
                   className="text-primary text-[13px] hover:underline"
                 >
                   {tAuth("forgotPassword")}
                 </Link>
               </div>
               <FormControl>
-                <div className="relative">
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••"
-                    autoComplete="current-password"
-                    className="pr-10"
-                    {...field}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((v) => !v)}
-                    className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-3 flex items-center"
-                    tabIndex={-1}
-                    aria-label={showPassword ? tAuth("hidePassword") : tAuth("showPassword")}
-                  >
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••"
+                  autoComplete="current-password"
+                  endIcon={
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((v) => !v)}
+                      className="text-muted-foreground hover:text-foreground cursor-pointer"
+                      tabIndex={-1}
+                      aria-label={showPassword ? tAuth("hidePassword") : tAuth("showPassword")}
+                    >
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  }
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <Button type="submit" className="mt-1 w-full" disabled={isPending}>
-          {isPending ? tAuth("loading") : tAuth("login")}
+        <Button type="submit" className="mt-1 w-full" disabled={showLoading}>
+          {showLoading ? (
+            <>
+              {tAuth("loggingIn")}
+              <AnimatedEllipsis />
+            </>
+          ) : (
+            tAuth("login")
+          )}
         </Button>
 
         <p className="text-center text-[15px] leading-[22px] text-[var(--text-body)]">
           {tAuth("newOnPlatform")}{" "}
-          <Link href={ROUTES.register} className="text-primary hover:underline">
+          <Link href={`/${locale}${ROUTES.register}`} className="text-primary hover:underline">
             {tAuth("createAccount")}
           </Link>
         </p>

@@ -1,7 +1,5 @@
+// Root loading boundary — return null to avoid flash during route transitions.
+// Each route segment should define its own loading skeleton if needed.
 export default function Loading() {
-  return (
-    <div className="flex flex-col flex-1 items-center justify-center">
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-    </div>
-  );
+  return null
 }

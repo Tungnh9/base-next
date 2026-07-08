@@ -1,9 +1,12 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Link from "next/link"
-import { useTranslations } from "next-intl"
+import { useTranslations, useLocale } from "next-intl"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { Eye, EyeOff } from "lucide-react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -22,7 +25,15 @@ import { createRegisterSchema, type RegisterFormInput } from "../schemas"
 export function RegisterForm() {
   const tAuth = useTranslations("auth")
   const tVal = useTranslations("validation")
+  const locale = useLocale()
   const { state, action, isPending } = useRegisterAction()
+  const [showPassword, setShowPassword] = useState(false)
+
+  useEffect(() => {
+    if (state.error) {
+      toast.error(tAuth(state.error))
+    }
+  }, [state, tAuth])
 
   const form = useForm<RegisterFormInput>({
     resolver: zodResolver(createRegisterSchema(tVal)),
@@ -49,7 +60,12 @@ export function RegisterForm() {
                 {tAuth("username")}
               </FormLabel>
               <FormControl>
-                <Input type="text" placeholder="john.doe" autoComplete="username" {...field} />
+                <Input
+                  type="text"
+                  placeholder={tAuth("usernamePlaceholder")}
+                  autoComplete="username"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -67,7 +83,7 @@ export function RegisterForm() {
               <FormControl>
                 <Input
                   type="email"
-                  placeholder="john.doe@gmail.com"
+                  placeholder={tAuth("registerEmailPlaceholder")}
                   autoComplete="email"
                   {...field}
                 />
@@ -86,7 +102,23 @@ export function RegisterForm() {
                 {tAuth("password")}
               </FormLabel>
               <FormControl>
-                <Input type="password" autoComplete="new-password" {...field} />
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••"
+                  autoComplete="new-password"
+                  endIcon={
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((v) => !v)}
+                      className="text-muted-foreground hover:text-foreground cursor-pointer"
+                      tabIndex={-1}
+                      aria-label={showPassword ? tAuth("hidePassword") : tAuth("showPassword")}
+                    >
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  }
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -122,15 +154,13 @@ export function RegisterForm() {
           )}
         />
 
-        {state.error && <p className="text-destructive text-sm">{tAuth(state.error)}</p>}
-
         <Button type="submit" className="mt-1 w-full" disabled={isPending}>
           {isPending ? tAuth("registerLoading") : tAuth("signUp")}
         </Button>
 
         <p className="text-muted-foreground text-center text-[15px] leading-[22px]">
           {tAuth("alreadyHaveAccount")}{" "}
-          <Link href={ROUTES.login} className="text-primary hover:underline">
+          <Link href={`/${locale}${ROUTES.login}`} className="text-primary hover:underline">
             {tAuth("signInInstead")}
           </Link>
         </p>

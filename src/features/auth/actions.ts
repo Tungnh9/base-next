@@ -25,6 +25,9 @@ export type AuthErrorCode =
 export interface ActionState {
   error?: AuthErrorCode
   success?: boolean
+  requiresTwoFactor?: boolean
+  twoFactorPhone?: string
+  requiresEmailVerification?: boolean
 }
 
 export async function loginAction(
@@ -52,8 +55,7 @@ export async function loginAction(
       accessToken: "demo-access-token",
     })
     await setSessionCookie(demoToken)
-    const locale = await getLocale()
-    redirect(`/${locale}${ROUTES.dashboard}`)
+    return { success: true }
   }
 
   let result: { requiresTwoFactor: boolean; twoFactorPhone?: string }
@@ -63,12 +65,11 @@ export async function loginAction(
     return { error: "loginFailed" }
   }
 
-  const locale = await getLocale()
   if (result.requiresTwoFactor) {
-    const phone = result.twoFactorPhone ? `?phone=${encodeURIComponent(result.twoFactorPhone)}` : ""
-    redirect(`/${locale}${ROUTES.twoStepVerification}${phone}`)
+    return { requiresTwoFactor: true, twoFactorPhone: result.twoFactorPhone }
   }
-  redirect(`/${locale}${ROUTES.dashboard}`)
+
+  return { success: true }
 }
 
 export async function registerAction(
@@ -103,10 +104,36 @@ export async function forgotPasswordAction(
   const parsed = forgotPasswordSchema.safeParse(raw)
   if (!parsed.success) return { error: "forgotPasswordFailed" }
 
+  // Dev-only demo — go to email verification step
+  if (process.env.NODE_ENV === "development" && parsed.data.email === "duyen@gmail.com") {
+    return { requiresEmailVerification: true }
+  }
+
   try {
     await authService.forgotPassword(parsed.data.email)
   } catch {
     return { error: "forgotPasswordFailed" }
+  }
+
+  return { success: true }
+}
+
+export async function verifyForgotPasswordCodeAction(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const parsed = otpSchema.safeParse(formData.get("code"))
+  if (!parsed.success) return { error: "invalidVerificationCode" }
+
+  // Dev-only demo
+  if (process.env.NODE_ENV === "development" && parsed.data === "120820") {
+    return { success: true }
+  }
+
+  try {
+    await authService.forgotPassword(parsed.data)
+  } catch {
+    return { error: "invalidVerificationCode" }
   }
 
   return { success: true }
@@ -124,6 +151,12 @@ export async function resetPasswordAction(
 
   const parsed = resetPasswordSchema.safeParse(raw)
   if (!parsed.success) return { error: "resetPasswordFailed" }
+
+  // Dev-only demo token
+  if (process.env.NODE_ENV === "development" && token === "demo-reset-token") {
+    const locale = await getLocale()
+    redirect(`/${locale}${ROUTES.login}`)
+  }
 
   try {
     await authService.resetPassword({ password: parsed.data.password, token })

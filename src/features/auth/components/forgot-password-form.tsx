@@ -1,10 +1,13 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Link from "next/link"
-import { useTranslations } from "next-intl"
+import { useRouter } from "next/navigation"
+import { useTranslations, useLocale } from "next-intl"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ChevronLeft } from "lucide-react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -24,14 +27,28 @@ type ForgotPasswordFormInput = { email: string }
 export function ForgotPasswordForm() {
   const tAuth = useTranslations("auth")
   const tVal = useTranslations("validation")
+  const locale = useLocale()
+  const router = useRouter()
   const { state, action, isPending } = useForgotPasswordAction()
+  const [submittedEmail, setSubmittedEmail] = useState("")
 
   const form = useForm<ForgotPasswordFormInput>({
     resolver: zodResolver(createForgotPasswordSchema(tVal)),
     defaultValues: { email: "" },
   })
 
+  useEffect(() => {
+    if (state.requiresEmailVerification) {
+      router.push(
+        `/${locale}${ROUTES.forgotPasswordVerify}?email=${encodeURIComponent(submittedEmail)}`
+      )
+    } else if (state.error) {
+      toast.error(tAuth(state.error))
+    }
+  }, [state, locale, router, submittedEmail, tAuth])
+
   function onSubmit(data: ForgotPasswordFormInput) {
+    setSubmittedEmail(data.email)
     const fd = new FormData()
     fd.set("email", data.email)
     action(fd)
@@ -45,7 +62,7 @@ export function ForgotPasswordForm() {
         </div>
         <div className="flex justify-center">
           <Link
-            href={ROUTES.login}
+            href={`/${locale}${ROUTES.login}`}
             className="text-primary inline-flex items-center gap-1 text-[15px] hover:underline"
           >
             <ChevronLeft className="size-4" />
@@ -70,7 +87,7 @@ export function ForgotPasswordForm() {
               <FormControl>
                 <Input
                   type="email"
-                  placeholder="john.doe@gmail.com"
+                  placeholder={tAuth("emailOrUsernamePlaceholder")}
                   autoComplete="email"
                   {...field}
                 />
@@ -80,15 +97,13 @@ export function ForgotPasswordForm() {
           )}
         />
 
-        {state.error && <p className="text-destructive text-sm">{tAuth(state.error)}</p>}
-
         <Button type="submit" className="mt-1 w-full" disabled={isPending}>
           {isPending ? tAuth("sendResetLinkLoading") : tAuth("sendResetLink")}
         </Button>
 
         <div className="flex justify-center">
           <Link
-            href={ROUTES.login}
+            href={`/${locale}${ROUTES.login}`}
             className="text-primary inline-flex items-center gap-1 text-[15px] hover:underline"
           >
             <ChevronLeft className="size-4" />

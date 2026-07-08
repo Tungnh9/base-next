@@ -1,10 +1,11 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
-import { useTranslations } from "next-intl"
+import { useTranslations, useLocale } from "next-intl"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ChevronLeft } from "lucide-react"
+import { ChevronLeft, Eye, EyeOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -26,7 +27,10 @@ interface ResetPasswordFormProps {
 export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   const tAuth = useTranslations("auth")
   const tVal = useTranslations("validation")
+  const locale = useLocale()
   const { state, action, isPending } = useResetPasswordAction()
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const form = useForm<ResetPasswordFormInput>({
     resolver: zodResolver(createResetPasswordSchema(tVal)),
@@ -53,7 +57,23 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
                 {tAuth("newPassword")}
               </FormLabel>
               <FormControl>
-                <Input type="password" autoComplete="new-password" {...field} />
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••"
+                  autoComplete="new-password"
+                  endIcon={
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((v) => !v)}
+                      className="text-muted-foreground hover:text-foreground cursor-pointer"
+                      tabIndex={-1}
+                      aria-label={showPassword ? tAuth("hidePassword") : tAuth("showPassword")}
+                    >
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  }
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -69,7 +89,25 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
                 {tAuth("confirmPassword")}
               </FormLabel>
               <FormControl>
-                <Input type="password" autoComplete="new-password" {...field} />
+                <Input
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="••••••"
+                  autoComplete="new-password"
+                  endIcon={
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword((v) => !v)}
+                      className="text-muted-foreground hover:text-foreground cursor-pointer"
+                      tabIndex={-1}
+                      aria-label={
+                        showConfirmPassword ? tAuth("hidePassword") : tAuth("showPassword")
+                      }
+                    >
+                      {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  }
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -84,7 +122,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 
         <div className="flex justify-center">
           <Link
-            href={ROUTES.login}
+            href={`/${locale}${ROUTES.login}`}
             className="text-primary inline-flex items-center gap-1 text-[15px] hover:underline"
           >
             <ChevronLeft className="size-4" />

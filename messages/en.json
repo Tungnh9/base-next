@@ -30,9 +30,13 @@
     "noAccount": "Don't have an account?",
     "hasAccount": "Already have an account?",
     "loading": "Signing in...",
+    "loggingIn": "Signing in",
     "welcomeTitle": "Welcome Back! 👋",
     "welcomeSubtitle": "Please sign in to your account and start the adventure",
     "emailOrUsername": "Email or Username",
+    "emailOrUsernamePlaceholder": "user@gmail.com",
+    "usernamePlaceholder": "username",
+    "registerEmailPlaceholder": "username@gmail.com",
     "newOnPlatform": "New on our platform?",
     "createAccount": "Create an account",
     "orContinueWith": "or",
@@ -74,7 +78,9 @@
     "verifyMyAccount": "Verify my account",
     "verifyingAccount": "Verifying...",
     "invalidVerificationCode": "Invalid verification code",
-    "didntGetCode": "Didn't get the code?"
+    "didntGetCode": "Didn't get the code?",
+    "forgotPasswordVerifyTitle": "Email Verification 📧",
+    "forgotPasswordVerifySubtitle": "Enter the 6-digit code sent to your email address"
   },
   "validation": {
     "emailInvalid": "Invalid email address",

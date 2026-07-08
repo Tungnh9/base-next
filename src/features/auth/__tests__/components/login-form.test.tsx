@@ -38,7 +38,7 @@ describe("LoginForm", () => {
   it("renders email input, password input, and submit button", () => {
     render(<LoginForm />)
 
-    expect(screen.getByPlaceholderText("john.doe")).toBeInTheDocument()
+    expect(screen.getByPlaceholderText("emailOrUsernamePlaceholder")).toBeInTheDocument()
     expect(screen.getByPlaceholderText("••••••")).toBeInTheDocument()
     expect(screen.getByRole("button", { name: /login/i })).toBeInTheDocument()
   })
@@ -65,7 +65,7 @@ describe("LoginForm", () => {
     expect(mockToastError).toHaveBeenCalledWith("loginFailed")
   })
 
-  it("disables button and shows loading text when isPending", () => {
+  it("disables submit button and shows loggingIn text while isPending", () => {
     mockUseLoginAction.mockReturnValue({
       state: {},
       action: mockAction,
@@ -74,10 +74,9 @@ describe("LoginForm", () => {
 
     render(<LoginForm />)
 
-    // Both submit button and eye-toggle exist; the submit button is disabled
-    const submitButton = screen.getByRole("button", { name: /loading/i })
+    // t("loggingIn") → "loggingIn" in test env; AnimatedEllipsis adds dots after
+    const submitButton = screen.getByRole("button", { name: /loggingIn/i })
     expect(submitButton).toBeDisabled()
-    expect(submitButton).toHaveTextContent("loading")
   })
 
   it("toggles password visibility when eye button is clicked", async () => {
@@ -87,10 +86,11 @@ describe("LoginForm", () => {
     const passwordInput = screen.getByPlaceholderText("••••••")
     expect(passwordInput).toHaveAttribute("type", "password")
 
-    await user.click(screen.getByRole("button", { name: /showPassword/i }))
+    // Button is inside aria-hidden span — use { hidden: true } to reach it
+    await user.click(screen.getByRole("button", { hidden: true, name: /showPassword/i }))
     expect(passwordInput).toHaveAttribute("type", "text")
 
-    await user.click(screen.getByRole("button", { name: /hidePassword/i }))
+    await user.click(screen.getByRole("button", { hidden: true, name: /hidePassword/i }))
     expect(passwordInput).toHaveAttribute("type", "password")
   })
 
@@ -98,7 +98,7 @@ describe("LoginForm", () => {
     const user = userEvent.setup()
     render(<LoginForm />)
 
-    await user.type(screen.getByPlaceholderText("john.doe"), "user@example.com")
+    await user.type(screen.getByPlaceholderText("emailOrUsernamePlaceholder"), "user@example.com")
     await user.type(screen.getByPlaceholderText("••••••"), "password123")
     await user.click(screen.getByRole("button", { name: /login/i }))
 

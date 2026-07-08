@@ -5,6 +5,7 @@ import {
   loginAction,
   registerAction,
   forgotPasswordAction,
+  verifyForgotPasswordCodeAction,
   resetPasswordAction,
   twoStepVerificationAction,
   resendVerificationEmailAction,
@@ -26,6 +27,11 @@ export function useRegisterAction() {
 
 export function useForgotPasswordAction() {
   const [state, action, isPending] = useActionState(forgotPasswordAction, initialState)
+  return { state, action, isPending }
+}
+
+export function useForgotPasswordVerifyAction() {
+  const [state, action, isPending] = useActionState(verifyForgotPasswordCodeAction, initialState)
   return { state, action, isPending }
 }
 
