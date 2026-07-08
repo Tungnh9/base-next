@@ -16,6 +16,8 @@
     "register": "Register",
     "email": "Email",
     "password": "Password",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
     "confirmPassword": "Confirm password",
     "name": "Full name",
     "forgotPassword": "Forgot password?",

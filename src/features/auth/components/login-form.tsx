@@ -1,9 +1,12 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { Eye, EyeOff } from "lucide-react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -22,10 +25,17 @@ export function LoginForm() {
   const tAuth = useTranslations("auth")
   const tVal = useTranslations("validation")
   const { state, action, isPending } = useLoginAction()
+  const [showPassword, setShowPassword] = useState(false)
   const form = useForm<LoginInput>({
     resolver: zodResolver(createLoginSchema(tVal)),
     defaultValues: { email: "", password: "" },
   })
+
+  useEffect(() => {
+    if (state.error) {
+      toast.error(tAuth(state.error))
+    }
+  }, [state.error, state, tAuth])
 
   function onSubmit(data: LoginInput) {
     const fd = new FormData()
@@ -69,14 +79,29 @@ export function LoginForm() {
                 </Link>
               </div>
               <FormControl>
-                <Input type="password" autoComplete="current-password" {...field} />
+                <div className="relative">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••"
+                    autoComplete="current-password"
+                    className="pr-10"
+                    {...field}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-3 flex items-center"
+                    tabIndex={-1}
+                    aria-label={showPassword ? tAuth("hidePassword") : tAuth("showPassword")}
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-
-        {state.error && <p className="text-destructive text-sm">{tAuth(state.error)}</p>}
 
         <Button type="submit" className="mt-1 w-full" disabled={isPending}>
           {isPending ? tAuth("loading") : tAuth("login")}

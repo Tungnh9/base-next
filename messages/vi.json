@@ -16,6 +16,8 @@
     "register": "Đăng ký",
     "email": "Email",
     "password": "Mật khẩu",
+    "showPassword": "Hiện mật khẩu",
+    "hidePassword": "Ẩn mật khẩu",
     "confirmPassword": "Xác nhận mật khẩu",
     "name": "Họ và tên",
     "forgotPassword": "Quên mật khẩu?",

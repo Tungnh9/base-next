@@ -39,6 +39,23 @@ export async function loginAction(
   const parsed = loginSchema.safeParse(raw)
   if (!parsed.success) return { error: "invalidCredentials" }
 
+  // Dev-only demo credentials — bypass real API
+  if (
+    process.env.NODE_ENV === "development" &&
+    parsed.data.email === "duyen@gmail.com" &&
+    parsed.data.password === "12082002"
+  ) {
+    const demoToken = await signToken({
+      userId: "demo-duyen",
+      email: "duyen@gmail.com",
+      role: "user",
+      accessToken: "demo-access-token",
+    })
+    await setSessionCookie(demoToken)
+    const locale = await getLocale()
+    redirect(`/${locale}${ROUTES.dashboard}`)
+  }
+
   let result: { requiresTwoFactor: boolean; twoFactorPhone?: string }
   try {
     result = await authService.login(parsed.data)
