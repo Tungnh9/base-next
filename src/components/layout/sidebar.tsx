@@ -70,7 +70,14 @@ export function Sidebar() {
                 href={`/${locale}`}
                 className="text-sidebar-foreground flex items-center gap-2 text-[22px] leading-6 font-bold"
               >
-                <Image src="/logo.svg" alt="Logo" width={28} height={19} priority />
+                <Image
+                  src="/logo.svg"
+                  alt="Logo"
+                  width={28}
+                  height={19}
+                  priority
+                  className="h-[19px] w-[28px]"
+                />
                 <span>App</span>
               </Link>
               <button

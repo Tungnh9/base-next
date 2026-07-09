@@ -25,7 +25,7 @@ export default async function TwoStepVerificationPage({ searchParams }: Props) {
   return (
     <div className="border-primary/25 relative z-10 flex w-full max-w-[450px] flex-col gap-6 rounded-md border-2 border-dashed bg-white p-8">
       <div className="flex items-center justify-center gap-2.5 py-2.5">
-        <Image src="/logo.svg" alt={appName} width={30} height={30} />
+        <Image src="/logo.svg" alt={appName} width={30} height={30} className="h-[30px] w-[30px]" />
         <span className="text-foreground text-[26px] leading-[36px] font-bold">{appName}</span>
       </div>
 
