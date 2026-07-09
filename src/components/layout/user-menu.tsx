@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { logoutAction } from "@/features/auth/actions"
+import { useUserStore } from "@/stores"
 
 interface UserMenuProps {
   email: string
@@ -25,6 +26,7 @@ const itemClassName =
 
 export function UserMenu({ email, role, avatar }: UserMenuProps) {
   const t = useTranslations()
+  const clearUser = useUserStore((s) => s.clearUser)
 
   return (
     <DropdownMenu>
@@ -101,7 +103,7 @@ export function UserMenu({ email, role, avatar }: UserMenuProps) {
                 "text-destructive [&_svg]:text-destructive hover:bg-destructive/10"
               )}
             >
-              <button type="submit" className="w-full">
+              <button type="submit" className="w-full" onClick={() => clearUser()}>
                 <LogOut className="size-[18px]" />
                 {t("auth.logout")}
               </button>

@@ -24,9 +24,9 @@ export function ForgotPasswordVerifyForm({ email }: ForgotPasswordVerifyFormProp
   const isCodeComplete = digits.every(Boolean)
 
   useEffect(() => {
-    if (state.success) {
+    if (state.success && state.resetToken) {
       router.push(
-        `/${locale}${ROUTES.resetPassword}?token=demo-reset-token&email=${encodeURIComponent(email)}`
+        `/${locale}${ROUTES.resetPassword}?token=${encodeURIComponent(state.resetToken)}&email=${encodeURIComponent(email)}`
       )
     } else if (state.error) {
       toast.error(tAuth(state.error))
@@ -36,6 +36,7 @@ export function ForgotPasswordVerifyForm({ email }: ForgotPasswordVerifyFormProp
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
     const fd = new FormData()
+    fd.set("email", email)
     fd.set("code", digits.join(""))
     action(fd)
   }

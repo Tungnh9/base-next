@@ -54,25 +54,6 @@ export function ForgotPasswordForm() {
     action(fd)
   }
 
-  if (state.success) {
-    return (
-      <div className="space-y-4">
-        <div className="bg-primary/10 text-primary rounded-md px-4 py-3 text-sm">
-          {tAuth("forgotPasswordSuccess")}
-        </div>
-        <div className="flex justify-center">
-          <Link
-            href={`/${locale}${ROUTES.login}`}
-            className="text-primary inline-flex items-center gap-1 text-[15px] hover:underline"
-          >
-            <ChevronLeft className="size-4" />
-            {tAuth("backToLogin")}
-          </Link>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod"
 
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
@@ -11,18 +11,19 @@ const envSchema = z.object({
 
   API_BASE_URL: z.string().url(),
   NEXT_PUBLIC_API_BASE_URL: z.string().url().optional(),
-});
 
-const parsed = envSchema.safeParse(process.env);
+  // Serve fixture data instead of calling the real backend — for building
+  // features before the backend exists. Flip to "false" once it's ready.
+  NEXT_PUBLIC_USE_MOCK_API: z.coerce.boolean().default(false),
+})
+
+const parsed = envSchema.safeParse(process.env)
 
 if (!parsed.success) {
-  console.error(
-    "❌ Invalid environment variables:",
-    parsed.error.flatten().fieldErrors
-  );
-  throw new Error("Invalid environment configuration. See above for details.");
+  console.error("❌ Invalid environment variables:", parsed.error.flatten().fieldErrors)
+  throw new Error("Invalid environment configuration. See above for details.")
 }
 
-export const env = parsed.data;
+export const env = parsed.data
 
-export type Env = z.infer<typeof envSchema>;
+export type Env = z.infer<typeof envSchema>

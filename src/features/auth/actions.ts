@@ -11,7 +11,7 @@ import {
   otpSchema,
 } from "./schemas"
 import { authService } from "./services"
-import { signToken, setSessionCookie } from "@/lib/auth"
+import type { User } from "./types"
 
 export type AuthErrorCode =
   | "loginFailed"
@@ -28,6 +28,8 @@ export interface ActionState {
   requiresTwoFactor?: boolean
   twoFactorPhone?: string
   requiresEmailVerification?: boolean
+  resetToken?: string
+  user?: User
 }
 
 export async function loginAction(
@@ -42,23 +44,7 @@ export async function loginAction(
   const parsed = loginSchema.safeParse(raw)
   if (!parsed.success) return { error: "invalidCredentials" }
 
-  // Dev-only demo credentials — bypass real API
-  if (
-    process.env.NODE_ENV === "development" &&
-    parsed.data.email === "duyen@gmail.com" &&
-    parsed.data.password === "12082002"
-  ) {
-    const demoToken = await signToken({
-      userId: "demo-duyen",
-      email: "duyen@gmail.com",
-      role: "user",
-      accessToken: "demo-access-token",
-    })
-    await setSessionCookie(demoToken)
-    return { success: true }
-  }
-
-  let result: { requiresTwoFactor: boolean; twoFactorPhone?: string }
+  let result: { requiresTwoFactor: boolean; twoFactorPhone?: string; user?: User }
   try {
     result = await authService.login(parsed.data)
   } catch {
@@ -69,7 +55,7 @@ export async function loginAction(
     return { requiresTwoFactor: true, twoFactorPhone: result.twoFactorPhone }
   }
 
-  return { success: true }
+  return { success: true, user: result.user }
 }
 
 export async function registerAction(
@@ -104,39 +90,31 @@ export async function forgotPasswordAction(
   const parsed = forgotPasswordSchema.safeParse(raw)
   if (!parsed.success) return { error: "forgotPasswordFailed" }
 
-  // Dev-only demo — go to email verification step
-  if (process.env.NODE_ENV === "development" && parsed.data.email === "duyen@gmail.com") {
-    return { requiresEmailVerification: true }
-  }
-
   try {
     await authService.forgotPassword(parsed.data.email)
   } catch {
     return { error: "forgotPasswordFailed" }
   }
 
-  return { success: true }
+  return { requiresEmailVerification: true }
 }
 
 export async function verifyForgotPasswordCodeAction(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  const parsed = otpSchema.safeParse(formData.get("code"))
-  if (!parsed.success) return { error: "invalidVerificationCode" }
+  const email = formData.get("email") as string
+  const parsedCode = otpSchema.safeParse(formData.get("code"))
+  if (!email || !parsedCode.success) return { error: "invalidVerificationCode" }
 
-  // Dev-only demo
-  if (process.env.NODE_ENV === "development" && parsed.data === "120820") {
-    return { success: true }
-  }
-
+  let resetToken: string
   try {
-    await authService.forgotPassword(parsed.data)
+    resetToken = await authService.verifyForgotPasswordCode({ email, code: parsedCode.data })
   } catch {
     return { error: "invalidVerificationCode" }
   }
 
-  return { success: true }
+  return { success: true, resetToken }
 }
 
 export async function resetPasswordAction(
@@ -151,12 +129,6 @@ export async function resetPasswordAction(
 
   const parsed = resetPasswordSchema.safeParse(raw)
   if (!parsed.success) return { error: "resetPasswordFailed" }
-
-  // Dev-only demo token
-  if (process.env.NODE_ENV === "development" && token === "demo-reset-token") {
-    const locale = await getLocale()
-    redirect(`/${locale}${ROUTES.login}`)
-  }
 
   try {
     await authService.resetPassword({ password: parsed.data.password, token })
@@ -189,25 +161,16 @@ export async function twoStepVerificationAction(
   }
   const code = parsed.data
 
-  const isDemoCode = process.env.NODE_ENV === "development" && code === "230320"
-  if (isDemoCode) {
-    const demoToken = await signToken({
-      userId: "demo-user",
-      email: "demo@localhost",
-      role: "user",
-      accessToken: "demo-access-token",
-    })
-    await setSessionCookie(demoToken)
-  } else {
-    try {
-      await authService.verifyTwoStep(code)
-    } catch {
-      return { error: "invalidVerificationCode" }
-    }
+  let user: User
+  try {
+    user = await authService.verifyTwoStep(code)
+  } catch {
+    return { error: "invalidVerificationCode" }
   }
 
-  const locale = await getLocale()
-  redirect(`/${locale}${ROUTES.dashboard}`)
+  // Client-side navigation (not redirect()) so the caller can persist `user`
+  // to localStorage first — same pattern as loginAction.
+  return { success: true, user }
 }
 
 export async function resendVerificationEmailAction(

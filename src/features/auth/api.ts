@@ -1,8 +1,10 @@
 import { serverApi } from "@/lib/api"
-import type { User, AuthResponse } from "./types"
+import { USE_MOCK_API } from "@/lib/mock"
+import { authMockApi } from "./mock-data"
+import type { User, AuthResponse, VerifyForgotPasswordCodeResponse } from "./types"
 import type { LoginInput, RegisterInput } from "./schemas"
 
-export const authApi = {
+const authRealApi = {
   login: (credentials: LoginInput) =>
     serverApi<AuthResponse>("/auth/login", {
       method: "POST",
@@ -31,6 +33,12 @@ export const authApi = {
       body: JSON.stringify(data),
     }),
 
+  verifyForgotPasswordCode: (data: { email: string; code: string }) =>
+    serverApi<VerifyForgotPasswordCodeResponse>("/auth/verify-forgot-password-code", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
   resendVerificationEmail: (data: { email: string }) =>
     serverApi<void>("/auth/resend-verification", {
       method: "POST",
@@ -38,10 +46,13 @@ export const authApi = {
     }),
 
   verifyTwoStep: (data: { code: string }) =>
-    serverApi<void>("/auth/verify-two-step", {
+    serverApi<AuthResponse>("/auth/verify-two-step", {
       method: "POST",
       body: JSON.stringify(data),
     }),
 
   resendTwoStepCode: () => serverApi<void>("/auth/resend-two-step", { method: "POST" }),
 }
+
+// Single switch point — set NEXT_PUBLIC_USE_MOCK_API=false once the real backend exists.
+export const authApi = USE_MOCK_API ? authMockApi : authRealApi

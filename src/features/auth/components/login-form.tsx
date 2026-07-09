@@ -19,6 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { ROUTES } from "@/lib/constants"
+import { useUserStore } from "@/stores"
 import { useLoginAction } from "../hooks/use-auth"
 import { createLoginSchema, type LoginInput } from "../schemas"
 
@@ -38,6 +39,7 @@ export function LoginForm() {
   const locale = useLocale()
   const router = useRouter()
   const { state, action, isPending } = useLoginAction()
+  const setUser = useUserStore((s) => s.setUser)
   const [showPassword, setShowPassword] = useState(false)
   // Latch: set true on submit, stays true until navigation (unmount) or error (state.error resets derived value)
   const [isNavigating, setIsNavigating] = useState(false)
@@ -50,6 +52,7 @@ export function LoginForm() {
 
   useEffect(() => {
     if (state.success) {
+      if (state.user) setUser(state.user)
       router.push(`/${locale}${ROUTES.dashboard}`)
     } else if (state.requiresTwoFactor) {
       const phone = state.twoFactorPhone ? `?phone=${encodeURIComponent(state.twoFactorPhone)}` : ""
@@ -57,7 +60,7 @@ export function LoginForm() {
     } else if (state.error) {
       toast.error(tAuth(state.error))
     }
-  }, [state, locale, router, tAuth])
+  }, [state, locale, router, tAuth, setUser])
 
   function onSubmit(data: LoginInput) {
     setIsNavigating(true)

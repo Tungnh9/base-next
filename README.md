@@ -315,6 +315,22 @@ type ApiResponse<T> =
   | { data: null; error: { message: string; code: string; status: number } }
 ```
 
+### Mock API khi chưa có backend
+
+Khi backend chưa sẵn sàng, mỗi feature có thể thêm `mock-data.ts` cạnh `api.ts` — cùng chữ ký hàm, trả fixture data qua `mockApi()`/`mockApiError()` (`src/lib/mock.ts`). Switch giữa mock/real ngay trong `api.ts`:
+
+```ts
+// features/[name]/api.ts
+import { USE_MOCK_API } from "@/lib/mock"
+import { xMockApi } from "./mock-data"
+
+const xRealApi = { list: () => serverApi<X[]>("/x") }
+
+export const xApi = USE_MOCK_API ? xMockApi : xRealApi
+```
+
+Bật/tắt qua `NEXT_PUBLIC_USE_MOCK_API` trong `.env.local`. Khi có backend thật, đổi về `false` — không cần sửa `actions.ts`, hook, hay component nào. Xem `src/features/auth/mock-data.ts` làm ví dụ.
+
 ### Server Actions
 
 ```ts
@@ -383,15 +399,16 @@ Thêm key vào `messages/en.json` và `messages/vi.json` trước khi dùng.
 
 ## Biến môi trường
 
-| Biến                       | Bắt buộc | Mô tả                                          |
-| -------------------------- | -------- | ---------------------------------------------- |
-| `NEXT_PUBLIC_APP_URL`      | ✓        | URL của app (VD: `http://localhost:3000`)      |
-| `JWT_SECRET`               | ✓        | Khóa ký JWT, tối thiểu 32 ký tự                |
-| `API_BASE_URL`             | ✓        | URL backend API (server-side)                  |
-| `NEXT_PUBLIC_APP_NAME`     |          | Tên app hiển thị                               |
-| `SESSION_COOKIE_NAME`      |          | Tên cookie session (mặc định: `session`)       |
-| `NEXT_PUBLIC_API_BASE_URL` |          | URL backend API (client-side, nếu khác server) |
-| `NODE_ENV`                 |          | `development` \| `production` \| `test`        |
+| Biến                       | Bắt buộc | Mô tả                                                                |
+| -------------------------- | -------- | -------------------------------------------------------------------- |
+| `NEXT_PUBLIC_APP_URL`      | ✓        | URL của app (VD: `http://localhost:3000`)                            |
+| `JWT_SECRET`               | ✓        | Khóa ký JWT, tối thiểu 32 ký tự                                      |
+| `API_BASE_URL`             | ✓        | URL backend API (server-side)                                        |
+| `NEXT_PUBLIC_APP_NAME`     |          | Tên app hiển thị                                                     |
+| `SESSION_COOKIE_NAME`      |          | Tên cookie session (mặc định: `session`)                             |
+| `NEXT_PUBLIC_API_BASE_URL` |          | URL backend API (client-side, nếu khác server)                       |
+| `NODE_ENV`                 |          | `development` \| `production` \| `test`                              |
+| `NEXT_PUBLIC_USE_MOCK_API` |          | `true` để dùng mock data thay vì gọi backend thật (mặc định `false`) |
 
 > Tất cả biến được validate lúc build bằng Zod (`src/lib/env.ts`). Build sẽ fail nếu thiếu biến bắt buộc.
 

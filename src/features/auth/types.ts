@@ -18,3 +18,7 @@ export interface AuthResponse {
   requiresTwoFactor?: boolean
   twoFactorPhone?: string
 }
+
+export interface VerifyForgotPasswordCodeResponse {
+  resetToken: string
+}

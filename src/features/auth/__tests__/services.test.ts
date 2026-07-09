@@ -7,6 +7,7 @@ vi.mock("../api", () => ({
     register: vi.fn(),
     forgotPassword: vi.fn(),
     resetPassword: vi.fn(),
+    verifyForgotPasswordCode: vi.fn(),
     logout: vi.fn(),
     me: vi.fn(),
     resendVerificationEmail: vi.fn(),
@@ -31,6 +32,8 @@ const mockLogin = vi.mocked(authApi.login)
 const mockRegister = vi.mocked(authApi.register)
 const mockForgotPassword = vi.mocked(authApi.forgotPassword)
 const mockResetPassword = vi.mocked(authApi.resetPassword)
+const mockVerifyForgotPasswordCode = vi.mocked(authApi.verifyForgotPasswordCode)
+const mockVerifyTwoStep = vi.mocked(authApi.verifyTwoStep)
 const mockSignToken = vi.mocked(signToken)
 const mockSetSessionCookie = vi.mocked(setSessionCookie)
 const mockClearSessionCookie = vi.mocked(clearSessionCookie)
@@ -187,6 +190,73 @@ describe("authService.resetPassword", () => {
     await expect(
       authService.resetPassword({ password: "newpass123", token: "expired-token" })
     ).rejects.toThrow(AuthError)
+  })
+})
+
+// ─── authService.verifyForgotPasswordCode ────────────────────────────────────
+
+describe("authService.verifyForgotPasswordCode", () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it("returns the reset token on success", async () => {
+    mockVerifyForgotPasswordCode.mockResolvedValue({
+      data: { resetToken: "real-reset-token" },
+      error: null,
+    })
+
+    const token = await authService.verifyForgotPasswordCode({
+      email: "user@example.com",
+      code: "120820",
+    })
+
+    expect(token).toBe("real-reset-token")
+  })
+
+  it("throws AuthError when the code is rejected", async () => {
+    mockVerifyForgotPasswordCode.mockResolvedValue({
+      data: null,
+      error: { message: "Invalid verification code", code: "INVALID_CODE", status: 400 },
+    })
+
+    await expect(
+      authService.verifyForgotPasswordCode({ email: "user@example.com", code: "000000" })
+    ).rejects.toThrow(AuthError)
+  })
+})
+
+// ─── authService.verifyTwoStep ────────────────────────────────────────────────
+
+describe("authService.verifyTwoStep", () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it("signs a new session token and sets the cookie on success", async () => {
+    mockVerifyTwoStep.mockResolvedValue({
+      data: { token: "backend-access-token", user: mockUser },
+      error: null,
+    })
+    mockSignToken.mockResolvedValue("signed-session-jwt")
+
+    const user = await authService.verifyTwoStep("230320")
+
+    expect(user).toEqual(mockUser)
+    expect(mockSignToken).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userId: "user-1",
+        email: "user@example.com",
+        accessToken: "backend-access-token",
+      })
+    )
+    expect(mockSetSessionCookie).toHaveBeenCalledWith("signed-session-jwt")
+  })
+
+  it("throws AuthError when the code is rejected", async () => {
+    mockVerifyTwoStep.mockResolvedValue({
+      data: null,
+      error: { message: "Invalid verification code", code: "INVALID_CODE", status: 400 },
+    })
+
+    await expect(authService.verifyTwoStep("000000")).rejects.toThrow(AuthError)
+    expect(mockSetSessionCookie).not.toHaveBeenCalled()
   })
 })
 
