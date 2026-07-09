@@ -1,44 +1,60 @@
 import { env } from "@/lib/env"
+import { ApiClient, ApiClientError } from "@/lib/api-client"
 import type { ApiResponse } from "@/types"
 
-async function apiFetch<T>(
-  baseUrl: string,
-  path: string,
-  init?: RequestInit & { token?: string }
-): Promise<ApiResponse<T>> {
-  const { token, ...fetchInit } = init ?? {}
+// Two instances mirroring the existing server/client split:
+// serverHttpClient talks to the real backend URL (server-only env var).
+// browserHttpClient talks to whatever URL is reachable from the browser.
+const serverHttpClient = new ApiClient({ baseURL: env.API_BASE_URL, timeout: 15_000 })
+const browserHttpClient = new ApiClient({
+  baseURL: env.NEXT_PUBLIC_API_BASE_URL ?? env.API_BASE_URL,
+  timeout: 15_000,
+})
 
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
+// Re-exported so future features can write `class XService extends BaseApiService`
+// against the same underlying clients instead of going through serverApi/clientApi.
+export { serverHttpClient, browserHttpClient }
+export { BaseApiService } from "@/lib/base-api.service"
+
+async function execute<T>(
+  client: ApiClient,
+  path: string,
+  init: RequestInit | undefined,
+  token: string | undefined
+): Promise<ApiResponse<T>> {
+  const method = (init?.method ?? "GET").toUpperCase()
+  const body = typeof init?.body === "string" ? JSON.parse(init.body) : undefined
+  const headers = {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    ...(fetchInit.headers as Record<string, string> | undefined),
+    ...(init?.headers as Record<string, string> | undefined),
   }
 
   try {
-    const res = await fetch(`${baseUrl}${path}`, { ...fetchInit, headers })
-
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}))
-      return {
-        data: null,
-        error: {
-          message: body.message ?? res.statusText,
-          code: body.code ?? "UNKNOWN",
-          status: res.status,
-        },
-      }
+    let data: T
+    switch (method) {
+      case "POST":
+        data = await client.post<T>(path, body, { headers })
+        break
+      case "PUT":
+        data = await client.put<T>(path, body, { headers })
+        break
+      case "PATCH":
+        data = await client.patch<T>(path, body, { headers })
+        break
+      case "DELETE":
+        data = await client.delete<T>(path, { headers })
+        break
+      default:
+        data = await client.get<T>(path, { headers })
     }
-
-    const data: T = await res.json()
     return { data, error: null }
   } catch (err) {
+    if (err instanceof ApiClientError) {
+      return { data: null, error: { message: err.message, code: err.code, status: err.status } }
+    }
     return {
       data: null,
-      error: {
-        message: err instanceof Error ? err.message : "Network error",
-        code: "NETWORK_ERROR",
-        status: 0,
-      },
+      error: { message: "Network error", code: "NETWORK_ERROR", status: 0 },
     }
   }
 }
@@ -51,8 +67,7 @@ export async function serverApi<T>(path: string, init?: RequestInit): Promise<Ap
   const cookieStore = await cookies()
   const sessionJwt = cookieStore.get(env.SESSION_COOKIE_NAME)?.value
   const session = sessionJwt ? await verifyToken(sessionJwt) : null
-  const token = session?.accessToken
-  return apiFetch<T>(env.API_BASE_URL, path, { ...init, token })
+  return execute<T>(serverHttpClient, path, init, session?.accessToken)
 }
 
 // Client-side calls (React components)
@@ -62,6 +77,5 @@ export async function clientApi<T>(
   init?: RequestInit,
   token?: string
 ): Promise<ApiResponse<T>> {
-  const baseUrl = env.NEXT_PUBLIC_API_BASE_URL ?? env.API_BASE_URL
-  return apiFetch<T>(baseUrl, path, { ...init, token })
+  return execute<T>(browserHttpClient, path, init, token)
 }
