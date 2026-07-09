@@ -61,7 +61,6 @@
     "forgotPasswordSubtitle": "Nhập email của bạn, chúng tôi sẽ gửi hướng dẫn đặt lại mật khẩu",
     "sendResetLink": "Gửi link đặt lại",
     "sendResetLinkLoading": "Đang gửi...",
-    "forgotPasswordSuccess": "Kiểm tra email của bạn để nhận hướng dẫn đặt lại mật khẩu",
     "forgotPasswordFailed": "Gửi link thất bại, vui lòng thử lại",
     "verifyEmailTitle": "Xác thực email 📧",
     "verifyEmailDesc": "Đường link kích hoạt tài khoản đã được gửi tới email:",
@@ -195,6 +194,8 @@
       "taskList": "Danh sách checklist",
       "link": "Thêm link",
       "image": "Chèn ảnh",
+      "video": "Chèn video",
+      "chart": "Chèn biểu đồ",
       "table": "Chèn bảng",
       "alignLeft": "Căn trái",
       "alignCenter": "Căn giữa",
@@ -203,7 +204,14 @@
       "textColor": "Màu chữ",
       "highlight": "Làm nổi bật",
       "clearFormat": "Xóa định dạng",
-      "horizontalRule": "Đường kẻ ngang"
+      "horizontalRule": "Đường kẻ ngang",
+      "emoji": "Chèn emoji"
+    },
+    "mention": {
+      "noResults": "Không tìm thấy người dùng"
+    },
+    "slash": {
+      "noResults": "Không có block phù hợp"
     },
     "link": {
       "title": "Thêm link",
@@ -220,6 +228,26 @@
       "uploadError": "Tải ảnh thất bại",
       "uploadTitle": "Kéo thả ảnh vào đây",
       "uploadSubtitle": "Hoặc click để chọn file (tối đa 5MB)"
+    },
+    "video": {
+      "title": "Chèn video",
+      "urlPlaceholder": "https://youtube.com/watch?v=... hoặc https://vimeo.com/...",
+      "insertBtn": "Chèn video",
+      "invalidUrl": "Chỉ hỗ trợ link YouTube hoặc Vimeo"
+    },
+    "chart": {
+      "title": "Chèn biểu đồ",
+      "titlePlaceholder": "Tiêu đề biểu đồ (không bắt buộc)",
+      "labelPlaceholder": "Nhãn",
+      "addRow": "Thêm dòng",
+      "removeRow": "Xóa dòng",
+      "insertBtn": "Chèn biểu đồ",
+      "types": {
+        "bar": "Cột",
+        "line": "Đường",
+        "area": "Vùng",
+        "pie": "Tròn"
+      }
     },
     "table": {
       "insert": "Chèn bảng 3×3",

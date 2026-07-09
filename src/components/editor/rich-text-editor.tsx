@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl"
 import { createExtensions } from "./extensions"
 import { EditorToolbar } from "./toolbar/editor-toolbar"
 import { cn } from "@/lib/utils"
+import type { MentionItem } from "./mention/types"
 
 export interface RichTextEditorProps {
   value?: JSONContent
@@ -19,6 +20,7 @@ export interface RichTextEditorProps {
   maxHeight?: number
   showCharacterCount?: boolean
   maxCharacters?: number
+  mentionItems?: MentionItem[]
 }
 
 export function RichTextEditor({
@@ -32,13 +34,32 @@ export function RichTextEditor({
   maxHeight,
   showCharacterCount = false,
   maxCharacters,
+  mentionItems,
 }: RichTextEditorProps) {
   const t = useTranslations("editor")
   const resolvedPlaceholder = placeholder ?? t("placeholder")
 
   const extensions = useMemo(
-    () => createExtensions({ placeholder: resolvedPlaceholder, maxCharacters }),
-    [resolvedPlaceholder, maxCharacters]
+    () =>
+      createExtensions({
+        placeholder: resolvedPlaceholder,
+        maxCharacters,
+        mentionItems,
+        mentionNoResultsLabel: t("mention.noResults"),
+        slashNoResultsLabel: t("slash.noResults"),
+        slashLabels: {
+          heading1: t("heading.h1"),
+          heading2: t("heading.h2"),
+          heading3: t("heading.h3"),
+          bulletList: t("toolbar.bulletList"),
+          orderedList: t("toolbar.orderedList"),
+          taskList: t("toolbar.taskList"),
+          blockquote: t("heading.blockquote"),
+          codeBlock: t("heading.codeBlock"),
+          horizontalRule: t("toolbar.horizontalRule"),
+        },
+      }),
+    [resolvedPlaceholder, maxCharacters, mentionItems, t]
   )
 
   const editor = useEditor({

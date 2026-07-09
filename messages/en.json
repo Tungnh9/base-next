@@ -61,7 +61,6 @@
     "forgotPasswordSubtitle": "Enter your email, and we'll send you instructions to reset your password",
     "sendResetLink": "Send Reset Link",
     "sendResetLinkLoading": "Sending...",
-    "forgotPasswordSuccess": "Check your email for instructions to reset your password",
     "forgotPasswordFailed": "Failed to send reset link, please try again",
     "verifyEmailTitle": "Verify your email 📧",
     "verifyEmailDesc": "Account activation link sent to your email address:",
@@ -195,6 +194,8 @@
       "taskList": "Task list",
       "link": "Add link",
       "image": "Insert image",
+      "video": "Insert video",
+      "chart": "Insert chart",
       "table": "Insert table",
       "alignLeft": "Align left",
       "alignCenter": "Align center",
@@ -203,7 +204,14 @@
       "textColor": "Text color",
       "highlight": "Highlight",
       "clearFormat": "Clear formatting",
-      "horizontalRule": "Horizontal rule"
+      "horizontalRule": "Horizontal rule",
+      "emoji": "Insert emoji"
+    },
+    "mention": {
+      "noResults": "No matching people"
+    },
+    "slash": {
+      "noResults": "No matching blocks"
     },
     "link": {
       "title": "Add link",
@@ -220,6 +228,26 @@
       "uploadError": "Upload failed",
       "uploadTitle": "Drop image here",
       "uploadSubtitle": "Or click to select a file (max 5MB)"
+    },
+    "video": {
+      "title": "Insert video",
+      "urlPlaceholder": "https://youtube.com/watch?v=... or https://vimeo.com/...",
+      "insertBtn": "Insert video",
+      "invalidUrl": "Only YouTube or Vimeo URLs are supported"
+    },
+    "chart": {
+      "title": "Insert chart",
+      "titlePlaceholder": "Chart title (optional)",
+      "labelPlaceholder": "Label",
+      "addRow": "Add row",
+      "removeRow": "Remove row",
+      "insertBtn": "Insert chart",
+      "types": {
+        "bar": "Bar",
+        "line": "Line",
+        "area": "Area",
+        "pie": "Pie"
+      }
     },
     "table": {
       "insert": "Insert 3×3 table",

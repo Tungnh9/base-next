@@ -16,10 +16,20 @@ import CharacterCount from "@tiptap/extension-character-count"
 import Placeholder from "@tiptap/extension-placeholder"
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight"
 import { createLowlight, common } from "lowlight"
+import { createMentionExtension } from "./mention/mention-extension"
+import { SlashCommand } from "./slash/slash-command"
+import { Video } from "./video/video-extension"
+import { Chart } from "./chart/chart-extension"
+import type { MentionItem } from "./mention/types"
+import type { SlashLabels } from "./slash/slash-items"
 
 interface ExtensionOptions {
   placeholder?: string
   maxCharacters?: number
+  mentionItems?: MentionItem[]
+  mentionNoResultsLabel?: string
+  slashLabels?: SlashLabels
+  slashNoResultsLabel?: string
 }
 
 export function createExtensions(options?: ExtensionOptions) {
@@ -48,5 +58,17 @@ export function createExtensions(options?: ExtensionOptions) {
       placeholder: options?.placeholder ?? "",
     }),
     CodeBlockLowlight.configure({ lowlight }),
+    Video,
+    Chart,
+    createMentionExtension({
+      items: options?.mentionItems,
+      noResultsLabel: options?.mentionNoResultsLabel,
+    }),
+    // Tiptap's Extension.configure() deep-merges by key — omit keys entirely
+    // (rather than passing `undefined`) so addOptions()'s defaults survive.
+    SlashCommand.configure({
+      ...(options?.slashLabels ? { labels: options.slashLabels } : {}),
+      ...(options?.slashNoResultsLabel ? { noResultsLabel: options.slashNoResultsLabel } : {}),
+    }),
   ]
 }

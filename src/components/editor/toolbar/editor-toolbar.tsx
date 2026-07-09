@@ -27,6 +27,9 @@ import { ColorPicker } from "./color-picker"
 import { LinkPopover } from "./link-popover"
 import { ImageDialog } from "./image-dialog"
 import { TableMenu } from "./table-menu"
+import { EmojiPicker } from "./emoji-picker"
+import { VideoDialog } from "./video-dialog"
+import { ChartDialog } from "./chart-dialog"
 
 interface EditorToolbarProps {
   editor: Editor | null
@@ -164,7 +167,10 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       {/* Insert */}
       <LinkPopover editor={editor} />
       <ImageDialog editor={editor} />
+      <VideoDialog editor={editor} />
+      <ChartDialog editor={editor} />
       <TableMenu editor={editor} />
+      <EmojiPicker editor={editor} />
       <ToolbarButton
         onClick={() => editor.chain().focus().setHorizontalRule().run()}
         tooltip={t("toolbar.horizontalRule")}
