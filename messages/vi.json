@@ -98,6 +98,9 @@
   },
   "errors": {
     "notFound": "Trang không tồn tại",
+    "notFoundTitle": "Không tìm thấy trang :(",
+    "notFoundDescription": "Rất tiếc! 😞 Trang bạn yêu cầu không tồn tại trên hệ thống.",
+    "backToHome": "Về trang chủ",
     "serverError": "Lỗi máy chủ",
     "unauthorized": "Bạn không có quyền truy cập"
   },
