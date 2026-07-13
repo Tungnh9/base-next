@@ -44,16 +44,6 @@ export function HeadingSelect({ editor }: HeadingSelectProps) {
       action: (e: Editor) => e.chain().focus().toggleHeading({ level: 4 }).run(),
       isActive: (e: Editor) => e.isActive("heading", { level: 4 }),
     },
-    {
-      label: t("heading.blockquote"),
-      action: (e: Editor) => e.chain().focus().toggleBlockquote().run(),
-      isActive: (e: Editor) => e.isActive("blockquote"),
-    },
-    {
-      label: t("heading.codeBlock"),
-      action: (e: Editor) => e.chain().focus().toggleCodeBlock().run(),
-      isActive: (e: Editor) => e.isActive("codeBlock"),
-    },
   ]
 
   const activeLabel = BLOCK_OPTIONS.find((o) => o.isActive(editor))?.label ?? t("heading.paragraph")

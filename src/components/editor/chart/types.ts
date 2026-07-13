@@ -1,12 +1,13 @@
 export type ChartType = "bar" | "line" | "area" | "pie"
 
-export interface ChartDataPoint {
-  label: string
-  value: number
+export interface ChartSeries {
+  name: string
+  data: number[]
 }
 
 export interface ChartAttrs {
   chartType: ChartType
   title: string
-  data: ChartDataPoint[]
+  categories: string[]
+  series: ChartSeries[]
 }

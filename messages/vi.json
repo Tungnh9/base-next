@@ -208,13 +208,43 @@
       "highlight": "Làm nổi bật",
       "clearFormat": "Xóa định dạng",
       "horizontalRule": "Đường kẻ ngang",
-      "emoji": "Chèn emoji"
+      "emoji": "Chèn emoji",
+      "attachment": "Đính kèm file"
+    },
+    "attachment": {
+      "title": "Tệp đính kèm",
+      "remove": "Xóa tệp đính kèm"
     },
     "mention": {
-      "noResults": "Không tìm thấy người dùng"
+      "noResults": "Không tìm thấy người dùng",
+      "groupLabel": "Mọi người",
+      "loading": "Đang tìm…"
     },
     "slash": {
-      "noResults": "Không có block phù hợp"
+      "noResults": "Không có block phù hợp",
+      "imageUrlPrompt": "URL ảnh",
+      "groups": {
+        "text": "Văn bản",
+        "heading": "Tiêu đề",
+        "list": "Danh sách",
+        "block": "Khối",
+        "media": "Media"
+      },
+      "descriptions": {
+        "paragraph": "Văn bản thường",
+        "heading1": "Tiêu đề lớn",
+        "heading2": "Tiêu đề vừa",
+        "heading3": "Tiêu đề nhỏ",
+        "bulletList": "Danh sách không thứ tự",
+        "orderedList": "Danh sách có thứ tự",
+        "taskList": "Danh sách công việc có checkbox",
+        "blockquote": "Làm nổi bật 1 đoạn trích dẫn",
+        "codeBlock": "Code nhiều dòng",
+        "horizontalRule": "Đường kẻ ngang phân cách",
+        "table": "Chèn bảng",
+        "image": "Tải lên hoặc chèn ảnh",
+        "attachment": "Đính kèm 1 file"
+      }
     },
     "link": {
       "title": "Thêm link",
@@ -234,16 +264,38 @@
     },
     "video": {
       "title": "Chèn video",
+      "urlTab": "URL",
+      "uploadTab": "Tải lên",
       "urlPlaceholder": "https://youtube.com/watch?v=... hoặc https://vimeo.com/...",
+      "urlHint": "Hỗ trợ YouTube, Vimeo, và link file trực tiếp (.mp4, .webm, .mov)",
+      "previewTitle": "Xem trước video",
+      "recognizedAs": "Đã nhận dạng: {provider}",
+      "providerFile": "File video",
+      "dropzoneTitle": "Kéo thả hoặc click để chọn file",
+      "dropzoneHint": "MP4, WebM, MOV",
+      "uploadInvalidType": "Vui lòng chọn file video (MP4, WebM, MOV…)",
+      "uploading": "Đang tải lên…",
+      "uploadSuccess": "Tải lên thành công",
+      "changeFile": "Đổi file",
       "insertBtn": "Chèn video",
-      "invalidUrl": "Chỉ hỗ trợ link YouTube hoặc Vimeo"
+      "invalidUrl": "Chỉ hỗ trợ link YouTube, Vimeo, hoặc file video trực tiếp"
     },
     "chart": {
       "title": "Chèn biểu đồ",
+      "chartTypeLabel": "Loại biểu đồ",
       "titlePlaceholder": "Tiêu đề biểu đồ (không bắt buộc)",
-      "labelPlaceholder": "Nhãn",
-      "addRow": "Thêm dòng",
-      "removeRow": "Xóa dòng",
+      "categoriesLabel": "Danh mục (trục X)",
+      "categoriesLabelPie": "Nhãn",
+      "categoriesPlaceholder": "Tháng 1, Tháng 2, Tháng 3…",
+      "categoriesHint": "Phân cách bằng dấu phẩy hoặc xuống dòng",
+      "seriesLabel": "Series dữ liệu",
+      "seriesLabelPie": "Giá trị",
+      "seriesNamePlaceholder": "Series {index}",
+      "seriesDataPlaceholder": "120, 200, 150, 80…",
+      "addSeries": "Thêm series",
+      "removeSeries": "Xóa series",
+      "preview": "Xem trước",
+      "loadingPreview": "Đang tải biểu đồ…",
       "insertBtn": "Chèn biểu đồ",
       "types": {
         "bar": "Cột",

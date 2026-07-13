@@ -11,6 +11,15 @@ declare module "@tiptap/core" {
   }
 }
 
+function parseJsonAttr<T>(raw: string | null, fallback: T): T {
+  if (!raw) return fallback
+  try {
+    return JSON.parse(raw)
+  } catch {
+    return fallback
+  }
+}
+
 // Renders a bar/line/area/pie chart via echarts. Data is entered manually
 // through the toolbar dialog — no backend/data-source wiring yet.
 export const Chart = Node.create({
@@ -23,19 +32,18 @@ export const Chart = Node.create({
     return {
       chartType: { default: "bar" },
       title: { default: "" },
-      data: {
+      categories: {
         default: [],
-        parseHTML: (element) => {
-          const raw = element.getAttribute("data-chart-json")
-          if (!raw) return []
-          try {
-            return JSON.parse(raw)
-          } catch {
-            return []
-          }
-        },
+        parseHTML: (element) => parseJsonAttr(element.getAttribute("data-chart-categories"), []),
         renderHTML: (attributes) => ({
-          "data-chart-json": JSON.stringify(attributes.data ?? []),
+          "data-chart-categories": JSON.stringify(attributes.categories ?? []),
+        }),
+      },
+      series: {
+        default: [],
+        parseHTML: (element) => parseJsonAttr(element.getAttribute("data-chart-series"), []),
+        renderHTML: (attributes) => ({
+          "data-chart-series": JSON.stringify(attributes.series ?? []),
         }),
       },
     }

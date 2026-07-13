@@ -10,32 +10,34 @@ import {
   Underline,
   Strikethrough,
   Code,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  AlignJustify,
+  RemoveFormatting,
   List,
   ListOrdered,
   ListTodo,
+  Quote,
+  Code2,
   Minus,
-  RemoveFormatting,
 } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import { ToolbarButton } from "./toolbar-button"
 import { HeadingSelect } from "./heading-select"
+import { AlignDropdown } from "./align-dropdown"
+import { TextColorButton } from "./text-color-button"
 import { ColorPicker } from "./color-picker"
-import { LinkPopover } from "./link-popover"
 import { ImageDialog } from "./image-dialog"
-import { TableMenu } from "./table-menu"
-import { EmojiPicker } from "./emoji-picker"
 import { VideoDialog } from "./video-dialog"
+import { AttachmentButton } from "./attachment-button"
+import { LinkPopover } from "./link-popover"
+import { EmojiPicker } from "./emoji-picker"
+import { TableMenu } from "./table-menu"
 import { ChartDialog } from "./chart-dialog"
 
 interface EditorToolbarProps {
   editor: Editor | null
+  onAttachClick?: () => void
 }
 
-export function EditorToolbar({ editor }: EditorToolbarProps) {
+export function EditorToolbar({ editor, onAttachClick }: EditorToolbarProps) {
   const t = useTranslations("editor")
 
   if (!editor) return null
@@ -58,11 +60,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         <Redo2 />
       </ToolbarButton>
 
-      <Separator orientation="vertical" className="mx-1 h-5" />
-
-      <HeadingSelect editor={editor} />
-
-      <Separator orientation="vertical" className="mx-1 h-5" />
+      <Separator orientation="vertical" className="mx-1 data-[orientation=vertical]:h-5" />
 
       {/* Inline formatting */}
       <ToolbarButton
@@ -100,46 +98,17 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       >
         <Code />
       </ToolbarButton>
-
-      <Separator orientation="vertical" className="mx-1 h-5" />
-
-      <ColorPicker editor={editor} />
-
-      <Separator orientation="vertical" className="mx-1 h-5" />
-
-      {/* Alignment */}
       <ToolbarButton
-        onClick={() => editor.chain().focus().setTextAlign("left").run()}
-        isActive={editor.isActive({ textAlign: "left" })}
-        tooltip={t("toolbar.alignLeft")}
+        onClick={() => editor.chain().focus().clearNodes().unsetAllMarks().run()}
+        tooltip={t("toolbar.clearFormat")}
       >
-        <AlignLeft />
-      </ToolbarButton>
-      <ToolbarButton
-        onClick={() => editor.chain().focus().setTextAlign("center").run()}
-        isActive={editor.isActive({ textAlign: "center" })}
-        tooltip={t("toolbar.alignCenter")}
-      >
-        <AlignCenter />
-      </ToolbarButton>
-      <ToolbarButton
-        onClick={() => editor.chain().focus().setTextAlign("right").run()}
-        isActive={editor.isActive({ textAlign: "right" })}
-        tooltip={t("toolbar.alignRight")}
-      >
-        <AlignRight />
-      </ToolbarButton>
-      <ToolbarButton
-        onClick={() => editor.chain().focus().setTextAlign("justify").run()}
-        isActive={editor.isActive({ textAlign: "justify" })}
-        tooltip={t("toolbar.alignJustify")}
-      >
-        <AlignJustify />
+        <RemoveFormatting />
       </ToolbarButton>
 
-      <Separator orientation="vertical" className="mx-1 h-5" />
+      <Separator orientation="vertical" className="mx-1 data-[orientation=vertical]:h-5" />
 
-      {/* Lists */}
+      {/* Structure */}
+      <HeadingSelect editor={editor} />
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleBulletList().run()}
         isActive={editor.isActive("bulletList")}
@@ -162,15 +131,23 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         <ListTodo />
       </ToolbarButton>
 
-      <Separator orientation="vertical" className="mx-1 h-5" />
+      <Separator orientation="vertical" className="mx-1 data-[orientation=vertical]:h-5" />
 
-      {/* Insert */}
-      <LinkPopover editor={editor} />
-      <ImageDialog editor={editor} />
-      <VideoDialog editor={editor} />
-      <ChartDialog editor={editor} />
-      <TableMenu editor={editor} />
-      <EmojiPicker editor={editor} />
+      {/* Blocks */}
+      <ToolbarButton
+        onClick={() => editor.chain().focus().toggleBlockquote().run()}
+        isActive={editor.isActive("blockquote")}
+        tooltip={t("heading.blockquote")}
+      >
+        <Quote />
+      </ToolbarButton>
+      <ToolbarButton
+        onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+        isActive={editor.isActive("codeBlock")}
+        tooltip={t("heading.codeBlock")}
+      >
+        <Code2 />
+      </ToolbarButton>
       <ToolbarButton
         onClick={() => editor.chain().focus().setHorizontalRule().run()}
         tooltip={t("toolbar.horizontalRule")}
@@ -178,15 +155,31 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         <Minus />
       </ToolbarButton>
 
-      <Separator orientation="vertical" className="mx-1 h-5" />
+      <Separator orientation="vertical" className="mx-1 data-[orientation=vertical]:h-5" />
 
-      {/* Clear */}
-      <ToolbarButton
-        onClick={() => editor.chain().focus().clearNodes().unsetAllMarks().run()}
-        tooltip={t("toolbar.clearFormat")}
-      >
-        <RemoveFormatting />
-      </ToolbarButton>
+      {/* Alignment */}
+      <AlignDropdown editor={editor} />
+
+      <Separator orientation="vertical" className="mx-1 data-[orientation=vertical]:h-5" />
+
+      {/* Color */}
+      <TextColorButton editor={editor} />
+      <ColorPicker editor={editor} />
+
+      <Separator orientation="vertical" className="mx-1 data-[orientation=vertical]:h-5" />
+
+      {/* Media */}
+      <ImageDialog editor={editor} />
+      <VideoDialog editor={editor} />
+      {onAttachClick && <AttachmentButton onClick={onAttachClick} />}
+
+      <Separator orientation="vertical" className="mx-1 data-[orientation=vertical]:h-5" />
+
+      {/* Insert */}
+      <LinkPopover editor={editor} />
+      <EmojiPicker editor={editor} />
+      <TableMenu editor={editor} />
+      <ChartDialog editor={editor} />
     </div>
   )
 }

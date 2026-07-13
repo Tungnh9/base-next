@@ -13,8 +13,9 @@ declare module "@tiptap/core" {
   }
 }
 
-// Embeds a YouTube/Vimeo iframe as an atomic block node. UI-only for now —
-// only remote embed URLs are supported, no file upload yet.
+// Embeds a YouTube/Vimeo iframe, or a direct/blob video file, as an atomic
+// block node. File uploads are session-local blob URLs — no backend/storage
+// wiring yet.
 export const Video = Node.create<VideoOptions>({
   name: "video",
   group: "block",
@@ -30,8 +31,12 @@ export const Video = Node.create<VideoOptions>({
       src: {
         default: null,
         parseHTML: (element) => {
-          const src = element.querySelector("iframe")?.getAttribute("src") ?? null
-          return isAllowedVideoEmbedSrc(src) ? src : null
+          const provider = element.getAttribute("data-provider")
+          const src =
+            element.querySelector("iframe")?.getAttribute("src") ??
+            element.querySelector("video")?.getAttribute("src") ??
+            null
+          return isAllowedVideoEmbedSrc(src, provider) ? src : null
         },
       },
       provider: {
@@ -54,8 +59,16 @@ export const Video = Node.create<VideoOptions>({
 
     // Re-check here too — attrs can be set via insertContent()/JSON without
     // going through the toolbar dialog's parseVideoUrl() validation.
-    if (!isAllowedVideoEmbedSrc(HTMLAttributes.src)) {
+    if (!isAllowedVideoEmbedSrc(HTMLAttributes.src, HTMLAttributes.provider)) {
       return ["div", wrapperAttrs]
+    }
+
+    if (HTMLAttributes.provider === "file") {
+      return [
+        "div",
+        wrapperAttrs,
+        ["video", { src: HTMLAttributes.src, controls: "true", preload: "metadata" }],
+      ]
     }
 
     return [

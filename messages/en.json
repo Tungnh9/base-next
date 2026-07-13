@@ -208,13 +208,43 @@
       "highlight": "Highlight",
       "clearFormat": "Clear formatting",
       "horizontalRule": "Horizontal rule",
-      "emoji": "Insert emoji"
+      "emoji": "Insert emoji",
+      "attachment": "Attach file"
+    },
+    "attachment": {
+      "title": "Attachments",
+      "remove": "Remove attachment"
     },
     "mention": {
-      "noResults": "No matching people"
+      "noResults": "No matching people",
+      "groupLabel": "People",
+      "loading": "Searching…"
     },
     "slash": {
-      "noResults": "No matching blocks"
+      "noResults": "No matching blocks",
+      "imageUrlPrompt": "Image URL",
+      "groups": {
+        "text": "Text",
+        "heading": "Headings",
+        "list": "Lists",
+        "block": "Blocks",
+        "media": "Media"
+      },
+      "descriptions": {
+        "paragraph": "Normal text",
+        "heading1": "Large section title",
+        "heading2": "Medium section title",
+        "heading3": "Small section title",
+        "bulletList": "Unordered list",
+        "orderedList": "Ordered list",
+        "taskList": "Checkable task items",
+        "blockquote": "Highlight a quote",
+        "codeBlock": "Multi-line code",
+        "horizontalRule": "Divider line",
+        "table": "Insert a table",
+        "image": "Upload or embed an image",
+        "attachment": "Attach a file"
+      }
     },
     "link": {
       "title": "Add link",
@@ -234,16 +264,38 @@
     },
     "video": {
       "title": "Insert video",
+      "urlTab": "URL",
+      "uploadTab": "Upload",
       "urlPlaceholder": "https://youtube.com/watch?v=... or https://vimeo.com/...",
+      "urlHint": "Supports YouTube, Vimeo, and direct file URLs (.mp4, .webm, .mov)",
+      "previewTitle": "Video preview",
+      "recognizedAs": "Recognized: {provider}",
+      "providerFile": "Video file",
+      "dropzoneTitle": "Drag & drop or click to select a file",
+      "dropzoneHint": "MP4, WebM, MOV",
+      "uploadInvalidType": "Please choose a video file (MP4, WebM, MOV…)",
+      "uploading": "Uploading…",
+      "uploadSuccess": "Upload complete",
+      "changeFile": "Change file",
       "insertBtn": "Insert video",
-      "invalidUrl": "Only YouTube or Vimeo URLs are supported"
+      "invalidUrl": "Only YouTube, Vimeo, or direct video file URLs are supported"
     },
     "chart": {
       "title": "Insert chart",
+      "chartTypeLabel": "Chart type",
       "titlePlaceholder": "Chart title (optional)",
-      "labelPlaceholder": "Label",
-      "addRow": "Add row",
-      "removeRow": "Remove row",
+      "categoriesLabel": "Categories (x-axis)",
+      "categoriesLabelPie": "Labels",
+      "categoriesPlaceholder": "January, February, March…",
+      "categoriesHint": "Separate with a comma or newline",
+      "seriesLabel": "Data series",
+      "seriesLabelPie": "Values",
+      "seriesNamePlaceholder": "Series {index}",
+      "seriesDataPlaceholder": "120, 200, 150, 80…",
+      "addSeries": "Add series",
+      "removeSeries": "Remove series",
+      "preview": "Preview",
+      "loadingPreview": "Loading chart…",
       "insertBtn": "Insert chart",
       "types": {
         "bar": "Bar",
