@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, startTransition } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useTranslations, useLocale } from "next-intl"
@@ -66,7 +66,7 @@ export function LoginForm() {
     setIsNavigating(true)
     const fd = new FormData()
     Object.entries(data).forEach(([k, v]) => fd.set(k, String(v)))
-    action(fd)
+    startTransition(() => action(fd))
   }
 
   return (

@@ -30,6 +30,7 @@ export const authService = {
     const token = await signToken({
       userId: data.user.id,
       email: data.user.email,
+      name: data.user.name,
       role: data.user.role,
       accessToken: data.token,
     })
@@ -47,6 +48,7 @@ export const authService = {
     const token = await signToken({
       userId: data.user.id,
       email: data.user.email,
+      name: data.user.name,
       role: data.user.role,
       accessToken: data.token,
     })
@@ -99,6 +101,7 @@ export const authService = {
     const token = await signToken({
       userId: data.user.id,
       email: data.user.email,
+      name: data.user.name,
       role: data.user.role,
       accessToken: data.token,
     })

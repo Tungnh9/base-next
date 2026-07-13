@@ -6,6 +6,7 @@ import { env } from "@/lib/env"
 export interface SessionPayload extends JWTPayload {
   userId: string
   email: string
+  name?: string
   role?: string
   accessToken?: string
 }
