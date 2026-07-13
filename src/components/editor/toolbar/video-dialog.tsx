@@ -50,13 +50,30 @@ export function VideoDialog({ editor }: VideoDialogProps) {
     }
   }
 
-  function handleClose() {
+  function handleOpenChange(next: boolean) {
+    if (!next) {
+      stopProgressTimer()
+      if (uploadState.status === "done" && uploadState.result) {
+        URL.revokeObjectURL(uploadState.result.url)
+      }
+      setUrlInput("")
+      setUrlError(null)
+      setFiles([])
+      setUploadState(IDLE_UPLOAD)
+    }
+    setOpen(next)
+  }
+
+  // Insert flows close the dialog without discarding the just-inserted blob
+  // URL (it's now referenced by the editor content), so they bypass the
+  // revoke-on-close in handleOpenChange.
+  function closeAfterInsert() {
+    stopProgressTimer()
     setOpen(false)
     setUrlInput("")
     setUrlError(null)
     setFiles([])
     setUploadState(IDLE_UPLOAD)
-    stopProgressTimer()
   }
 
   // No backend yet — simulate an upload with a fake progress ramp, then hand
@@ -101,13 +118,13 @@ export function VideoDialog({ editor }: VideoDialogProps) {
       return
     }
     editor.chain().focus().setVideo({ src: parsed.embedUrl, provider: parsed.provider }).run()
-    handleClose()
+    closeAfterInsert()
   }
 
   function handleInsertUpload() {
     if (uploadState.status !== "done" || !uploadState.result) return
     editor.chain().focus().setVideo({ src: uploadState.result.url, provider: "file" }).run()
-    handleClose()
+    closeAfterInsert()
   }
 
   const providerLabel =
@@ -118,7 +135,7 @@ export function VideoDialog({ editor }: VideoDialogProps) {
         : "Vimeo"
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <ToolbarButton tooltip={t("toolbar.video")}>
           <VideoIcon />
@@ -189,7 +206,7 @@ export function VideoDialog({ editor }: VideoDialogProps) {
             {urlError && <p className="text-destructive text-sm">{urlError}</p>}
 
             <div className="flex justify-end gap-2 pt-1">
-              <Button type="button" variant="outline" onClick={handleClose}>
+              <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
                 {tCommon("cancel")}
               </Button>
               <Button type="button" onClick={handleInsertUrl} disabled={!urlInput.trim()}>
@@ -248,7 +265,7 @@ export function VideoDialog({ editor }: VideoDialogProps) {
             )}
 
             <div className="flex justify-end gap-2 pt-1">
-              <Button type="button" variant="outline" onClick={handleClose}>
+              <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
                 {tCommon("cancel")}
               </Button>
               <Button

@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 export interface AttachmentUpload {
   id: string
@@ -23,6 +23,20 @@ function nextAttachmentId() {
 // session-local blob URL, mirroring the video dialog's upload tab.
 export function useAttachments() {
   const [attachments, setAttachments] = useState<AttachmentUpload[]>([])
+  const attachmentsRef = useRef(attachments)
+  useEffect(() => {
+    attachmentsRef.current = attachments
+  }, [attachments])
+
+  // Revoke any blob URLs still outstanding when the editor unmounts —
+  // removeAttachment only covers explicit removal, not unmount.
+  useEffect(() => {
+    return () => {
+      attachmentsRef.current.forEach((a) => {
+        if (a.url) URL.revokeObjectURL(a.url)
+      })
+    }
+  }, [])
 
   const addFile = useCallback((file: File) => {
     const id = nextAttachmentId()
