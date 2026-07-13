@@ -1,25 +1,25 @@
-import { getTranslations } from "next-intl/server";
-import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server"
+import type { Metadata } from "next"
 import {
   Accordion,
   AccordionItem,
   AccordionTrigger,
   AccordionContent,
-} from "@/components/ui/accordion";
+} from "@/components/ui/accordion"
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("nav");
-  return { title: t("dashboard") };
+  const t = await getTranslations("nav")
+  return { title: t("dashboard") }
 }
 
 export default async function DashboardPage() {
-  const t = await getTranslations("nav");
+  const t = await getTranslations("nav")
 
   return (
-    <div className="flex flex-col flex-1 p-6 gap-8">
+    <div className="flex flex-1 flex-col gap-8">
       <h1>{t("dashboard")}</h1>
 
-      <div className="max-w-2xl flex flex-col gap-8">
+      <div className="flex max-w-2xl flex-col gap-8">
         {/* Default variant */}
         <div>
           <h6 className="mb-3">Default Accordion</h6>
@@ -27,8 +27,8 @@ export default async function DashboardPage() {
             <AccordionItem value="item-1">
               <AccordionTrigger>Accordion Item #1</AccordionTrigger>
               <AccordionContent>
-                Lemon drops chocolate cake gummies carrot cake chupa chups muffin topping.
-                Sesame snaps icing marzipan gummi bears macaroon dragée danish caramels powder.
+                Lemon drops chocolate cake gummies carrot cake chupa chups muffin topping. Sesame
+                snaps icing marzipan gummi bears macaroon dragée danish caramels powder.
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-2">
@@ -54,8 +54,8 @@ export default async function DashboardPage() {
             <AccordionItem value="item-1">
               <AccordionTrigger>Accordion Item #1</AccordionTrigger>
               <AccordionContent>
-                Lemon drops chocolate cake gummies carrot cake chupa chups muffin topping.
-                Sesame snaps icing marzipan gummi bears macaroon dragée danish caramels powder.
+                Lemon drops chocolate cake gummies carrot cake chupa chups muffin topping. Sesame
+                snaps icing marzipan gummi bears macaroon dragée danish caramels powder.
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-2">
@@ -75,5 +75,5 @@ export default async function DashboardPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

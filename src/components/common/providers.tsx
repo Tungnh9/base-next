@@ -12,11 +12,12 @@ interface ProvidersProps {
   children: ReactNode
   locale: string
   messages: AbstractIntlMessages
+  timeZone?: string
 }
 
-export function Providers({ children, locale, messages }: ProvidersProps) {
+export function Providers({ children, locale, messages, timeZone }: ProvidersProps) {
   return (
-    <NextIntlClientProvider locale={locale} messages={messages}>
+    <NextIntlClientProvider locale={locale} messages={messages} timeZone={timeZone}>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
         <TooltipProvider>{children}</TooltipProvider>
         <Toaster />

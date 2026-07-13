@@ -115,6 +115,7 @@
   },
   "userMenu": {
     "openLabel": "User menu",
+    "defaultName": "User",
     "defaultRole": "User",
     "myProfile": "My Profile",
     "setting": "Setting",
@@ -156,9 +157,12 @@
     "openLabel": "Shortcuts",
     "title": "Shortcuts",
     "items": {
+      "calendar": { "label": "Calendar", "sublabel": "Appointments" },
+      "invoice": { "label": "Invoice App", "sublabel": "Manage Accounts" },
+      "users": { "label": "User App", "sublabel": "Manage Users" },
+      "roles": { "label": "Role Management", "sublabel": "Permission" },
       "dashboard": { "label": "Dashboard", "sublabel": "Overview" },
-      "analytics": { "label": "Analytics", "sublabel": "Statistics" },
-      "calendar": { "label": "Calendar", "sublabel": "Schedule" }
+      "settings": { "label": "Settings", "sublabel": "Account Settings" }
     }
   },
   "search": {

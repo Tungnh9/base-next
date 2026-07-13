@@ -73,12 +73,12 @@ export function Sidebar() {
                 <Image
                   src="/logo.svg"
                   alt="Logo"
-                  width={28}
-                  height={19}
+                  width={34}
+                  height={23}
                   priority
-                  className="h-[19px] w-[28px]"
+                  className="h-[23px] w-[34px]"
                 />
-                <span>App</span>
+                <span>Vuexy</span>
               </Link>
               <button
                 onClick={toggleSidebarCollapsed}

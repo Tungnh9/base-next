@@ -54,7 +54,7 @@ export function LanguageSwitcher({ currentLocale }: { currentLocale: Locale }) {
         onClick={() => setOpen((v) => !v)}
         aria-label="Change language"
         aria-expanded={open}
-        className="flex size-[26px] items-center justify-center rounded-full transition-opacity hover:opacity-80"
+        className="flex size-[26px] cursor-pointer items-center justify-center rounded-full transition-opacity hover:opacity-80"
       >
         <span aria-hidden="true" className="text-[22px] leading-none">
           {LOCALE_FLAGS[currentLocale]}
@@ -67,7 +67,7 @@ export function LanguageSwitcher({ currentLocale }: { currentLocale: Locale }) {
             <button
               key={locale}
               onClick={() => switchTo(locale)}
-              className={`hover:bg-foreground/[0.08] flex w-full items-center px-3 py-2 text-sm transition-colors ${
+              className={`hover:bg-foreground/[0.08] flex w-full cursor-pointer items-center px-3 py-2 text-sm transition-colors ${
                 locale === currentLocale ? "text-primary font-semibold" : "text-foreground"
               }`}
             >

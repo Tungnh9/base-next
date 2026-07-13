@@ -17,14 +17,15 @@ import { useUserStore } from "@/stores"
 
 interface UserMenuProps {
   email: string
+  name?: string
   role?: string
   avatar?: string
 }
 
 const itemClassName =
-  "gap-2 rounded-[6px] px-4 py-[7px] text-[15px] text-foreground [&_svg]:text-foreground"
+  "gap-3 rounded-[6px] px-4 py-3 text-[15px] text-foreground [&_svg]:text-foreground"
 
-export function UserMenu({ email, role, avatar }: UserMenuProps) {
+export function UserMenu({ email, name, role, avatar }: UserMenuProps) {
   const t = useTranslations()
   const clearUser = useUserStore((s) => s.clearUser)
 
@@ -32,7 +33,7 @@ export function UserMenu({ email, role, avatar }: UserMenuProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="focus-visible:ring-ring cursor-pointer rounded-full transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+          className="focus-visible:ring-ring cursor-pointer rounded-full leading-[0] transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
           aria-label={t("userMenu.openLabel")}
         >
           <Avatar size={38} status="online">
@@ -42,13 +43,15 @@ export function UserMenu({ email, role, avatar }: UserMenuProps) {
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[230px] overflow-hidden p-0 py-2">
-        <div className="flex items-center gap-3 px-4 py-2">
+        <div className="flex items-center gap-[10px] px-6 py-4">
           <Avatar size={38} status="online" className="shrink-0">
             {avatar && <AvatarImage src={avatar} alt={email} />}
             <AvatarFallback>{email.charAt(0).toUpperCase()}</AvatarFallback>
           </Avatar>
           <div className="min-w-0">
-            <p className="text-foreground truncate text-[15px] font-semibold">{email}</p>
+            <p className="text-foreground truncate text-[15px] font-semibold">
+              {name ?? t("userMenu.defaultName")}
+            </p>
             <p className="text-muted-foreground truncate text-[13px]">
               {role ?? t("userMenu.defaultRole")}
             </p>
@@ -59,15 +62,15 @@ export function UserMenu({ email, role, avatar }: UserMenuProps) {
 
         <div className="flex flex-col gap-1 px-2">
           <DropdownMenuItem className={itemClassName}>
-            <UserCheck className="size-[18px]" />
+            <UserCheck className="size-6" />
             {t("userMenu.myProfile")}
           </DropdownMenuItem>
           <DropdownMenuItem className={itemClassName}>
-            <Settings className="size-[18px]" />
+            <Settings className="size-6" />
             {t("userMenu.setting")}
           </DropdownMenuItem>
           <DropdownMenuItem className={itemClassName}>
-            <CreditCard className="size-[18px]" />
+            <CreditCard className="size-6" />
             <span className="flex-1">{t("userMenu.billing")}</span>
             <span className="bg-destructive/16 text-destructive flex size-[22px] items-center justify-center rounded-full text-[13px] font-semibold">
               2
@@ -79,15 +82,15 @@ export function UserMenu({ email, role, avatar }: UserMenuProps) {
 
         <div className="flex flex-col gap-1 px-2">
           <DropdownMenuItem className={itemClassName}>
-            <LifeBuoy className="size-[18px]" />
+            <LifeBuoy className="size-6" />
             {t("userMenu.help")}
           </DropdownMenuItem>
           <DropdownMenuItem className={itemClassName}>
-            <Info className="size-[18px]" />
+            <Info className="size-6" />
             {t("userMenu.faq")}
           </DropdownMenuItem>
           <DropdownMenuItem className={itemClassName}>
-            <DollarSign className="size-[18px]" />
+            <DollarSign className="size-6" />
             {t("userMenu.pricing")}
           </DropdownMenuItem>
         </div>
@@ -105,7 +108,7 @@ export function UserMenu({ email, role, avatar }: UserMenuProps) {
               logoutAction()
             }}
           >
-            <LogOut className="size-[18px]" />
+            <LogOut className="size-6" />
             {t("auth.logout")}
           </DropdownMenuItem>
         </div>

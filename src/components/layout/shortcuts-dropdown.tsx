@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useParams } from "next/navigation"
-import { BarChart2, Calendar, LayoutDashboard, LayoutGrid } from "lucide-react"
+import { BarChart2, Calendar, FileText, LayoutGrid, Lock, Settings, Users } from "lucide-react"
 import { useTranslations } from "next-intl"
 import {
   DropdownMenu,
@@ -11,9 +11,18 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 const SHORTCUTS = [
-  { key: "dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { key: "analytics", href: "/analytics", icon: BarChart2 },
   { key: "calendar", href: "/calendar", icon: Calendar },
+  { key: "invoice", href: "/invoice", icon: FileText },
+  { key: "users", href: "/users", icon: Users },
+  { key: "roles", href: "/roles", icon: Lock },
+  { key: "dashboard", href: "/dashboard", icon: BarChart2 },
+  { key: "settings", href: "/settings", icon: Settings },
+]
+
+const ROWS = [
+  { id: "row-0", items: SHORTCUTS.slice(0, 2) },
+  { id: "row-1", items: SHORTCUTS.slice(2, 4) },
+  { id: "row-2", items: SHORTCUTS.slice(4, 6) },
 ]
 
 export function ShortcutsDropdown() {
@@ -26,7 +35,7 @@ export function ShortcutsDropdown() {
         <button
           type="button"
           aria-label={t("shortcuts.openLabel")}
-          className="text-muted-foreground hover:text-foreground flex size-[26px] items-center justify-center transition-colors"
+          className="text-muted-foreground hover:text-foreground flex size-[26px] cursor-pointer items-center justify-center transition-colors"
         >
           <LayoutGrid className="size-[22px]" />
         </button>
@@ -36,23 +45,30 @@ export function ShortcutsDropdown() {
           <span className="text-foreground text-[18px] font-semibold">{t("shortcuts.title")}</span>
           <LayoutGrid className="text-muted-foreground size-[22px]" />
         </div>
-        <div className="divide-border grid grid-cols-3 divide-x border-t">
-          {SHORTCUTS.map((s) => (
-            <Link
-              key={s.href}
-              href={`/${locale}${s.href}`}
-              className="hover:bg-accent flex flex-col items-center gap-2 px-3 py-4 text-center transition-colors"
-            >
-              <span className="bg-foreground/[0.08] flex size-12 items-center justify-center rounded-full">
-                <s.icon className="text-foreground size-5" />
-              </span>
-              <span className="text-foreground text-[15px] font-semibold">
-                {t(`shortcuts.items.${s.key}.label`)}
-              </span>
-              <span className="text-muted-foreground text-[13px]">
-                {t(`shortcuts.items.${s.key}.sublabel`)}
-              </span>
-            </Link>
+        <div className="border-t">
+          {ROWS.map((row, rowIdx) => (
+            <div key={row.id}>
+              {rowIdx > 0 && <div className="border-border border-t" />}
+              <div className="divide-border flex divide-x">
+                {row.items.map((s) => (
+                  <Link
+                    key={s.href}
+                    href={`/${locale}${s.href}`}
+                    className="hover:bg-accent flex flex-1 flex-col items-center gap-2 px-4 py-4 text-center transition-colors"
+                  >
+                    <span className="bg-foreground/[0.08] flex size-12 items-center justify-center rounded-full">
+                      <s.icon className="text-foreground size-6" />
+                    </span>
+                    <span className="text-foreground text-[15px] font-semibold">
+                      {t(`shortcuts.items.${s.key}.label`)}
+                    </span>
+                    <span className="text-muted-foreground text-[13px]">
+                      {t(`shortcuts.items.${s.key}.sublabel`)}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       </DropdownMenuContent>
