@@ -16,7 +16,7 @@ export default async function DashboardPage() {
   const t = await getTranslations("nav");
 
   return (
-    <div className="flex flex-col flex-1 p-6 gap-8">
+    <div className="flex flex-col flex-1 gap-8">
       <h1>{t("dashboard")}</h1>
 
       <div className="max-w-2xl flex flex-col gap-8">

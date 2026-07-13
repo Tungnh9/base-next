@@ -2,11 +2,19 @@ import Image from "next/image"
 import Link from "next/link"
 import { getLocale, getTranslations } from "next-intl/server"
 import { Button } from "@/components/ui/button"
+import { getSession } from "@/lib/auth"
 import { ROUTES } from "@/lib/constants"
 
 export default async function NotFound() {
-  const locale = await getLocale()
-  const t = await getTranslations("errors")
+  const [locale, t, session] = await Promise.all([
+    getLocale(),
+    getTranslations("errors"),
+    getSession(),
+  ])
+
+  const homeHref = session
+    ? `/${locale}${ROUTES.dashboard}`
+    : `/${locale}${ROUTES.login}`
 
   return (
     <div className="relative flex flex-1 flex-col items-center justify-center overflow-hidden pt-[100px]">
@@ -29,7 +37,7 @@ export default async function NotFound() {
         </p>
       </div>
       <Button asChild className="relative z-10 mt-6">
-        <Link href={`/${locale}${ROUTES.home}`}>{t("backToHome")}</Link>
+        <Link href={homeHref}>{t("backToHome")}</Link>
       </Button>
       <Image
         src="/images/notify/error.png"
