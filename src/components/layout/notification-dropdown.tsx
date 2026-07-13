@@ -33,13 +33,17 @@ export function NotificationDropdown() {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
   }
 
+  function dismiss(id: string) {
+    setNotifications((prev) => prev.filter((n) => n.id !== id))
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
           type="button"
           aria-label={t("notifications.openLabel")}
-          className="text-muted-foreground hover:text-foreground relative flex size-[26px] items-center justify-center transition-colors"
+          className="text-muted-foreground hover:text-foreground relative flex size-[26px] cursor-pointer items-center justify-center transition-colors"
         >
           <Bell className="size-[22px]" />
           {unreadCount > 0 && (
@@ -85,6 +89,7 @@ export function NotificationDropdown() {
                     type="button"
                     className="text-muted-foreground hover:text-foreground mt-1 shrink-0 transition-colors"
                     aria-label={t("notifications.dismiss")}
+                    onClick={() => dismiss(n.id)}
                   >
                     <X className="size-4" />
                   </button>

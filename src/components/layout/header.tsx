@@ -24,7 +24,7 @@ export async function Header() {
           <ShortcutsDropdown />
           <NotificationDropdown />
           {session && (
-            <UserMenu email={session.email} role={session.role} avatar="/images/avatars/avt1.png" />
+            <UserMenu email={session.email} name={session.name} role={session.role} avatar="/images/avatars/avt1.png" />
           )}
         </div>
       </header>

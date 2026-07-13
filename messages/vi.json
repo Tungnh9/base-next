@@ -115,6 +115,7 @@
   },
   "userMenu": {
     "openLabel": "Menu người dùng",
+    "defaultName": "Người dùng",
     "defaultRole": "Người dùng",
     "myProfile": "Trang cá nhân",
     "setting": "Cài đặt",
@@ -156,9 +157,12 @@
     "openLabel": "Lối tắt",
     "title": "Lối tắt",
     "items": {
+      "calendar": { "label": "Lịch", "sublabel": "Lịch hẹn" },
+      "invoice": { "label": "Hóa đơn", "sublabel": "Quản lý tài khoản" },
+      "users": { "label": "Người dùng", "sublabel": "Quản lý người dùng" },
+      "roles": { "label": "Phân quyền", "sublabel": "Vai trò & Quyền" },
       "dashboard": { "label": "Dashboard", "sublabel": "Tổng quan" },
-      "analytics": { "label": "Analytics", "sublabel": "Phân tích" },
-      "calendar": { "label": "Lịch", "sublabel": "Lịch làm việc" }
+      "settings": { "label": "Cài đặt", "sublabel": "Cài đặt tài khoản" }
     }
   },
   "search": {
