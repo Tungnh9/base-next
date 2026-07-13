@@ -32,7 +32,7 @@ export function UserMenu({ email, role, avatar }: UserMenuProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="focus-visible:ring-ring rounded-full transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+          className="focus-visible:ring-ring cursor-pointer rounded-full transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
           aria-label={t("userMenu.openLabel")}
         >
           <Avatar size={38} status="online">
@@ -95,20 +95,19 @@ export function UserMenu({ email, role, avatar }: UserMenuProps) {
         <DropdownMenuSeparator />
 
         <div className="px-2">
-          <form action={logoutAction} className="contents">
-            <DropdownMenuItem
-              asChild
-              className={cn(
-                itemClassName,
-                "text-destructive [&_svg]:text-destructive hover:bg-destructive/10"
-              )}
-            >
-              <button type="submit" className="w-full" onClick={() => clearUser()}>
-                <LogOut className="size-[18px]" />
-                {t("auth.logout")}
-              </button>
-            </DropdownMenuItem>
-          </form>
+          <DropdownMenuItem
+            className={cn(
+              itemClassName,
+              "text-destructive [&_svg]:text-destructive hover:bg-destructive/10"
+            )}
+            onSelect={() => {
+              clearUser()
+              logoutAction()
+            }}
+          >
+            <LogOut className="size-[18px]" />
+            {t("auth.logout")}
+          </DropdownMenuItem>
         </div>
       </DropdownMenuContent>
     </DropdownMenu>
