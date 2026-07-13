@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
 import { jwtVerify } from "jose"
-import { locales, defaultLocale } from "@/i18n/config"
+
+// Inline constants from i18n/config — proxy runs in an isolated compilation
+// context where tsconfig path aliases (@/) are not reliably resolved by Turbopack.
+const locales = ["en", "vi"] as const
+type Locale = (typeof locales)[number]
+const defaultLocale: Locale = "vi"
 
 // Path segments (without locale prefix) that don't require auth
 const PUBLIC_PATHS = [
@@ -11,7 +16,6 @@ const PUBLIC_PATHS = [
   "/verify-email",
   "/two-step-verification",
   "/api/health",
-  "/ui-test",
 ]
 // URL prefixes to skip entirely (static assets)
 const SKIP_PREFIXES = ["/_next", "/favicon.ico"]

@@ -1,4 +1,4 @@
-import { getMessages } from "next-intl/server";
+import { getMessages, getTimeZone } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { locales, type Locale } from "@/i18n/config";
 import { Providers } from "@/components/common/providers";
@@ -22,10 +22,10 @@ export default async function LocaleLayout({
     notFound();
   }
 
-  const messages = await getMessages();
+  const [messages, timeZone] = await Promise.all([getMessages(), getTimeZone()]);
 
   return (
-    <Providers locale={locale} messages={messages}>
+    <Providers locale={locale} messages={messages} timeZone={timeZone}>
       {children}
     </Providers>
   );
