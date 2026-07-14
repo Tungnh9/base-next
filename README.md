@@ -16,7 +16,7 @@ Next.js 16 base template — scalable, production-ready, dùng được cho mọ
 | HTTP Client   | axios (via `ApiClient` class)         |
 | Tables        | TanStack Table v8                     |
 | Icons         | lucide-react                          |
-| Notifications | Sonner + shadcn Toast (Radix)         |
+| Notifications | Sonner                                |
 | Rich Text     | TipTap v3 (ProseMirror, @tiptap/core) |
 
 ---
@@ -51,3 +51,23 @@ npm run test:coverage        # Test + coverage report
 | [docs/i18n.md](docs/i18n.md)                   | Thêm ngôn ngữ, thêm string dịch               |
 | [docs/environment.md](docs/environment.md)     | Biến môi trường                               |
 | [docs/contributing.md](docs/contributing.md)   | Commit types, branch naming, quy trình push   |
+
+---
+
+## Trang tiện ích (misc)
+
+Các trang public không cần xác thực, không có sidebar/header:
+
+| Route             | Mô tả                |
+| ----------------- | -------------------- |
+| `/maintenance`    | Trang đang bảo trì   |
+| `/coming-soon`    | Trang sắp ra mắt     |
+| `/not-authorized` | Trang không có quyền |
+
+Route group `(misc)` — thêm route mới vào `src/app/[locale]/(misc)/` và khai báo trong `src/proxy.ts` → `PUBLIC_PATHS`.
+
+## Quy ước Button
+
+- Mọi `<button>` đều có `cursor: pointer` (khai báo trong `globals.css @layer base`)
+- Trạng thái `disabled` hiển thị `cursor: not-allowed`
+- Dùng `<Button>` từ `@/components/ui/button` cho tất cả button trong app
