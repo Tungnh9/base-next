@@ -1,0 +1,2 @@
+npm run build
+bash agent-skill/scripts/check-readme-sync.sh

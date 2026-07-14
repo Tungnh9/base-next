@@ -16,21 +16,312 @@
     "register": "Register",
     "email": "Email",
     "password": "Password",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
     "confirmPassword": "Confirm password",
+    "name": "Full name",
     "forgotPassword": "Forgot password?",
     "loginSuccess": "Logged in successfully",
     "logoutSuccess": "Logged out successfully",
+    "loginFailed": "Login failed, please try again",
+    "registerFailed": "Registration failed, please try again",
+    "registerSuccess": "Registration successful",
     "invalidCredentials": "Invalid email or password",
     "noAccount": "Don't have an account?",
-    "hasAccount": "Already have an account?"
+    "hasAccount": "Already have an account?",
+    "loading": "Signing in...",
+    "loggingIn": "Signing in",
+    "welcomeTitle": "Welcome Back! 👋",
+    "welcomeSubtitle": "Please sign in to your account and start the adventure",
+    "emailOrUsername": "Email or Username",
+    "emailOrUsernamePlaceholder": "user@gmail.com",
+    "usernamePlaceholder": "username",
+    "registerEmailPlaceholder": "username@gmail.com",
+    "newOnPlatform": "New on our platform?",
+    "createAccount": "Create an account",
+    "orContinueWith": "or",
+    "registerTitle": "Adventure starts here 🚀",
+    "registerSubtitle": "Make your app management easy and fun!",
+    "username": "Username",
+    "signUp": "Sign up",
+    "registerLoading": "Signing up...",
+    "agreeToPolicy": "I agree to",
+    "privacyPolicy": "privacy policy & terms",
+    "alreadyHaveAccount": "Already have an account?",
+    "signInInstead": "Sign in instead",
+    "resetPassword": "Reset Password",
+    "resetPasswordTitle": "Reset Password 🔒",
+    "resetPasswordFor": "for",
+    "newPassword": "New Password",
+    "setNewPassword": "Set New Password",
+    "resetPasswordLoading": "Setting password...",
+    "backToLogin": "Back to log in",
+    "resetPasswordFailed": "Reset password failed, please try again",
+    "forgotPasswordTitle": "Forgot Password? 🔒",
+    "forgotPasswordSubtitle": "Enter your email, and we'll send you instructions to reset your password",
+    "sendResetLink": "Send Reset Link",
+    "sendResetLinkLoading": "Sending...",
+    "forgotPasswordFailed": "Failed to send reset link, please try again",
+    "verifyEmailTitle": "Verify your email 📧",
+    "verifyEmailDesc": "Account activation link sent to your email address:",
+    "verifyEmailDescContinue": "Please follow the link inside to continue.",
+    "skipForNow": "Skip for now",
+    "didntGetEmail": "Didn't get the email?",
+    "resend": "Resend",
+    "resendSuccess": "Sent! Check your inbox.",
+    "resendCodeSuccess": "Sent! Check your phone.",
+    "resendFailed": "Failed to resend, please try again",
+    "twoStepTitle": "Two-Step Verification 💬",
+    "twoStepSubtitle": "We sent a verification code to your mobile. Enter the code from the mobile in the field below.",
+    "typeSecurityCode": "Type your 6 digit security code",
+    "verifyMyAccount": "Verify my account",
+    "verifyingAccount": "Verifying...",
+    "invalidVerificationCode": "Invalid verification code",
+    "didntGetCode": "Didn't get the code?",
+    "forgotPasswordVerifyTitle": "Email Verification 📧",
+    "forgotPasswordVerifySubtitle": "Enter the 6-digit code sent to your email address"
+  },
+  "validation": {
+    "emailInvalid": "Invalid email address",
+    "passwordMin": "Password must be at least 6 characters",
+    "nameMin": "Name must be at least 2 characters",
+    "passwordMismatch": "Passwords do not match",
+    "usernameMin": "Username must be at least 2 characters",
+    "mustAgreeTerms": "You must agree to the terms"
   },
   "nav": {
     "home": "Home",
-    "dashboard": "Dashboard"
+    "dashboard": "Dashboard",
+    "analytics": "Analytics",
+    "calendar": "Calendar",
+    "sectionAppsAndPages": "Apps & Pages"
   },
   "errors": {
     "notFound": "Page not found",
+    "notFoundTitle": "Page Not Found :(",
+    "notFoundDescription": "Oops! 😞 The requested URL was not found on this server.",
+    "backToHome": "Back to Home",
     "serverError": "Server error",
     "unauthorized": "You are not authorized to access this page"
+  },
+  "carousel": {
+    "prevSlide": "Previous slide",
+    "nextSlide": "Next slide",
+    "goToSlide": "Go to slide {index}",
+    "slideLabel": "Slide {index} of {total}"
+  },
+  "alert": {
+    "close": "Close"
+  },
+  "userMenu": {
+    "openLabel": "User menu",
+    "defaultName": "User",
+    "defaultRole": "User",
+    "myProfile": "My Profile",
+    "setting": "Setting",
+    "billing": "Billing",
+    "help": "Help",
+    "faq": "FAQ",
+    "pricing": "Pricing"
+  },
+  "datePicker": {
+    "apply": "Apply",
+    "placeholder": "DD/MM/YYYY",
+    "placeholderRange": "DD/MM/YYYY – DD/MM/YYYY"
+  },
+  "notifications": {
+    "openLabel": "Notifications",
+    "title": "Notification",
+    "markAllRead": "Mark all as read",
+    "dismiss": "Dismiss notification",
+    "viewAll": "View all notifications",
+    "demo": {
+      "achievement": {
+        "title": "Congratulations!",
+        "description": "You just earned the member of the month badge",
+        "time": "1 hour ago"
+      },
+      "connection": {
+        "title": "Nguyen Van A",
+        "description": "Accepted your connection request",
+        "time": "12 hours ago"
+      },
+      "report": {
+        "title": "System Report",
+        "description": "July report is ready to view",
+        "time": "24/07, 10:30"
+      }
+    }
+  },
+  "shortcuts": {
+    "openLabel": "Shortcuts",
+    "title": "Shortcuts",
+    "items": {
+      "calendar": { "label": "Calendar", "sublabel": "Appointments" },
+      "invoice": { "label": "Invoice App", "sublabel": "Manage Accounts" },
+      "users": { "label": "User App", "sublabel": "Manage Users" },
+      "roles": { "label": "Role Management", "sublabel": "Permission" },
+      "dashboard": { "label": "Dashboard", "sublabel": "Overview" },
+      "settings": { "label": "Settings", "sublabel": "Account Settings" }
+    }
+  },
+  "search": {
+    "placeholder": "Search (Ctrl+/)",
+    "quickNav": "Quick navigation",
+    "noResults": "No results found"
+  },
+  "editor": {
+    "placeholder": "Type '/' for commands, '@' to mention someone…",
+    "heading": {
+      "paragraph": "Paragraph",
+      "h1": "Heading 1",
+      "h2": "Heading 2",
+      "h3": "Heading 3",
+      "h4": "Heading 4",
+      "blockquote": "Quote",
+      "codeBlock": "Code block"
+    },
+    "color": {
+      "removeColor": "Remove color",
+      "removeHighlight": "Remove highlight"
+    },
+    "toolbar": {
+      "undo": "Undo (Ctrl+Z)",
+      "redo": "Redo (Ctrl+Y)",
+      "bold": "Bold (Ctrl+B)",
+      "italic": "Italic (Ctrl+I)",
+      "underline": "Underline (Ctrl+U)",
+      "strike": "Strikethrough",
+      "code": "Inline code",
+      "codeBlock": "Code block",
+      "heading": "Block type",
+      "blockquote": "Blockquote",
+      "bulletList": "Bullet list",
+      "orderedList": "Ordered list",
+      "taskList": "Task list",
+      "link": "Add link",
+      "image": "Insert image",
+      "video": "Insert video",
+      "chart": "Insert chart",
+      "table": "Insert table",
+      "alignLeft": "Align left",
+      "alignCenter": "Align center",
+      "alignRight": "Align right",
+      "alignJustify": "Justify",
+      "textColor": "Text color",
+      "highlight": "Highlight",
+      "clearFormat": "Clear formatting",
+      "horizontalRule": "Horizontal rule",
+      "emoji": "Insert emoji",
+      "attachment": "Attach file"
+    },
+    "attachment": {
+      "title": "Attachments",
+      "remove": "Remove attachment"
+    },
+    "mention": {
+      "noResults": "No matching people",
+      "groupLabel": "People",
+      "loading": "Searching…"
+    },
+    "slash": {
+      "noResults": "No matching blocks",
+      "imageUrlPrompt": "Image URL",
+      "groups": {
+        "text": "Text",
+        "heading": "Headings",
+        "list": "Lists",
+        "block": "Blocks",
+        "media": "Media"
+      },
+      "descriptions": {
+        "paragraph": "Normal text",
+        "heading1": "Large section title",
+        "heading2": "Medium section title",
+        "heading3": "Small section title",
+        "bulletList": "Unordered list",
+        "orderedList": "Ordered list",
+        "taskList": "Checkable task items",
+        "blockquote": "Highlight a quote",
+        "codeBlock": "Multi-line code",
+        "horizontalRule": "Divider line",
+        "table": "Insert a table",
+        "image": "Upload or embed an image",
+        "attachment": "Attach a file"
+      }
+    },
+    "link": {
+      "title": "Add link",
+      "open": "Open link",
+      "remove": "Remove link"
+    },
+    "image": {
+      "title": "Insert image",
+      "uploadTab": "Upload",
+      "urlTab": "From URL",
+      "urlPlaceholder": "https://example.com/image.png",
+      "insertBtn": "Insert image",
+      "uploading": "Uploading...",
+      "uploadError": "Upload failed",
+      "uploadTitle": "Drop image here",
+      "uploadSubtitle": "Or click to select a file (max 5MB)"
+    },
+    "video": {
+      "title": "Insert video",
+      "urlTab": "URL",
+      "uploadTab": "Upload",
+      "urlPlaceholder": "https://youtube.com/watch?v=... or https://vimeo.com/...",
+      "urlHint": "Supports YouTube, Vimeo, and direct file URLs (.mp4, .webm, .mov)",
+      "previewTitle": "Video preview",
+      "recognizedAs": "Recognized: {provider}",
+      "providerFile": "Video file",
+      "dropzoneTitle": "Drag & drop or click to select a file",
+      "dropzoneHint": "MP4, WebM, MOV",
+      "uploadInvalidType": "Please choose a video file (MP4, WebM, MOV…)",
+      "uploading": "Uploading…",
+      "uploadSuccess": "Upload complete",
+      "changeFile": "Change file",
+      "insertBtn": "Insert video",
+      "invalidUrl": "Only YouTube, Vimeo, or direct video file URLs are supported"
+    },
+    "chart": {
+      "title": "Insert chart",
+      "chartTypeLabel": "Chart type",
+      "titleLabel": "Chart title",
+      "titlePlaceholder": "Chart title (optional)",
+      "categoriesLabel": "Categories (x-axis)",
+      "categoriesLabelPie": "Labels",
+      "categoriesPlaceholder": "January, February, March…",
+      "categoriesHint": "Separate with a comma or newline",
+      "seriesLabel": "Data series",
+      "seriesLabelPie": "Values",
+      "seriesNamePlaceholder": "Series {index}",
+      "seriesDataPlaceholder": "120, 200, 150, 80…",
+      "addSeries": "Add series",
+      "removeSeries": "Remove series",
+      "preview": "Preview",
+      "loadingPreview": "Loading chart…",
+      "insertBtn": "Insert chart",
+      "types": {
+        "bar": "Bar",
+        "line": "Line",
+        "area": "Area",
+        "pie": "Pie"
+      }
+    },
+    "table": {
+      "insert": "Insert 3×3 table",
+      "addRowBefore": "Add row before",
+      "addRowAfter": "Add row after",
+      "deleteRow": "Delete row",
+      "addColBefore": "Add column before",
+      "addColAfter": "Add column after",
+      "deleteCol": "Delete column",
+      "deleteTable": "Delete table",
+      "mergeCells": "Merge cells",
+      "splitCell": "Split cell"
+    },
+    "characters": "{count} characters",
+    "charactersMax": "{count}/{max} characters"
   }
 }

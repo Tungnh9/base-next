@@ -1,17 +1,9 @@
-import { getTranslations } from "next-intl/server";
-import type { Metadata } from "next";
+import { RichTextEditor } from "@/components/editor/rich-text-editor"
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("nav");
-  return { title: t("dashboard") };
-}
-
-export default async function DashboardPage() {
-  const t = await getTranslations("nav");
-
+export default function DashboardPage() {
   return (
-    <div className="flex flex-col flex-1 p-6">
-      <h1>{t("dashboard")}</h1>
+    <div className="flex flex-1 flex-col">
+      <RichTextEditor />
     </div>
-  );
+  )
 }

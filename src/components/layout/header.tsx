@@ -1,37 +1,38 @@
-import Link from "next/link";
-import { getTranslations } from "next-intl/server";
-import { getSession } from "@/lib/auth";
-import { ROUTES } from "@/lib/constants";
-import { Button } from "@/components/ui/button";
-import { logoutAction } from "@/features/auth/actions";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { getLocale } from "next-intl/server"
+import { ThemeToggle } from "@/components/ui/theme-toggle"
+import { getSession } from "@/lib/auth"
+import type { Locale } from "@/i18n/config"
+import { LanguageSwitcher } from "./language-switcher"
+import { NotificationDropdown } from "./notification-dropdown"
+import { SearchBox } from "./search-box"
+import { ShortcutsDropdown } from "./shortcuts-dropdown"
+import { UserMenu } from "./user-menu"
 
 export async function Header() {
-  const t = await getTranslations("nav");
-  const session = await getSession();
+  const [session, rawLocale] = await Promise.all([getSession(), getLocale()])
+  const locale = rawLocale as Locale
 
   return (
-    <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center justify-between px-4">
-        <Link href={ROUTES.home} className="font-semibold">
-          App
-        </Link>
+    <div className="bg-background sticky top-4 z-50">
+      <header className="bg-card flex h-[62px] items-center gap-4 rounded-[6px] px-6 py-3 shadow-[0px_2px_4px_0px_rgba(165,163,174,0.3)]">
+        <SearchBox />
 
-        <nav className="flex items-center gap-2">
+        {/* Right actions */}
+        <div className="ml-auto flex shrink-0 items-center gap-4">
+          <LanguageSwitcher currentLocale={locale} />
           <ThemeToggle />
-          {session ? (
-            <form action={logoutAction}>
-              <Button variant="ghost" size="sm" type="submit">
-                {t("dashboard")}
-              </Button>
-            </form>
-          ) : (
-            <Button asChild size="sm">
-              <Link href={ROUTES.login}>Đăng nhập</Link>
-            </Button>
+          <ShortcutsDropdown />
+          <NotificationDropdown />
+          {session && (
+            <UserMenu
+              email={session.email}
+              name={session.name}
+              role={session.role}
+              avatar="/images/avatars/avt1.png"
+            />
           )}
-        </nav>
-      </div>
-    </header>
-  );
+        </div>
+      </header>
+    </div>
+  )
 }

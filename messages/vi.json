@@ -16,21 +16,312 @@
     "register": "Đăng ký",
     "email": "Email",
     "password": "Mật khẩu",
+    "showPassword": "Hiện mật khẩu",
+    "hidePassword": "Ẩn mật khẩu",
     "confirmPassword": "Xác nhận mật khẩu",
+    "name": "Họ và tên",
     "forgotPassword": "Quên mật khẩu?",
     "loginSuccess": "Đăng nhập thành công",
     "logoutSuccess": "Đăng xuất thành công",
+    "loginFailed": "Đăng nhập thất bại, vui lòng thử lại",
+    "registerFailed": "Đăng ký thất bại, vui lòng thử lại",
+    "registerSuccess": "Đăng ký thành công",
     "invalidCredentials": "Email hoặc mật khẩu không đúng",
     "noAccount": "Chưa có tài khoản?",
-    "hasAccount": "Đã có tài khoản?"
+    "hasAccount": "Đã có tài khoản?",
+    "loading": "Đang đăng nhập...",
+    "loggingIn": "Đang đăng nhập",
+    "welcomeTitle": "Chào mừng! 👋",
+    "welcomeSubtitle": "Vui lòng đăng nhập và tiếp tục hành trình",
+    "emailOrUsername": "Email hoặc Tên đăng nhập",
+    "emailOrUsernamePlaceholder": "user@gmail.com",
+    "usernamePlaceholder": "username",
+    "registerEmailPlaceholder": "username@gmail.com",
+    "newOnPlatform": "Mới tham gia?",
+    "createAccount": "Tạo tài khoản",
+    "orContinueWith": "hoặc",
+    "registerTitle": "Cuộc phiêu lưu bắt đầu 🚀",
+    "registerSubtitle": "Quản lý ứng dụng của bạn dễ dàng và thú vị!",
+    "username": "Tên đăng nhập",
+    "signUp": "Đăng ký",
+    "registerLoading": "Đang đăng ký...",
+    "agreeToPolicy": "Tôi đồng ý với",
+    "privacyPolicy": "chính sách bảo mật & điều khoản",
+    "alreadyHaveAccount": "Đã có tài khoản?",
+    "signInInstead": "Đăng nhập ngay",
+    "resetPassword": "Đặt lại mật khẩu",
+    "resetPasswordTitle": "Đặt lại mật khẩu 🔒",
+    "resetPasswordFor": "cho",
+    "newPassword": "Mật khẩu mới",
+    "setNewPassword": "Đặt mật khẩu mới",
+    "resetPasswordLoading": "Đang đặt lại...",
+    "backToLogin": "Quay lại đăng nhập",
+    "resetPasswordFailed": "Đặt lại mật khẩu thất bại, vui lòng thử lại",
+    "forgotPasswordTitle": "Quên mật khẩu? 🔒",
+    "forgotPasswordSubtitle": "Nhập email của bạn, chúng tôi sẽ gửi hướng dẫn đặt lại mật khẩu",
+    "sendResetLink": "Gửi link đặt lại",
+    "sendResetLinkLoading": "Đang gửi...",
+    "forgotPasswordFailed": "Gửi link thất bại, vui lòng thử lại",
+    "verifyEmailTitle": "Xác thực email 📧",
+    "verifyEmailDesc": "Đường link kích hoạt tài khoản đã được gửi tới email:",
+    "verifyEmailDescContinue": "Vui lòng nhấp vào đường dẫn trong email để tiếp tục.",
+    "skipForNow": "Bỏ qua",
+    "didntGetEmail": "Không nhận được email?",
+    "resend": "Gửi lại",
+    "resendSuccess": "Đã gửi! Kiểm tra hộp thư của bạn.",
+    "resendCodeSuccess": "Đã gửi! Kiểm tra điện thoại của bạn.",
+    "resendFailed": "Gửi lại thất bại, vui lòng thử lại",
+    "twoStepTitle": "Xác minh hai bước 💬",
+    "twoStepSubtitle": "Chúng tôi đã gửi mã xác minh đến điện thoại của bạn. Nhập mã từ điện thoại vào ô bên dưới.",
+    "typeSecurityCode": "Nhập mã bảo mật 6 chữ số",
+    "verifyMyAccount": "Xác minh tài khoản",
+    "verifyingAccount": "Đang xác minh...",
+    "invalidVerificationCode": "Mã xác minh không đúng",
+    "didntGetCode": "Không nhận được mã?",
+    "forgotPasswordVerifyTitle": "Xác thực email 📧",
+    "forgotPasswordVerifySubtitle": "Nhập mã 6 chữ số đã được gửi đến email của bạn"
+  },
+  "validation": {
+    "emailInvalid": "Email không hợp lệ",
+    "passwordMin": "Mật khẩu tối thiểu 6 ký tự",
+    "nameMin": "Tên tối thiểu 2 ký tự",
+    "passwordMismatch": "Mật khẩu không khớp",
+    "usernameMin": "Tên đăng nhập tối thiểu 2 ký tự",
+    "mustAgreeTerms": "Bạn phải đồng ý với điều khoản sử dụng"
   },
   "nav": {
     "home": "Trang chủ",
-    "dashboard": "Bảng điều khiển"
+    "dashboard": "Bảng điều khiển",
+    "analytics": "Phân tích",
+    "calendar": "Lịch",
+    "sectionAppsAndPages": "Ứng dụng & Trang"
   },
   "errors": {
     "notFound": "Trang không tồn tại",
+    "notFoundTitle": "Không tìm thấy trang :(",
+    "notFoundDescription": "Rất tiếc! 😞 Trang bạn yêu cầu không tồn tại trên hệ thống.",
+    "backToHome": "Về trang chủ",
     "serverError": "Lỗi máy chủ",
     "unauthorized": "Bạn không có quyền truy cập"
+  },
+  "carousel": {
+    "prevSlide": "Slide trước",
+    "nextSlide": "Slide tiếp theo",
+    "goToSlide": "Đến slide {index}",
+    "slideLabel": "Slide {index}/{total}"
+  },
+  "alert": {
+    "close": "Đóng"
+  },
+  "userMenu": {
+    "openLabel": "Menu người dùng",
+    "defaultName": "Người dùng",
+    "defaultRole": "Người dùng",
+    "myProfile": "Trang cá nhân",
+    "setting": "Cài đặt",
+    "billing": "Thanh toán",
+    "help": "Trợ giúp",
+    "faq": "Câu hỏi thường gặp",
+    "pricing": "Bảng giá"
+  },
+  "datePicker": {
+    "apply": "Áp dụng",
+    "placeholder": "DD/MM/YYYY",
+    "placeholderRange": "DD/MM/YYYY – DD/MM/YYYY"
+  },
+  "notifications": {
+    "openLabel": "Thông báo",
+    "title": "Thông báo",
+    "markAllRead": "Đánh dấu đã đọc tất cả",
+    "dismiss": "Xóa thông báo",
+    "viewAll": "Xem tất cả thông báo",
+    "demo": {
+      "achievement": {
+        "title": "Chúc mừng!",
+        "description": "Bạn vừa đạt huy hiệu thành viên tháng",
+        "time": "1 giờ trước"
+      },
+      "connection": {
+        "title": "Nguyễn Văn A",
+        "description": "Đã chấp nhận lời mời kết nối",
+        "time": "12 giờ trước"
+      },
+      "report": {
+        "title": "Báo cáo hệ thống",
+        "description": "Báo cáo tháng 7 đã sẵn sàng để xem",
+        "time": "24/07, 10:30"
+      }
+    }
+  },
+  "shortcuts": {
+    "openLabel": "Lối tắt",
+    "title": "Lối tắt",
+    "items": {
+      "calendar": { "label": "Lịch", "sublabel": "Lịch hẹn" },
+      "invoice": { "label": "Hóa đơn", "sublabel": "Quản lý tài khoản" },
+      "users": { "label": "Người dùng", "sublabel": "Quản lý người dùng" },
+      "roles": { "label": "Phân quyền", "sublabel": "Vai trò & Quyền" },
+      "dashboard": { "label": "Dashboard", "sublabel": "Tổng quan" },
+      "settings": { "label": "Cài đặt", "sublabel": "Cài đặt tài khoản" }
+    }
+  },
+  "search": {
+    "placeholder": "Tìm kiếm (Ctrl+/)",
+    "quickNav": "Điều hướng nhanh",
+    "noResults": "Không tìm thấy kết quả"
+  },
+  "editor": {
+    "placeholder": "Gõ '/' để chèn nội dung, '@' để đề cập ai đó…",
+    "heading": {
+      "paragraph": "Đoạn văn",
+      "h1": "Tiêu đề 1",
+      "h2": "Tiêu đề 2",
+      "h3": "Tiêu đề 3",
+      "h4": "Tiêu đề 4",
+      "blockquote": "Trích dẫn",
+      "codeBlock": "Code block"
+    },
+    "color": {
+      "removeColor": "Xóa màu",
+      "removeHighlight": "Xóa highlight"
+    },
+    "toolbar": {
+      "undo": "Hoàn tác (Ctrl+Z)",
+      "redo": "Làm lại (Ctrl+Y)",
+      "bold": "Đậm (Ctrl+B)",
+      "italic": "Nghiêng (Ctrl+I)",
+      "underline": "Gạch chân (Ctrl+U)",
+      "strike": "Gạch ngang",
+      "code": "Code inline",
+      "codeBlock": "Code block",
+      "heading": "Kiểu đoạn văn",
+      "blockquote": "Trích dẫn",
+      "bulletList": "Danh sách không thứ tự",
+      "orderedList": "Danh sách thứ tự",
+      "taskList": "Danh sách checklist",
+      "link": "Thêm link",
+      "image": "Chèn ảnh",
+      "video": "Chèn video",
+      "chart": "Chèn biểu đồ",
+      "table": "Chèn bảng",
+      "alignLeft": "Căn trái",
+      "alignCenter": "Căn giữa",
+      "alignRight": "Căn phải",
+      "alignJustify": "Căn đều",
+      "textColor": "Màu chữ",
+      "highlight": "Làm nổi bật",
+      "clearFormat": "Xóa định dạng",
+      "horizontalRule": "Đường kẻ ngang",
+      "emoji": "Chèn emoji",
+      "attachment": "Đính kèm file"
+    },
+    "attachment": {
+      "title": "Tệp đính kèm",
+      "remove": "Xóa tệp đính kèm"
+    },
+    "mention": {
+      "noResults": "Không tìm thấy người dùng",
+      "groupLabel": "Mọi người",
+      "loading": "Đang tìm…"
+    },
+    "slash": {
+      "noResults": "Không có block phù hợp",
+      "imageUrlPrompt": "URL ảnh",
+      "groups": {
+        "text": "Văn bản",
+        "heading": "Tiêu đề",
+        "list": "Danh sách",
+        "block": "Khối",
+        "media": "Media"
+      },
+      "descriptions": {
+        "paragraph": "Văn bản thường",
+        "heading1": "Tiêu đề lớn",
+        "heading2": "Tiêu đề vừa",
+        "heading3": "Tiêu đề nhỏ",
+        "bulletList": "Danh sách không thứ tự",
+        "orderedList": "Danh sách có thứ tự",
+        "taskList": "Danh sách công việc có checkbox",
+        "blockquote": "Làm nổi bật 1 đoạn trích dẫn",
+        "codeBlock": "Code nhiều dòng",
+        "horizontalRule": "Đường kẻ ngang phân cách",
+        "table": "Chèn bảng",
+        "image": "Tải lên hoặc chèn ảnh",
+        "attachment": "Đính kèm 1 file"
+      }
+    },
+    "link": {
+      "title": "Thêm link",
+      "open": "Mở link",
+      "remove": "Xóa link"
+    },
+    "image": {
+      "title": "Chèn ảnh",
+      "uploadTab": "Tải lên",
+      "urlTab": "Từ URL",
+      "urlPlaceholder": "https://example.com/image.png",
+      "insertBtn": "Chèn ảnh",
+      "uploading": "Đang tải...",
+      "uploadError": "Tải ảnh thất bại",
+      "uploadTitle": "Kéo thả ảnh vào đây",
+      "uploadSubtitle": "Hoặc click để chọn file (tối đa 5MB)"
+    },
+    "video": {
+      "title": "Chèn video",
+      "urlTab": "URL",
+      "uploadTab": "Tải lên",
+      "urlPlaceholder": "https://youtube.com/watch?v=... hoặc https://vimeo.com/...",
+      "urlHint": "Hỗ trợ YouTube, Vimeo, và link file trực tiếp (.mp4, .webm, .mov)",
+      "previewTitle": "Xem trước video",
+      "recognizedAs": "Đã nhận dạng: {provider}",
+      "providerFile": "File video",
+      "dropzoneTitle": "Kéo thả hoặc click để chọn file",
+      "dropzoneHint": "MP4, WebM, MOV",
+      "uploadInvalidType": "Vui lòng chọn file video (MP4, WebM, MOV…)",
+      "uploading": "Đang tải lên…",
+      "uploadSuccess": "Tải lên thành công",
+      "changeFile": "Đổi file",
+      "insertBtn": "Chèn video",
+      "invalidUrl": "Chỉ hỗ trợ link YouTube, Vimeo, hoặc file video trực tiếp"
+    },
+    "chart": {
+      "title": "Chèn biểu đồ",
+      "chartTypeLabel": "Loại biểu đồ",
+      "titleLabel": "Tiêu đề biểu đồ",
+      "titlePlaceholder": "Tiêu đề biểu đồ (không bắt buộc)",
+      "categoriesLabel": "Danh mục (trục X)",
+      "categoriesLabelPie": "Nhãn",
+      "categoriesPlaceholder": "Tháng 1, Tháng 2, Tháng 3…",
+      "categoriesHint": "Phân cách bằng dấu phẩy hoặc xuống dòng",
+      "seriesLabel": "Series dữ liệu",
+      "seriesLabelPie": "Giá trị",
+      "seriesNamePlaceholder": "Series {index}",
+      "seriesDataPlaceholder": "120, 200, 150, 80…",
+      "addSeries": "Thêm series",
+      "removeSeries": "Xóa series",
+      "preview": "Xem trước",
+      "loadingPreview": "Đang tải biểu đồ…",
+      "insertBtn": "Chèn biểu đồ",
+      "types": {
+        "bar": "Cột",
+        "line": "Đường",
+        "area": "Vùng",
+        "pie": "Tròn"
+      }
+    },
+    "table": {
+      "insert": "Chèn bảng 3×3",
+      "addRowBefore": "Thêm hàng trước",
+      "addRowAfter": "Thêm hàng sau",
+      "deleteRow": "Xóa hàng",
+      "addColBefore": "Thêm cột trước",
+      "addColAfter": "Thêm cột sau",
+      "deleteCol": "Xóa cột",
+      "deleteTable": "Xóa bảng",
+      "mergeCells": "Gộp ô",
+      "splitCell": "Tách ô"
+    },
+    "characters": "{count} ký tự",
+    "charactersMax": "{count}/{max} ký tự"
   }
 }

@@ -1,15 +1,17 @@
-import { SignJWT, jwtVerify, type JWTPayload } from "jose";
-import { cookies } from "next/headers";
-import { env } from "@/lib/env";
+import { SignJWT, jwtVerify, type JWTPayload } from "jose"
+import { cookies } from "next/headers"
+import { env } from "@/lib/env"
 
 export interface SessionPayload extends JWTPayload {
-  userId: string;
-  email: string;
-  role?: string;
+  userId: string
+  email: string
+  name?: string
+  role?: string
+  accessToken?: string
 }
 
 function getSecret() {
-  return new TextEncoder().encode(env.JWT_SECRET);
+  return new TextEncoder().encode(env.JWT_SECRET)
 }
 
 export async function signToken(payload: SessionPayload): Promise<string> {
@@ -17,39 +19,37 @@ export async function signToken(payload: SessionPayload): Promise<string> {
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("7d")
-    .sign(getSecret());
+    .sign(getSecret())
 }
 
-export async function verifyToken(
-  token: string
-): Promise<SessionPayload | null> {
+export async function verifyToken(token: string): Promise<SessionPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, getSecret());
-    return payload as SessionPayload;
+    const { payload } = await jwtVerify(token, getSecret())
+    return payload as SessionPayload
   } catch {
-    return null;
+    return null
   }
 }
 
 export async function getSession(): Promise<SessionPayload | null> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(env.SESSION_COOKIE_NAME)?.value;
-  if (!token) return null;
-  return verifyToken(token);
+  const cookieStore = await cookies()
+  const token = cookieStore.get(env.SESSION_COOKIE_NAME)?.value
+  if (!token) return null
+  return verifyToken(token)
 }
 
 export async function setSessionCookie(token: string): Promise<void> {
-  const cookieStore = await cookies();
+  const cookieStore = await cookies()
   cookieStore.set(env.SESSION_COOKIE_NAME, token, {
     httpOnly: true,
     secure: env.NODE_ENV === "production",
     sameSite: "lax",
     maxAge: 60 * 60 * 24 * 7, // 7 days
     path: "/",
-  });
+  })
 }
 
 export async function clearSessionCookie(): Promise<void> {
-  const cookieStore = await cookies();
-  cookieStore.delete(env.SESSION_COOKIE_NAME);
+  const cookieStore = await cookies()
+  cookieStore.delete(env.SESSION_COOKIE_NAME)
 }

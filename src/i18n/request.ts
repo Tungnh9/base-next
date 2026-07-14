@@ -1,15 +1,17 @@
-import { getRequestConfig } from "next-intl/server";
-import { hasLocale } from "next-intl";
-import { routing } from "./routing";
+import { getRequestConfig } from "next-intl/server"
+import { hasLocale } from "next-intl"
+import { routing } from "./routing"
 
 export default getRequestConfig(async ({ requestLocale }) => {
-  const requested = await requestLocale;
-  const locale = hasLocale(routing.locales, requested)
-    ? requested
-    : routing.defaultLocale;
+  const requested = await requestLocale
+  const locale = hasLocale(routing.locales, requested) ? requested : routing.defaultLocale
 
   return {
     locale,
     messages: (await import(`../../messages/${locale}.json`)).default,
-  };
-});
+    // Explicit default — without it, next-intl falls back to the server OS's
+    // timezone, which can differ across environments and cause hydration
+    // mismatches for any date/time formatting.
+    timeZone: "Asia/Ho_Chi_Minh",
+  }
+})

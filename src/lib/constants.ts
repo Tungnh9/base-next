@@ -3,6 +3,13 @@ export const ROUTES = {
   login: "/login",
   register: "/register",
   dashboard: "/dashboard",
-} as const;
+  analytics: "/analytics",
+  calendar: "/calendar",
+  forgotPassword: "/forgot-password",
+  resetPassword: "/reset-password",
+  verifyEmail: "/verify-email",
+  twoStepVerification: "/two-step-verification",
+  forgotPasswordVerify: "/forgot-password-verify",
+} as const
 
-export type Route = (typeof ROUTES)[keyof typeof ROUTES];
+export type Route = (typeof ROUTES)[keyof typeof ROUTES]

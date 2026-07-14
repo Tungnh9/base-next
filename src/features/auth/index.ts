@@ -1,0 +1,11 @@
+// Public API for the auth feature
+export type { User, Session, AuthResponse } from "./types"
+export type { LoginInput, RegisterInput } from "./schemas"
+export { loginSchema, registerSchema, createLoginSchema, createRegisterSchema } from "./schemas"
+export { authApi } from "./api"
+export { authService, AuthError } from "./services"
+export { loginAction, registerAction, logoutAction } from "./actions"
+export type { ActionState } from "./actions"
+export { useLoginAction, useRegisterAction } from "./hooks/use-auth"
+export { LoginForm } from "./components/login-form"
+export { RegisterForm } from "./components/register-form"

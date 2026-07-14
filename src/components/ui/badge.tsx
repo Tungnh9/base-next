@@ -4,45 +4,103 @@ import { Slot } from "radix-ui"
 
 import { cn } from "@/lib/utils"
 
+const DEFAULT_VARIANT = "primary" as const
+const DEFAULT_SKIN    = "filled"  as const
+const DEFAULT_SIZE    = "sm"      as const
+
 const badgeVariants = cva(
-  "inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-full border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&>svg]:pointer-events-none [&>svg]:size-3",
+  "inline-flex items-center gap-1.5 rounded-full font-medium whitespace-nowrap [&_svg]:shrink-0 [&_svg]:pointer-events-none",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground [a&]:hover:bg-primary/90",
-        secondary:
-          "bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90",
-        destructive:
-          "bg-destructive text-white focus-visible:ring-destructive/20 dark:bg-destructive/60 dark:focus-visible:ring-destructive/40 [a&]:hover:bg-destructive/90",
-        outline:
-          "border-border text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
-        ghost: "[a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 [a&]:hover:underline",
+        primary:   "",
+        secondary: "",
+        success:   "",
+        danger:    "",
+        warning:   "",
+        info:      "",
+        dark:      "",
+      },
+      skin: {
+        filled: "",
+        glow:   "",
+        light:  "",
+        dot:    "",
+      },
+      size: {
+        sm: "px-2.5 py-0.5 text-xs [&_svg]:size-3.5",
+        md: "px-3.5 py-1   text-sm [&_svg]:size-4",
       },
     },
+    compoundVariants: [
+      // filled
+      { variant: "primary",   skin: "filled", className: "bg-primary     text-white" },
+      { variant: "secondary", skin: "filled", className: "bg-secondary   text-white" },
+      { variant: "success",   skin: "filled", className: "bg-success     text-white" },
+      { variant: "danger",    skin: "filled", className: "bg-destructive text-white" },
+      { variant: "warning",   skin: "filled", className: "bg-warning     text-white" },
+      { variant: "info",      skin: "filled", className: "bg-info        text-white" },
+      { variant: "dark",      skin: "filled", className: "bg-foreground  text-background" },
+      // light
+      { variant: "primary",   skin: "light", className: "bg-primary/10     text-primary" },
+      { variant: "secondary", skin: "light", className: "bg-secondary/10   text-secondary" },
+      { variant: "success",   skin: "light", className: "bg-success/10     text-success" },
+      { variant: "danger",    skin: "light", className: "bg-destructive/10 text-destructive" },
+      { variant: "warning",   skin: "light", className: "bg-warning/10     text-warning" },
+      { variant: "info",      skin: "light", className: "bg-info/10        text-info" },
+      { variant: "dark",      skin: "light", className: "bg-foreground/10  text-foreground" },
+      // glow — filled + colored box-shadow
+      { variant: "primary",   skin: "glow", className: "bg-primary     text-white [box-shadow:0_0_8px_2px_color-mix(in_srgb,var(--color-primary)_40%,transparent)]" },
+      { variant: "secondary", skin: "glow", className: "bg-secondary   text-white [box-shadow:0_0_8px_2px_color-mix(in_srgb,var(--color-secondary)_40%,transparent)]" },
+      { variant: "success",   skin: "glow", className: "bg-success     text-white [box-shadow:0_0_8px_2px_color-mix(in_srgb,var(--color-success)_40%,transparent)]" },
+      { variant: "danger",    skin: "glow", className: "bg-destructive text-white [box-shadow:0_0_8px_2px_color-mix(in_srgb,var(--color-destructive)_40%,transparent)]" },
+      { variant: "warning",   skin: "glow", className: "bg-warning     text-white [box-shadow:0_0_8px_2px_color-mix(in_srgb,var(--color-warning)_40%,transparent)]" },
+      { variant: "info",      skin: "glow", className: "bg-info        text-white [box-shadow:0_0_8px_2px_color-mix(in_srgb,var(--color-info)_40%,transparent)]" },
+      { variant: "dark",      skin: "glow", className: "bg-foreground  text-background [box-shadow:0_0_8px_2px_color-mix(in_srgb,var(--color-foreground)_40%,transparent)]" },
+      // dot — transparent background, colored text only
+      { variant: "primary",   skin: "dot", className: "text-primary" },
+      { variant: "secondary", skin: "dot", className: "text-secondary" },
+      { variant: "success",   skin: "dot", className: "text-success" },
+      { variant: "danger",    skin: "dot", className: "text-destructive" },
+      { variant: "warning",   skin: "dot", className: "text-warning" },
+      { variant: "info",      skin: "dot", className: "text-info" },
+      { variant: "dark",      skin: "dot", className: "text-foreground" },
+    ],
     defaultVariants: {
-      variant: "default",
+      variant: DEFAULT_VARIANT,
+      skin:    DEFAULT_SKIN,
+      size:    DEFAULT_SIZE,
     },
   }
 )
 
+type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>["variant"]>
+type BadgeSkin    = NonNullable<VariantProps<typeof badgeVariants>["skin"]>
+type BadgeSize    = NonNullable<VariantProps<typeof badgeVariants>["size"]>
+
 function Badge({
   className,
-  variant = "default",
+  variant = DEFAULT_VARIANT,
+  skin = DEFAULT_SKIN,
+  size = DEFAULT_SIZE,
   asChild = false,
   ...props
 }: React.ComponentProps<"span"> &
-  VariantProps<typeof badgeVariants> & { asChild?: boolean }) {
+  VariantProps<typeof badgeVariants> & {
+    asChild?: boolean
+  }) {
   const Comp = asChild ? Slot.Root : "span"
 
   return (
     <Comp
       data-slot="badge"
       data-variant={variant}
-      className={cn(badgeVariants({ variant }), className)}
+      data-skin={skin}
+      className={cn(badgeVariants({ variant, skin, size }), className)}
       {...props}
     />
   )
 }
 
 export { Badge, badgeVariants }
+export type { BadgeVariant, BadgeSkin, BadgeSize }

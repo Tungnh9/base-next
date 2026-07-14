@@ -1,0 +1,80 @@
+import { mockApi, mockApiError } from "@/lib/mock"
+import type { AuthResponse, User, VerifyForgotPasswordCodeResponse } from "./types"
+import type { LoginInput, RegisterInput } from "./schemas"
+
+const MOCK_USER: User = {
+  id: "mock-user-1",
+  email: "duyen@gmail.com",
+  name: "Duyên Nguyễn",
+  role: "user",
+  createdAt: "2026-01-01T00:00:00.000Z",
+}
+
+// Fixed test cases so every auth branch (success / 2FA / failure) is reachable
+// deterministically while mocking — any other email/password just succeeds.
+const MOCK_2FA_EMAIL = "2fa@example.com"
+const MOCK_FAIL_EMAIL = "wrong@example.com"
+const MOCK_2FA_CODE = "230320"
+const MOCK_FORGOT_PASSWORD_CODE = "120820"
+const MOCK_RESET_TOKEN = "demo-reset-token"
+
+export const authMockApi = {
+  login: ({ email }: LoginInput) => {
+    if (email === MOCK_FAIL_EMAIL) {
+      return mockApiError({
+        message: "Invalid email or password",
+        code: "UNAUTHORIZED",
+        status: 401,
+      })
+    }
+    if (email === MOCK_2FA_EMAIL) {
+      return mockApi<AuthResponse>({
+        token: "mock-access-token",
+        user: { ...MOCK_USER, email },
+        requiresTwoFactor: true,
+        twoFactorPhone: "+84900000000",
+      })
+    }
+    return mockApi<AuthResponse>({
+      token: "mock-access-token",
+      user: { ...MOCK_USER, email },
+      requiresTwoFactor: false,
+    })
+  },
+
+  register: ({ email, username }: RegisterInput) =>
+    mockApi<AuthResponse>({
+      token: "mock-access-token",
+      user: { ...MOCK_USER, email, name: username },
+      requiresTwoFactor: false,
+    }),
+
+  me: () => mockApi<User>(MOCK_USER),
+
+  logout: () => mockApi<void>(undefined),
+
+  forgotPassword: (_data: { email: string }) => mockApi<void>(undefined),
+
+  resetPassword: (data: { password: string; token: string }) =>
+    data.token === MOCK_RESET_TOKEN
+      ? mockApi<void>(undefined)
+      : mockApiError({ message: "Invalid or expired token", code: "INVALID_TOKEN", status: 400 }),
+
+  verifyForgotPasswordCode: (data: { email: string; code: string }) =>
+    data.code === MOCK_FORGOT_PASSWORD_CODE
+      ? mockApi<VerifyForgotPasswordCodeResponse>({ resetToken: MOCK_RESET_TOKEN })
+      : mockApiError({ message: "Invalid verification code", code: "INVALID_CODE", status: 400 }),
+
+  resendVerificationEmail: (_data: { email: string }) => mockApi<void>(undefined),
+
+  verifyTwoStep: (data: { code: string }) =>
+    data.code === MOCK_2FA_CODE
+      ? mockApi<AuthResponse>({
+          token: "mock-access-token",
+          user: { ...MOCK_USER, email: MOCK_2FA_EMAIL },
+          requiresTwoFactor: false,
+        })
+      : mockApiError({ message: "Invalid verification code", code: "INVALID_CODE", status: 400 }),
+
+  resendTwoStepCode: () => mockApi<void>(undefined),
+}

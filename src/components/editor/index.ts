@@ -1,0 +1,6 @@
+export { RichTextEditor } from "./rich-text-editor"
+export { RichTextViewer } from "./rich-text-viewer"
+export { createExtensions } from "./extensions"
+export type { RichTextEditorProps } from "./rich-text-editor"
+export type { RichTextViewerProps } from "./rich-text-viewer"
+export type { JSONContent } from "@tiptap/react"

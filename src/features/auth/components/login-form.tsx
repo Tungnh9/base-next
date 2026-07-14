@@ -1,10 +1,15 @@
-"use client";
+"use client"
 
-import { useTranslations } from "next-intl";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useEffect, useState, startTransition } from "react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useTranslations, useLocale } from "next-intl"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Eye, EyeOff } from "lucide-react"
+import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   Form,
   FormControl,
@@ -12,32 +17,73 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { useLoginAction } from "../hooks/use-auth";
-import { loginSchema, type LoginInput } from "../schemas";
+} from "@/components/ui/form"
+import { ROUTES } from "@/lib/constants"
+import { useUserStore } from "@/stores"
+import { useLoginAction } from "../hooks/use-auth"
+import { createLoginSchema, type LoginInput } from "../schemas"
+
+function AnimatedEllipsis() {
+  const [count, setCount] = useState(1)
+  useEffect(() => {
+    const id = setInterval(() => setCount((c) => (c % 3) + 1), 500)
+    return () => clearInterval(id)
+  }, [])
+  // fixed width prevents layout shift as dot count changes
+  return <span className="inline-block w-[18px] text-left">{".".repeat(count)}</span>
+}
 
 export function LoginForm() {
-  const t = useTranslations("auth");
-  const { state, action, isPending } = useLoginAction();
+  const tAuth = useTranslations("auth")
+  const tVal = useTranslations("validation")
+  const locale = useLocale()
+  const router = useRouter()
+  const { state, action, isPending } = useLoginAction()
+  const setUser = useUserStore((s) => s.setUser)
+  const [showPassword, setShowPassword] = useState(false)
+  // Latch: set true on submit, stays true until navigation (unmount) or error (state.error resets derived value)
+  const [isNavigating, setIsNavigating] = useState(false)
+  const showLoading = isPending || (isNavigating && !state.error)
 
   const form = useForm<LoginInput>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(createLoginSchema(tVal)),
     defaultValues: { email: "", password: "" },
-  });
+  })
+
+  useEffect(() => {
+    if (state.success) {
+      if (state.user) setUser(state.user)
+      router.push(`/${locale}${ROUTES.dashboard}`)
+    } else if (state.requiresTwoFactor) {
+      const phone = state.twoFactorPhone ? `?phone=${encodeURIComponent(state.twoFactorPhone)}` : ""
+      router.push(`/${locale}${ROUTES.twoStepVerification}${phone}`)
+    } else if (state.error) {
+      toast.error(tAuth(state.error))
+    }
+  }, [state, locale, router, tAuth, setUser])
+
+  function onSubmit(data: LoginInput) {
+    setIsNavigating(true)
+    const fd = new FormData()
+    Object.entries(data).forEach(([k, v]) => fd.set(k, String(v)))
+    startTransition(() => action(fd))
+  }
 
   return (
     <Form {...form}>
-      <form action={action} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="email"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("email")}</FormLabel>
+            <FormItem className="gap-1">
+              <FormLabel className="text-[13px] font-normal text-[#5d596c]">
+                {tAuth("emailOrUsername")}
+              </FormLabel>
               <FormControl>
                 <Input
                   type="email"
-                  placeholder="you@example.com"
+                  placeholder={tAuth("emailOrUsernamePlaceholder")}
                   autoComplete="email"
                   {...field}
                 />
@@ -51,12 +97,34 @@ export function LoginForm() {
           control={form.control}
           name="password"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("password")}</FormLabel>
+            <FormItem className="gap-1">
+              <div className="flex items-center justify-between">
+                <FormLabel className="text-[13px] font-normal text-[#5d596c]">
+                  {tAuth("password")}
+                </FormLabel>
+                <Link
+                  href={`/${locale}${ROUTES.forgotPassword}`}
+                  className="text-primary text-[13px] hover:underline"
+                >
+                  {tAuth("forgotPassword")}
+                </Link>
+              </div>
               <FormControl>
                 <Input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••"
                   autoComplete="current-password"
+                  endIcon={
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((v) => !v)}
+                      className="text-muted-foreground hover:text-foreground cursor-pointer"
+                      tabIndex={-1}
+                      aria-label={showPassword ? tAuth("hidePassword") : tAuth("showPassword")}
+                    >
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  }
                   {...field}
                 />
               </FormControl>
@@ -65,14 +133,24 @@ export function LoginForm() {
           )}
         />
 
-        {state.error && (
-          <p className="text-sm text-destructive">{state.error}</p>
-        )}
-
-        <Button type="submit" className="w-full" disabled={isPending}>
-          {isPending ? t("loading" as never) : t("login")}
+        <Button type="submit" className="mt-1 w-full" disabled={showLoading}>
+          {showLoading ? (
+            <>
+              {tAuth("loggingIn")}
+              <AnimatedEllipsis />
+            </>
+          ) : (
+            tAuth("login")
+          )}
         </Button>
+
+        <p className="text-center text-[15px] leading-[22px] text-[var(--text-body)]">
+          {tAuth("newOnPlatform")}{" "}
+          <Link href={`/${locale}${ROUTES.register}`} className="text-primary hover:underline">
+            {tAuth("createAccount")}
+          </Link>
+        </p>
       </form>
     </Form>
-  );
+  )
 }

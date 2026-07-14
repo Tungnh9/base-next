@@ -1,31 +1,30 @@
-"use client";
+"use client"
 
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-
-type Theme = "light" | "dark" | "system";
+import { create } from "zustand"
+import { persist } from "zustand/middleware"
 
 interface UiState {
-  sidebarOpen: boolean;
-  theme: Theme;
-  toggleSidebar: () => void;
-  setSidebarOpen: (open: boolean) => void;
-  setTheme: (theme: Theme) => void;
+  sidebarCollapsed: boolean
+  sidebarOpen: boolean
+  toggleSidebarCollapsed: () => void
+  toggleSidebar: () => void
+  setSidebarOpen: (open: boolean) => void
 }
 
 export const useUiStore = create<UiState>()(
   persist(
     (set) => ({
-      sidebarOpen: true,
-      theme: "system",
+      sidebarCollapsed: false,
+      sidebarOpen: false,
+      toggleSidebarCollapsed: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
       toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
       setSidebarOpen: (open) => set({ sidebarOpen: open }),
-      setTheme: (theme) => set({ theme }),
     }),
     {
       name: "ui-storage",
-      // Chỉ persist theme — không persist auth state (XSS risk)
-      partialize: (s) => ({ theme: s.theme }),
+      // Persist sidebarCollapsed — remembers desktop sidebar preference across page loads
+      // sidebarOpen NOT persisted — always starts closed on mobile
+      partialize: (s) => ({ sidebarCollapsed: s.sidebarCollapsed }),
     }
   )
-);
+)

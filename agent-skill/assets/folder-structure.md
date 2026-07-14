@@ -59,8 +59,9 @@ base-next/
     │       └── components/         # UI components của feature
     │
     ├── components/
-    │   └── ui/                     # shadcn/ui components — KHÔNG sửa thủ công
-    │                               # Thêm qua: npx shadcn@latest add [name]
+    │   ├── ui/                     # shadcn/ui components — KHÔNG sửa thủ công
+    │   │                           # Thêm qua: npx shadcn@latest add [name]
+    │   └── layout/                 # Header, Sidebar, Footer, layout components
     │
     ├── lib/
     │   ├── utils.ts                # cn() utility và helpers dùng chung
@@ -74,6 +75,9 @@ base-next/
     ├── hooks/
     │   ├── use-mounted.ts          # Hydration safety hook
     │   └── use-media-query.ts      # Responsive breakpoint hook
+    │
+    ├── config/
+    │   └── nav.ts                  # Shared config (nav structure, routes, constants)
     │
     ├── i18n/
     │   ├── config.ts               # Danh sách locales, defaultLocale
@@ -89,16 +93,18 @@ base-next/
 
 ## Quy tắc đặt file
 
-| Loại file | Đặt ở đâu |
-|-----------|-----------|
-| Business logic, data fetching | `src/features/[name]/` |
-| UI component dùng chung | `src/components/ui/` (shadcn) |
-| Custom hook dùng chung | `src/hooks/` |
-| Utility function dùng chung | `src/lib/utils.ts` |
-| Global state | `src/stores/[name]-store.ts` |
-| TypeScript types dùng chung | `src/types/` |
-| Route page | `src/app/[locale]/(group)/[name]/page.tsx` |
-| i18n string | `messages/vi.json` + `messages/en.json` |
+| Loại file                                  | Đặt ở đâu                                  |
+| ------------------------------------------ | ------------------------------------------ |
+| Business logic, data fetching              | `src/features/[name]/`                     |
+| UI component dùng chung                    | `src/components/ui/` (shadcn)              |
+| Layout component (Header, Sidebar, Footer) | `src/components/layout/`                   |
+| Shared config (nav, routes, constants)     | `src/config/`                              |
+| Custom hook dùng chung                     | `src/hooks/`                               |
+| Utility function dùng chung                | `src/lib/utils.ts`                         |
+| Global state                               | `src/stores/[name]-store.ts`               |
+| TypeScript types dùng chung                | `src/types/`                               |
+| Route page                                 | `src/app/[locale]/(group)/[name]/page.tsx` |
+| i18n string                                | `messages/vi.json` + `messages/en.json`    |
 
 ---
 

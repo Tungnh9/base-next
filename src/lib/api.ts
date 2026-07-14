@@ -1,70 +1,83 @@
-import { env } from "@/lib/env";
+import { env } from "@/lib/env"
+import { ApiClient, ApiClientError } from "@/lib/api-client"
+import type { ApiResponse } from "@/types"
 
-export type ApiResponse<T> =
-  | { data: T; error: null }
-  | { data: null; error: { message: string; code: string; status: number } };
+// Two instances mirroring the existing server/client split:
+// serverHttpClient talks to the real backend URL (server-only env var).
+// browserHttpClient talks to whatever URL is reachable from the browser.
+const serverHttpClient = new ApiClient({ baseURL: env.API_BASE_URL, timeout: 15_000 })
+const browserHttpClient = new ApiClient({
+  baseURL: env.NEXT_PUBLIC_API_BASE_URL ?? env.API_BASE_URL,
+  timeout: 15_000,
+})
 
-async function apiFetch<T>(
-  baseUrl: string,
+// Re-exported so future features can write `class XService extends BaseApiService`
+// against the same underlying clients instead of going through serverApi/clientApi.
+export { serverHttpClient, browserHttpClient }
+export { BaseApiService } from "@/lib/base-api.service"
+
+async function execute<T>(
+  client: ApiClient,
   path: string,
-  init?: RequestInit & { token?: string }
+  init: RequestInit | undefined,
+  token: string | undefined
 ): Promise<ApiResponse<T>> {
-  const { token, ...fetchInit } = init ?? {};
-
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
+  const method = (init?.method ?? "GET").toUpperCase()
+  // Parse JSON strings back to objects so Axios can serialize them correctly.
+  // Non-string bodies (FormData, Blob, etc.) are passed through as-is.
+  const body = typeof init?.body === "string" ? JSON.parse(init.body) : init?.body
+  const headers = {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    ...(fetchInit.headers as Record<string, string> | undefined),
-  };
+    ...(init?.headers as Record<string, string> | undefined),
+  }
 
   try {
-    const res = await fetch(`${baseUrl}${path}`, { ...fetchInit, headers });
-
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
-      return {
-        data: null,
-        error: {
-          message: body.message ?? res.statusText,
-          code: body.code ?? "UNKNOWN",
-          status: res.status,
-        },
-      };
+    let data: T
+    switch (method) {
+      case "POST":
+        data = await client.post<T>(path, body, { headers })
+        break
+      case "PUT":
+        data = await client.put<T>(path, body, { headers })
+        break
+      case "PATCH":
+        data = await client.patch<T>(path, body, { headers })
+        break
+      case "DELETE":
+        data = await client.delete<T>(path, body, { headers })
+        break
+      default:
+        data = await client.get<T>(path, { headers })
     }
-
-    const data: T = await res.json();
-    return { data, error: null };
+    return { data, error: null }
   } catch (err) {
+    if (err instanceof ApiClientError) {
+      return { data: null, error: { message: err.message, code: err.code, status: err.status } }
+    }
     return {
       data: null,
-      error: {
-        message: err instanceof Error ? err.message : "Network error",
-        code: "NETWORK_ERROR",
-        status: 0,
-      },
-    };
+      error: { message: "Network error", code: "NETWORK_ERROR", status: 0 },
+    }
   }
 }
 
 // Server-side calls (Server Actions, Route Handlers)
-// Tự lấy session cookie — chỉ dùng trong server context
-export async function serverApi<T>(
-  path: string,
-  init?: RequestInit
-): Promise<ApiResponse<T>> {
-  const { cookies } = await import("next/headers");
-  const cookieStore = await cookies();
-  const token = cookieStore.get(env.SESSION_COOKIE_NAME)?.value;
-  return apiFetch<T>(env.API_BASE_URL, path, { ...init, token });
+// Reads session JWT from cookie, extracts the backend accessToken stored within
+export async function serverApi<T>(path: string, init?: RequestInit): Promise<ApiResponse<T>> {
+  const { cookies } = await import("next/headers")
+  const { verifyToken } = await import("@/lib/auth")
+  const cookieStore = await cookies()
+  const sessionJwt = cookieStore.get(env.SESSION_COOKIE_NAME)?.value
+  const session = sessionJwt ? await verifyToken(sessionJwt) : null
+  return execute<T>(serverHttpClient, path, init, session?.accessToken)
 }
 
 // Client-side calls (React components)
-// Token phải truyền tường minh hoặc đọc từ store
+// Token must be passed explicitly or read from a store
 export async function clientApi<T>(
   path: string,
   init?: RequestInit,
   token?: string
 ): Promise<ApiResponse<T>> {
-  const baseUrl = env.NEXT_PUBLIC_API_BASE_URL ?? env.API_BASE_URL;
-  return apiFetch<T>(baseUrl, path, { ...init, token });
+  return execute<T>(browserHttpClient, path, init, token)
 }
