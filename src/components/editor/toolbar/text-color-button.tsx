@@ -67,9 +67,15 @@ export function TextColorButton({ editor }: TextColorButtonProps) {
   }
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover
+      open={open}
+      onOpenChange={(o) => {
+        if (!o) setCustomHex("")
+        setOpen(o)
+      }}
+    >
       <PopoverTrigger asChild>
-        <ToolbarButton tooltip={t("toolbar.textColor")}>
+        <ToolbarButton tooltip={t("toolbar.textColor")} isActive={!!currentColor}>
           <span className="relative flex items-center justify-center">
             <Palette />
             <span

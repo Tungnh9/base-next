@@ -31,6 +31,13 @@ interface SeriesRow {
   dataRaw: string
 }
 
+const CHART_TYPES: { type: ChartType; icon: typeof BarChart2 }[] = [
+  { type: "bar", icon: BarChart2 },
+  { type: "line", icon: LineChart },
+  { type: "area", icon: TrendingUp },
+  { type: "pie", icon: PieChart },
+]
+
 const DEFAULT_CATEGORIES = "January, February, March, April, May, June"
 const DEFAULT_SERIES: SeriesRow[] = [
   { id: "1", name: "Series 1", dataRaw: "120, 200, 150, 80, 70, 110" },
@@ -42,6 +49,19 @@ function nextRowId() {
   return `row-${rowIdCounter}`
 }
 
+// Shared class strings for form controls — text-foreground ensures text is
+// visible in both light and dark modes.
+const inputCls =
+  "border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-ring/50 w-full rounded-[6px] border px-3 py-2 text-[13px] outline-none focus:ring-[3px] transition-[border-color,box-shadow]"
+const textareaCls =
+  "border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-ring/50 w-full resize-none rounded-[6px] border px-3 py-2 font-mono text-xs outline-none focus:ring-[3px] transition-[border-color,box-shadow]"
+const innerInputCls =
+  "border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-ring/50 flex-1 rounded-[5px] border px-2.5 py-1.5 text-xs outline-none focus:ring-[2px] transition-[border-color,box-shadow]"
+const innerTextareaCls =
+  "border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-ring/50 w-full resize-none rounded-[5px] border px-2.5 py-1.5 font-mono text-xs outline-none focus:ring-[2px] transition-[border-color,box-shadow]"
+const sectionLabel =
+  "text-muted-foreground mb-2 block text-[11px] font-semibold tracking-wide uppercase"
+
 export function ChartDialog({ editor }: ChartDialogProps) {
   const t = useTranslations("editor")
   const tCommon = useTranslations("common")
@@ -51,13 +71,6 @@ export function ChartDialog({ editor }: ChartDialogProps) {
   const [title, setTitle] = useState("")
   const [categoriesRaw, setCategoriesRaw] = useState(DEFAULT_CATEGORIES)
   const [seriesRows, setSeriesRows] = useState<SeriesRow[]>(DEFAULT_SERIES)
-
-  const CHART_TYPES: { type: ChartType; icon: typeof BarChart2 }[] = [
-    { type: "bar", icon: BarChart2 },
-    { type: "line", icon: LineChart },
-    { type: "area", icon: TrendingUp },
-    { type: "pie", icon: PieChart },
-  ]
 
   const isPie = chartType === "pie"
   const effectiveRows = isPie ? seriesRows.slice(0, 1) : seriesRows
@@ -113,59 +126,67 @@ export function ChartDialog({ editor }: ChartDialogProps) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        if (!v) handleClose()
+        else setOpen(true)
+      }}
+    >
       <DialogTrigger asChild>
         <ToolbarButton tooltip={t("toolbar.chart")}>
           <ChartColumn />
         </ToolbarButton>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl overflow-hidden p-0">
-        <DialogHeader className="border-border mb-0 border-b px-6 py-4">
+
+      {/* max-w override must include sm: prefix — base DialogContent has
+          sm:max-w-[500px] which twMerge treats as a separate class group */}
+      <DialogContent className="max-h-[90vh] max-w-[min(960px,calc(100vw-2rem))] overflow-hidden p-0 sm:max-w-[min(960px,calc(100vw-2rem))]">
+        <DialogHeader className="border-border border-b px-6 py-4">
           <DialogTitle>{t("chart.title")}</DialogTitle>
         </DialogHeader>
 
-        <div className="divide-border flex divide-x">
-          {/* Left: form */}
-          <div className="flex w-[360px] shrink-0 flex-col gap-4 overflow-y-auto p-5">
+        <div className="divide-border flex min-h-0 flex-1 divide-x overflow-hidden">
+          {/* ── Left panel: form ─────────────────────────────── */}
+          <div className="flex w-[45%] max-w-[440px] min-w-[280px] shrink-0 flex-col gap-5 overflow-y-auto p-6">
+            {/* Chart type */}
             <div>
-              <label className="text-muted-foreground mb-1.5 block text-[11px] font-semibold tracking-wide uppercase">
-                {t("chart.chartTypeLabel")}
-              </label>
-              <div className="flex gap-1.5">
+              <label className={sectionLabel}>{t("chart.chartTypeLabel")}</label>
+              <div className="grid grid-cols-4 gap-2">
                 {CHART_TYPES.map(({ type, icon: Icon }) => (
                   <button
                     key={type}
                     type="button"
                     onClick={() => setChartType(type)}
                     className={cn(
-                      "flex flex-1 flex-col items-center gap-1 rounded-[7px] border py-2 text-[11px] font-medium transition-colors",
+                      "flex flex-col items-center gap-1.5 rounded-[8px] border py-3 text-[12px] font-medium transition-colors",
                       chartType === type
-                        ? "border-primary/40 bg-primary/16 text-primary"
-                        : "border-border bg-muted text-muted-foreground hover:border-primary/30 hover:text-primary"
+                        ? "border-primary/50 bg-primary/15 text-primary"
+                        : "border-border bg-muted text-muted-foreground hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
                     )}
                   >
-                    <Icon className="size-3.5" />
+                    <Icon className="size-5" />
                     {t(`chart.types.${type}`)}
                   </button>
                 ))}
               </div>
             </div>
 
+            {/* Title */}
             <div>
-              <label className="text-muted-foreground mb-1.5 block text-[11px] font-semibold tracking-wide uppercase">
-                {t("chart.title")}
-              </label>
+              <label className={sectionLabel}>{t("chart.titleLabel")}</label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder={t("chart.titlePlaceholder")}
-                className="border-input bg-card focus:border-primary focus:ring-ring/50 w-full rounded-[6px] border px-3 py-2 text-[13px] outline-none focus:ring-[3px]"
+                className={inputCls}
               />
             </div>
 
+            {/* Categories */}
             <div>
-              <label className="text-muted-foreground mb-1.5 block text-[11px] font-semibold tracking-wide uppercase">
+              <label className={sectionLabel}>
                 {isPie ? t("chart.categoriesLabelPie") : t("chart.categoriesLabel")}
               </label>
               <textarea
@@ -173,19 +194,21 @@ export function ChartDialog({ editor }: ChartDialogProps) {
                 onChange={(e) => setCategoriesRaw(e.target.value)}
                 placeholder={t("chart.categoriesPlaceholder")}
                 rows={3}
-                className="border-input bg-card focus:border-primary focus:ring-ring/50 w-full resize-none rounded-[6px] border px-3 py-2 font-mono text-xs outline-none focus:ring-[3px]"
+                className={textareaCls}
               />
-              <p className="text-muted-foreground mt-1 text-[11px]">{t("chart.categoriesHint")}</p>
+              <p className="text-muted-foreground mt-1.5 text-[11px]">
+                {t("chart.categoriesHint")}
+              </p>
             </div>
 
+            {/* Series */}
             <div>
-              <label className="text-muted-foreground mb-1.5 block text-[11px] font-semibold tracking-wide uppercase">
+              <label className={sectionLabel}>
                 {isPie ? t("chart.seriesLabelPie") : t("chart.seriesLabel")}
               </label>
-
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2.5">
                 {effectiveRows.map((row, idx) => (
-                  <div key={row.id} className="border-border bg-muted rounded-[7px] border p-3">
+                  <div key={row.id} className="border-border bg-muted/50 rounded-[8px] border p-3">
                     {!isPie && (
                       <div className="mb-2 flex items-center gap-2">
                         <input
@@ -193,7 +216,7 @@ export function ChartDialog({ editor }: ChartDialogProps) {
                           value={row.name}
                           onChange={(e) => updateSeries(row.id, "name", e.target.value)}
                           placeholder={t("chart.seriesNamePlaceholder", { index: idx + 1 })}
-                          className="border-input bg-card focus:border-primary focus:ring-ring/50 flex-1 rounded-[5px] border px-2.5 py-1.5 text-xs outline-none focus:ring-[2px]"
+                          className={innerInputCls}
                         />
                         {seriesRows.length > 1 && (
                           <button
@@ -212,7 +235,7 @@ export function ChartDialog({ editor }: ChartDialogProps) {
                       onChange={(e) => updateSeries(row.id, "dataRaw", e.target.value)}
                       placeholder={t("chart.seriesDataPlaceholder")}
                       rows={2}
-                      className="border-input bg-card focus:border-primary focus:ring-ring/50 w-full resize-none rounded-[5px] border px-2.5 py-1.5 font-mono text-xs outline-none focus:ring-[2px]"
+                      className={innerTextareaCls}
                     />
                   </div>
                 ))}
@@ -222,22 +245,26 @@ export function ChartDialog({ editor }: ChartDialogProps) {
                 <button
                   type="button"
                   onClick={addSeries}
-                  className="text-primary mt-2 flex items-center gap-1.5 text-xs transition-opacity hover:opacity-70"
+                  className="text-primary mt-3 flex items-center gap-1.5 text-[13px] transition-opacity hover:opacity-70"
                 >
-                  <Plus className="size-3.5" />
+                  <Plus className="size-4" />
                   {t("chart.addSeries")}
                 </button>
               )}
             </div>
           </div>
 
-          {/* Right: live preview */}
-          <div className="bg-muted/40 flex flex-1 flex-col p-5">
-            <p className="text-muted-foreground mb-3 text-[11px] font-semibold tracking-wide uppercase">
-              {t("chart.preview")}
-            </p>
-            <div className="border-border bg-card flex-1 rounded-[8px] border p-3">
-              {open && <ReactECharts option={previewOption} style={{ height: 300 }} notMerge />}
+          {/* ── Right panel: live preview ─────────────────────── */}
+          <div className="bg-muted/30 flex flex-1 flex-col p-6">
+            <p className={sectionLabel}>{t("chart.preview")}</p>
+            <div className="border-border bg-card flex-1 rounded-[10px] border p-4">
+              {open && (
+                <ReactECharts
+                  option={previewOption}
+                  style={{ height: "100%", minHeight: 360 }}
+                  notMerge
+                />
+              )}
             </div>
           </div>
         </div>

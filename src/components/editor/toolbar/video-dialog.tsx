@@ -142,142 +142,143 @@ export function VideoDialog({ editor }: VideoDialogProps) {
         </ToolbarButton>
       </DialogTrigger>
       <DialogContent className="max-w-lg">
-        <DialogHeader>
+        <DialogHeader className="border-border border-b py-4">
           <DialogTitle>{t("video.title")}</DialogTitle>
         </DialogHeader>
+        <div className="px-6 pt-5 pb-6">
+          <Tabs defaultValue="url" onValueChange={() => setUrlError(null)}>
+            <TabsList variant="pill" fullWidth>
+              <TabsTrigger value="url">{t("video.urlTab")}</TabsTrigger>
+              <TabsTrigger value="upload">{t("video.uploadTab")}</TabsTrigger>
+            </TabsList>
 
-        <Tabs defaultValue="url">
-          <TabsList variant="pill">
-            <TabsTrigger value="url">{t("video.urlTab")}</TabsTrigger>
-            <TabsTrigger value="upload">{t("video.uploadTab")}</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="url" className="space-y-3">
-            <div>
-              <input
-                autoFocus
-                type="url"
-                value={urlInput}
-                onChange={(e) => {
-                  setUrlInput(e.target.value)
-                  setUrlError(null)
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleInsertUrl()
-                }}
-                placeholder={t("video.urlPlaceholder")}
-                className="border-input bg-card focus:border-primary focus:ring-ring/50 h-[38px] w-full rounded-[6px] border px-3 text-[15px] outline-none focus:ring-[3px]"
-              />
-              <p className="text-muted-foreground mt-1.5 text-xs">{t("video.urlHint")}</p>
-            </div>
-
-            {parsed && (
-              <div className="border-success/30 bg-success/10 flex items-center gap-2 rounded-[6px] border px-3 py-2">
-                <CheckCircle2 className="text-success size-3.5 shrink-0" />
-                <span className="text-success text-xs">
-                  {t("video.recognizedAs", { provider: providerLabel })}
-                </span>
+            <TabsContent value="url" className="space-y-3">
+              <div>
+                <input
+                  autoFocus
+                  type="url"
+                  value={urlInput}
+                  onChange={(e) => {
+                    setUrlInput(e.target.value)
+                    setUrlError(null)
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleInsertUrl()
+                  }}
+                  placeholder={t("video.urlPlaceholder")}
+                  className="border-input bg-card focus:border-primary focus:ring-ring/50 h-[38px] w-full rounded-[6px] border px-3 text-[15px] outline-none focus:ring-[3px]"
+                />
+                <p className="text-muted-foreground mt-1.5 text-xs">{t("video.urlHint")}</p>
               </div>
-            )}
 
-            {parsed && (
-              <div className="aspect-video overflow-hidden rounded-[8px] bg-black">
-                {parsed.provider === "file" ? (
-                  <video
-                    key={parsed.embedUrl}
-                    src={parsed.embedUrl}
-                    controls
-                    preload="metadata"
-                    className="size-full"
-                  />
-                ) : (
-                  <iframe
-                    key={parsed.embedUrl}
-                    src={parsed.embedUrl}
-                    className="size-full border-0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    title={t("video.previewTitle")}
-                  />
-                )}
-              </div>
-            )}
-
-            {urlError && <p className="text-destructive text-sm">{urlError}</p>}
-
-            <div className="flex justify-end gap-2 pt-1">
-              <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
-                {tCommon("cancel")}
-              </Button>
-              <Button type="button" onClick={handleInsertUrl} disabled={!urlInput.trim()}>
-                {t("video.insertBtn")}
-              </Button>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="upload" className="space-y-3">
-            {uploadState.status === "uploading" ? (
-              <div className="space-y-3 py-2">
-                <div className="flex items-center gap-2">
-                  <Loader2 className="text-primary size-4 animate-spin" />
-                  <span className="text-sm">{t("video.uploading")}</span>
-                  <span className="text-primary ml-auto text-xs font-semibold">
-                    {uploadState.progress}%
+              {parsed && (
+                <div className="border-success/30 bg-success/10 flex items-center gap-2 rounded-[6px] border px-3 py-2">
+                  <CheckCircle2 className="text-success size-3.5 shrink-0" />
+                  <span className="text-success text-xs">
+                    {t("video.recognizedAs", { provider: providerLabel })}
                   </span>
                 </div>
-                <div className="bg-muted h-2 w-full overflow-hidden rounded-full">
-                  <div
-                    className="bg-primary h-full rounded-full transition-all duration-150"
-                    style={{ width: `${uploadState.progress}%` }}
-                  />
-                </div>
-              </div>
-            ) : uploadState.status === "done" && uploadState.result ? (
-              <div className="border-success/30 bg-success/10 flex items-center gap-3 rounded-[8px] border px-4 py-3">
-                <CheckCircle2 className="text-success size-5 shrink-0" />
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium">{t("video.uploadSuccess")}</p>
-                  <p className="text-muted-foreground mt-0.5 truncate text-xs">
-                    {uploadState.result.filename}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleFilesChange([])}
-                  className="text-muted-foreground hover:text-destructive shrink-0 text-xs transition-colors"
-                >
-                  {t("video.changeFile")}
-                </button>
-              </div>
-            ) : (
-              <>
-                <FileUpload
-                  files={files}
-                  onFilesChange={handleFilesChange}
-                  accept="video/*"
-                  title={t("video.dropzoneTitle")}
-                  subtitle={t("video.dropzoneHint")}
-                />
-                {uploadState.status === "error" && (
-                  <p className="text-destructive text-sm">{uploadState.error}</p>
-                )}
-              </>
-            )}
+              )}
 
-            <div className="flex justify-end gap-2 pt-1">
-              <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
-                {tCommon("cancel")}
-              </Button>
-              <Button
-                type="button"
-                onClick={handleInsertUpload}
-                disabled={uploadState.status !== "done"}
-              >
-                {t("video.insertBtn")}
-              </Button>
-            </div>
-          </TabsContent>
-        </Tabs>
+              {parsed && (
+                <div className="aspect-video overflow-hidden rounded-[8px] bg-black">
+                  {parsed.provider === "file" ? (
+                    <video
+                      key={parsed.embedUrl}
+                      src={parsed.embedUrl}
+                      controls
+                      preload="metadata"
+                      className="size-full"
+                    />
+                  ) : (
+                    <iframe
+                      key={parsed.embedUrl}
+                      src={parsed.embedUrl}
+                      className="size-full border-0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      title={t("video.previewTitle")}
+                    />
+                  )}
+                </div>
+              )}
+
+              {urlError && <p className="text-destructive text-sm">{urlError}</p>}
+
+              <div className="flex justify-end gap-2 pt-1">
+                <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
+                  {tCommon("cancel")}
+                </Button>
+                <Button type="button" onClick={handleInsertUrl} disabled={!parsed}>
+                  {t("video.insertBtn")}
+                </Button>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="upload" className="space-y-3">
+              {uploadState.status === "uploading" ? (
+                <div className="space-y-3 py-2">
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="text-primary size-4 animate-spin" />
+                    <span className="text-sm">{t("video.uploading")}</span>
+                    <span className="text-primary ml-auto text-xs font-semibold">
+                      {uploadState.progress}%
+                    </span>
+                  </div>
+                  <div className="bg-muted h-2 w-full overflow-hidden rounded-full">
+                    <div
+                      className="bg-primary h-full rounded-full transition-all duration-150"
+                      style={{ width: `${uploadState.progress}%` }}
+                    />
+                  </div>
+                </div>
+              ) : uploadState.status === "done" && uploadState.result ? (
+                <div className="border-success/30 bg-success/10 flex items-center gap-3 rounded-[8px] border px-4 py-3">
+                  <CheckCircle2 className="text-success size-5 shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium">{t("video.uploadSuccess")}</p>
+                    <p className="text-muted-foreground mt-0.5 truncate text-xs">
+                      {uploadState.result.filename}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleFilesChange([])}
+                    className="text-muted-foreground hover:text-destructive shrink-0 text-xs transition-colors"
+                  >
+                    {t("video.changeFile")}
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <FileUpload
+                    files={files}
+                    onFilesChange={handleFilesChange}
+                    accept="video/*"
+                    title={t("video.dropzoneTitle")}
+                    subtitle={t("video.dropzoneHint")}
+                  />
+                  {uploadState.status === "error" && (
+                    <p className="text-destructive text-sm">{uploadState.error}</p>
+                  )}
+                </>
+              )}
+
+              <div className="flex justify-end gap-2 pt-1">
+                <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
+                  {tCommon("cancel")}
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleInsertUpload}
+                  disabled={uploadState.status !== "done"}
+                >
+                  {t("video.insertBtn")}
+                </Button>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
       </DialogContent>
     </Dialog>
   )

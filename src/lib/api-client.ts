@@ -92,8 +92,8 @@ export class ApiClient {
     return this.request<T>({ ...config, method: "PATCH", url, data })
   }
 
-  delete<T = void>(url: string, config?: RequestConfig): Promise<T> {
-    return this.request<T>({ ...config, method: "DELETE", url })
+  delete<T = void>(url: string, data?: unknown, config?: RequestConfig): Promise<T> {
+    return this.request<T>({ ...config, method: "DELETE", url, data })
   }
 
   // Upload File hoặc FormData — File tự động được wrap vào FormData với key "file".

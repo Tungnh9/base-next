@@ -1,6 +1,6 @@
 "use client"
 
-import { type Editor } from "@tiptap/react"
+import { type Editor, useEditorState } from "@tiptap/react"
 import { useTranslations } from "next-intl"
 import {
   Undo2,
@@ -40,21 +40,34 @@ interface EditorToolbarProps {
 export function EditorToolbar({ editor, onAttachClick }: EditorToolbarProps) {
   const t = useTranslations("editor")
 
+  // In TipTap v3 useEditor() only re-renders when the editor instance changes,
+  // not when editor state changes. useEditorState subscribes to transactions so
+  // canUndo/canRedo stay accurate after every command.
+  const editorState = useEditorState({
+    editor,
+    selector: ({ editor: e }) => ({
+      canUndo: e?.can().undo() ?? false,
+      canRedo: e?.can().redo() ?? false,
+    }),
+  })
+
   if (!editor) return null
 
   return (
     <div className="border-border flex flex-wrap items-center gap-0.5 border-b px-2 py-1.5">
       {/* History */}
       <ToolbarButton
+        onMouseDown={(e) => e.preventDefault()}
         onClick={() => editor.chain().focus().undo().run()}
-        disabled={!editor.can().undo()}
+        disabled={!editorState?.canUndo}
         tooltip={t("toolbar.undo")}
       >
         <Undo2 />
       </ToolbarButton>
       <ToolbarButton
+        onMouseDown={(e) => e.preventDefault()}
         onClick={() => editor.chain().focus().redo().run()}
-        disabled={!editor.can().redo()}
+        disabled={!editorState?.canRedo}
         tooltip={t("toolbar.redo")}
       >
         <Redo2 />
@@ -137,14 +150,14 @@ export function EditorToolbar({ editor, onAttachClick }: EditorToolbarProps) {
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
         isActive={editor.isActive("blockquote")}
-        tooltip={t("heading.blockquote")}
+        tooltip={t("toolbar.blockquote")}
       >
         <Quote />
       </ToolbarButton>
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleCodeBlock().run()}
         isActive={editor.isActive("codeBlock")}
-        tooltip={t("heading.codeBlock")}
+        tooltip={t("toolbar.codeBlock")}
       >
         <Code2 />
       </ToolbarButton>

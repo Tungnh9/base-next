@@ -1,4 +1,3 @@
-import { cache } from "react"
 import { SignJWT, jwtVerify, type JWTPayload } from "jose"
 import { cookies } from "next/headers"
 import { env } from "@/lib/env"
@@ -32,12 +31,12 @@ export async function verifyToken(token: string): Promise<SessionPayload | null>
   }
 }
 
-export const getSession = cache(async function getSession(): Promise<SessionPayload | null> {
+export async function getSession(): Promise<SessionPayload | null> {
   const cookieStore = await cookies()
   const token = cookieStore.get(env.SESSION_COOKIE_NAME)?.value
   if (!token) return null
   return verifyToken(token)
-})
+}
 
 export async function setSessionCookie(token: string): Promise<void> {
   const cookieStore = await cookies()

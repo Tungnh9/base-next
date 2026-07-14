@@ -43,8 +43,15 @@ export function ImageDialog({ editor }: ImageDialogProps) {
   }
 
   const handleUrlInsert = () => {
-    if (!urlInput.trim()) return
-    insertImageUrl(urlInput.trim())
+    const url = urlInput.trim()
+    if (!url) return
+    try {
+      const { protocol } = new URL(url)
+      if (protocol !== "http:" && protocol !== "https:") return
+    } catch {
+      return
+    }
+    insertImageUrl(url)
   }
 
   const handleUpload = async () => {
@@ -66,88 +73,96 @@ export function ImageDialog({ editor }: ImageDialogProps) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        if (!v) handleClose()
+        else setOpen(true)
+      }}
+    >
       <DialogTrigger asChild>
         <ToolbarButton tooltip={t("toolbar.image")}>
           <ImageIcon />
         </ToolbarButton>
       </DialogTrigger>
       <DialogContent className="max-w-md">
-        <DialogHeader>
+        <DialogHeader className="border-border border-b py-4">
           <DialogTitle>{t("image.title")}</DialogTitle>
         </DialogHeader>
-        <Tabs defaultValue="upload">
-          <TabsList variant="pill">
-            <TabsTrigger value="upload">{t("image.uploadTab")}</TabsTrigger>
-            <TabsTrigger value="url">{t("image.urlTab")}</TabsTrigger>
-          </TabsList>
+        <div className="px-6 pt-5 pb-6">
+          <Tabs defaultValue="upload">
+            <TabsList variant="pill" fullWidth>
+              <TabsTrigger value="upload">{t("image.uploadTab")}</TabsTrigger>
+              <TabsTrigger value="url">{t("image.urlTab")}</TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="upload">
-            <FileUpload
-              files={files}
-              onFilesChange={setFiles}
-              accept="image/*"
-              title={t("image.uploadTitle")}
-              subtitle={t("image.uploadSubtitle")}
-            />
-            {uploadError && <p className="text-destructive mt-2 text-sm">{uploadError}</p>}
-            <div className="mt-4 flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={handleClose}>
-                {tCommon("cancel")}
-              </Button>
-              <Button
-                type="button"
-                onClick={handleUpload}
-                disabled={files.length === 0 || isUploading}
-              >
-                {isUploading ? (
-                  <>
-                    <Loader2 className="mr-1 size-4 animate-spin" />
-                    {t("image.uploading")}
-                  </>
-                ) : (
-                  t("image.insertBtn")
-                )}
-              </Button>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="url">
-            <input
-              type="url"
-              value={urlInput}
-              onChange={(e) => setUrlInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleUrlInsert()
-              }}
-              placeholder={t("image.urlPlaceholder")}
-              className="border-input bg-card focus:border-primary focus:ring-ring/50 h-[38px] w-full rounded-[6px] border px-3 text-[15px] outline-none focus:ring-[3px]"
-              autoFocus
-            />
-            {urlInput && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={urlInput}
-                alt="preview"
-                className="border-border mt-3 max-h-40 w-full rounded-[6px] border object-contain"
-                onError={(e) => {
-                  ;(e.target as HTMLImageElement).style.display = "none"
-                }}
-                onLoad={(e) => {
-                  ;(e.target as HTMLImageElement).style.display = "block"
-                }}
+            <TabsContent value="upload">
+              <FileUpload
+                files={files}
+                onFilesChange={setFiles}
+                accept="image/*"
+                title={t("image.uploadTitle")}
+                subtitle={t("image.uploadSubtitle")}
               />
-            )}
-            <div className="mt-4 flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={handleClose}>
-                {tCommon("cancel")}
-              </Button>
-              <Button type="button" onClick={handleUrlInsert} disabled={!urlInput.trim()}>
-                {t("image.insertBtn")}
-              </Button>
-            </div>
-          </TabsContent>
-        </Tabs>
+              {uploadError && <p className="text-destructive mt-2 text-sm">{uploadError}</p>}
+              <div className="mt-4 flex justify-end gap-2">
+                <Button type="button" variant="outline" onClick={handleClose}>
+                  {tCommon("cancel")}
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleUpload}
+                  disabled={files.length === 0 || isUploading}
+                >
+                  {isUploading ? (
+                    <>
+                      <Loader2 className="mr-1 size-4 animate-spin" />
+                      {t("image.uploading")}
+                    </>
+                  ) : (
+                    t("image.insertBtn")
+                  )}
+                </Button>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="url">
+              <input
+                type="url"
+                value={urlInput}
+                onChange={(e) => setUrlInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleUrlInsert()
+                }}
+                placeholder={t("image.urlPlaceholder")}
+                className="border-input bg-card focus:border-primary focus:ring-ring/50 h-[38px] w-full rounded-[6px] border px-3 text-[15px] outline-none focus:ring-[3px]"
+                autoFocus
+              />
+              {urlInput && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={urlInput}
+                  alt="preview"
+                  className="border-border mt-3 max-h-40 w-full rounded-[6px] border object-contain"
+                  onError={(e) => {
+                    ;(e.target as HTMLImageElement).style.display = "none"
+                  }}
+                  onLoad={(e) => {
+                    ;(e.target as HTMLImageElement).style.display = "block"
+                  }}
+                />
+              )}
+              <div className="mt-4 flex justify-end gap-2">
+                <Button type="button" variant="outline" onClick={handleClose}>
+                  {tCommon("cancel")}
+                </Button>
+                <Button type="button" onClick={handleUrlInsert} disabled={!urlInput.trim()}>
+                  {t("image.insertBtn")}
+                </Button>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
       </DialogContent>
     </Dialog>
   )

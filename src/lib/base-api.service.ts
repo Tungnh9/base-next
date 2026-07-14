@@ -33,8 +33,12 @@ export abstract class BaseApiService {
     return this.client.patch<T>(this.url(path), data, config)
   }
 
-  protected delete<T = void>(path: string = "", config?: RequestConfig): Promise<T> {
-    return this.client.delete<T>(this.url(path), config)
+  protected delete<T = void>(
+    path: string = "",
+    data?: unknown,
+    config?: RequestConfig
+  ): Promise<T> {
+    return this.client.delete<T>(this.url(path), data, config)
   }
 
   protected upload<T>(

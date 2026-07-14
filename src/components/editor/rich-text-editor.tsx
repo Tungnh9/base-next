@@ -2,7 +2,7 @@
 
 import { useMemo, useEffect, useRef, useCallback } from "react"
 import { useEditor, EditorContent } from "@tiptap/react"
-import type { JSONContent } from "@tiptap/react"
+import type { JSONContent } from "@tiptap/core"
 import { useTranslations } from "next-intl"
 import { createExtensions } from "./extensions"
 import { EditorToolbar } from "./toolbar/editor-toolbar"
@@ -110,6 +110,44 @@ export function RichTextEditor({
       onChange?.(e.getJSON())
     },
   })
+
+  // Track blob: URLs used by video nodes — revoke them when the node is
+  // deleted from the document (closeAfterInsert intentionally skips revocation
+  // because the editor still owns the URL at that point).
+  const videoBlobUrlsRef = useRef<Set<string>>(new Set())
+  useEffect(() => {
+    if (!editor) return
+
+    function collectVideoBlobUrls(node: JSONContent, out: Set<string>) {
+      if (
+        node.type === "video" &&
+        node.attrs?.provider === "file" &&
+        typeof node.attrs?.src === "string" &&
+        node.attrs.src.startsWith("blob:")
+      ) {
+        out.add(node.attrs.src as string)
+      }
+      node.content?.forEach((child) => collectVideoBlobUrls(child, out))
+    }
+
+    function handleUpdate() {
+      if (!editor) return
+      const current = new Set<string>()
+      collectVideoBlobUrls(editor.getJSON(), current)
+      videoBlobUrlsRef.current.forEach((url) => {
+        if (!current.has(url)) URL.revokeObjectURL(url)
+      })
+      videoBlobUrlsRef.current = current
+    }
+
+    editor.on("update", handleUpdate)
+    return () => {
+      editor.off("update", handleUpdate)
+      // Revoke all remaining blob URLs when the editor is destroyed
+      videoBlobUrlsRef.current.forEach((url) => URL.revokeObjectURL(url))
+      videoBlobUrlsRef.current = new Set()
+    }
+  }, [editor])
 
   // Sync controlled value when not focused (compare to avoid loop)
   useEffect(() => {

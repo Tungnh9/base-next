@@ -23,7 +23,9 @@ async function execute<T>(
   token: string | undefined
 ): Promise<ApiResponse<T>> {
   const method = (init?.method ?? "GET").toUpperCase()
-  const body = typeof init?.body === "string" ? JSON.parse(init.body) : undefined
+  // Parse JSON strings back to objects so Axios can serialize them correctly.
+  // Non-string bodies (FormData, Blob, etc.) are passed through as-is.
+  const body = typeof init?.body === "string" ? JSON.parse(init.body) : init?.body
   const headers = {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(init?.headers as Record<string, string> | undefined),
@@ -42,7 +44,7 @@ async function execute<T>(
         data = await client.patch<T>(path, body, { headers })
         break
       case "DELETE":
-        data = await client.delete<T>(path, { headers })
+        data = await client.delete<T>(path, body, { headers })
         break
       default:
         data = await client.get<T>(path, { headers })

@@ -287,6 +287,7 @@
     "chart": {
       "title": "Chèn biểu đồ",
       "chartTypeLabel": "Loại biểu đồ",
+      "titleLabel": "Tiêu đề biểu đồ",
       "titlePlaceholder": "Tiêu đề biểu đồ (không bắt buộc)",
       "categoriesLabel": "Danh mục (trục X)",
       "categoriesLabelPie": "Nhãn",

@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { type Editor } from "@tiptap/react"
 import { useTranslations } from "next-intl"
 import { Highlighter } from "lucide-react"
@@ -26,11 +27,26 @@ interface ColorPickerProps {
 
 export function ColorPicker({ editor }: ColorPickerProps) {
   const t = useTranslations("editor")
+  const [open, setOpen] = useState(false)
 
   const currentHighlight = editor.getAttributes("highlight").color as string | undefined
 
+  function selectColor(color: string) {
+    if (currentHighlight === color) {
+      editor.chain().focus().unsetHighlight().run()
+    } else {
+      editor.chain().focus().setHighlight({ color }).run()
+    }
+    setOpen(false)
+  }
+
+  function removeHighlight() {
+    editor.chain().focus().unsetHighlight().run()
+    setOpen(false)
+  }
+
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <ToolbarButton tooltip={t("toolbar.highlight")} isActive={!!currentHighlight}>
           <span className="relative flex items-center justify-center">
@@ -55,23 +71,19 @@ export function ColorPicker({ editor }: ColorPickerProps) {
                 currentHighlight === color && "ring-primary ring-2 ring-offset-1"
               )}
               style={{ backgroundColor: color }}
-              onClick={() => {
-                if (currentHighlight === color) {
-                  editor.chain().focus().unsetHighlight().run()
-                } else {
-                  editor.chain().focus().setHighlight({ color }).run()
-                }
-              }}
+              onClick={() => selectColor(color)}
             />
           ))}
         </div>
-        <button
-          type="button"
-          className="text-muted-foreground hover:text-foreground mt-2 text-xs"
-          onClick={() => editor.chain().focus().unsetHighlight().run()}
-        >
-          {t("color.removeHighlight")}
-        </button>
+        {currentHighlight && (
+          <button
+            type="button"
+            className="text-muted-foreground hover:text-destructive mt-2 w-full text-xs transition-colors"
+            onClick={removeHighlight}
+          >
+            {t("color.removeHighlight")}
+          </button>
+        )}
       </PopoverContent>
     </Popover>
   )

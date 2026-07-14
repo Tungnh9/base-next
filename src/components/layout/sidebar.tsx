@@ -1,6 +1,5 @@
 "use client"
 
-import * as React from "react"
 import Link from "next/link"
 import { useParams, usePathname } from "next/navigation"
 import Image from "next/image"
@@ -59,7 +58,7 @@ export function Sidebar() {
           {sidebarCollapsed ? (
             <button
               onClick={toggleSidebarCollapsed}
-              className="border-sidebar-border text-sidebar-foreground hover:bg-sidebar-accent flex size-5 items-center justify-center rounded-full border transition-colors"
+              className="border-sidebar-border text-sidebar-foreground hover:bg-sidebar-accent flex size-5 cursor-pointer items-center justify-center rounded-full border transition-colors"
               aria-label="Expand sidebar"
             >
               <ChevronRight className="size-3" />
@@ -82,7 +81,7 @@ export function Sidebar() {
               </Link>
               <button
                 onClick={toggleSidebarCollapsed}
-                className="border-sidebar-border text-sidebar-foreground hover:bg-sidebar-accent flex size-5 items-center justify-center rounded-full border transition-colors"
+                className="border-sidebar-border text-sidebar-foreground hover:bg-sidebar-accent flex size-5 cursor-pointer items-center justify-center rounded-full border transition-colors"
                 aria-label="Collapse sidebar"
               >
                 <ChevronLeft className="size-3" />

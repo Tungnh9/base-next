@@ -12,6 +12,7 @@ const PUBLIC_PATHS = [
   "/login",
   "/register",
   "/forgot-password",
+  "/forgot-password-verify",
   "/reset-password",
   "/verify-email",
   "/two-step-verification",

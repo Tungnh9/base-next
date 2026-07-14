@@ -43,7 +43,7 @@ export function EmojiPicker({ editor }: EmojiPickerProps) {
           <Picker
             data={() => import("@emoji-mart/data").then((mod) => mod.default)}
             onEmojiSelect={handleSelect}
-            theme="light"
+            theme="auto"
             previewPosition="none"
           />
         )}

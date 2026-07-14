@@ -84,6 +84,13 @@ export const authService = {
   },
 
   async logout(): Promise<void> {
+    // Best-effort: notify backend to invalidate the access token.
+    // Always clear the local cookie regardless of backend response.
+    try {
+      await authApi.logout()
+    } catch {
+      // ignore — local cookie must still be cleared
+    }
     await clearSessionCookie()
   },
 
