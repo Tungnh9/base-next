@@ -334,6 +334,9 @@
     "resetPassword": "Đặt lại mật khẩu",
     "verifyEmail": "Xác thực email",
     "twoStepVerification": "Xác thực 2 bước",
+    "maintenance": "Đang bảo trì",
+    "comingSoon": "Sắp ra mắt",
+    "notAuthorized": "Không có quyền truy cập",
     "siteName": "Vuexy"
   },
   "customers": {
@@ -372,5 +375,24 @@
     },
     "empty": "Chưa có khách hàng nào",
     "searchPlaceholder": "Tìm theo tên, email..."
+  },
+  "misc": {
+    "maintenance": {
+      "title": "Đang bảo trì!",
+      "subtitle": "Xin lỗi vì sự bất tiện này, chúng tôi đang thực hiện bảo trì hệ thống.",
+      "action": "Xác minh tài khoản"
+    },
+    "comingSoon": {
+      "title": "Sắp ra mắt",
+      "subtitle": "Chúng tôi đang tạo ra điều gì đó tuyệt vời. Hãy đăng ký để nhận thông báo khi sẵn sàng!",
+      "emailPlaceholder": "Nhập email",
+      "action": "Thông báo cho tôi",
+      "successToast": "Chúng tôi sẽ liên hệ lại cho bạn ! 😊"
+    },
+    "notAuthorized": {
+      "title": "Bạn không có quyền truy cập!",
+      "subtitle": "Bạn không có quyền xem trang này với thông tin đăng nhập hiện tại. Vui lòng liên hệ quản trị viên.",
+      "action": "Xác minh tài khoản"
+    }
   }
 }

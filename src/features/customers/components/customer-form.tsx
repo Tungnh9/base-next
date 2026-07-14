@@ -1,13 +1,20 @@
 "use client"
 
 import { useEffect } from "react"
-import { useForm } from "react-hook-form"
+import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useTranslations } from "next-intl"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { createCustomerSchema, type CreateCustomerFormValues } from "../schemas"
 import type { Customer } from "../types"
 
@@ -25,6 +32,7 @@ export function CustomerForm({ open, onOpenChange, customer, onSubmit }: Custome
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<CreateCustomerFormValues>({
     resolver: zodResolver(createCustomerSchema),
@@ -81,15 +89,23 @@ export function CustomerForm({ open, onOpenChange, customer, onSubmit }: Custome
               {errors.phone && <p className="text-destructive text-xs">{errors.phone.message}</p>}
             </div>
             <div className="grid gap-1.5">
-              <Label htmlFor="status">{t("form.status")}</Label>
-              <select
-                id="status"
-                {...register("status")}
-                className="border-input bg-background text-foreground focus:border-primary focus:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none focus:ring-[3px]"
-              >
-                <option value="active">{t("status.active")}</option>
-                <option value="inactive">{t("status.inactive")}</option>
-              </select>
+              <Label>{t("form.status")}</Label>
+              <Controller
+                control={control}
+                name="status"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">{t("status.active")}</SelectItem>
+                      <SelectItem value="inactive">{t("status.inactive")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.status && <p className="text-destructive text-xs">{errors.status.message}</p>}
             </div>
           </div>
           <div className="grid gap-1.5">

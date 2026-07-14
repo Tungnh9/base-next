@@ -104,7 +104,7 @@ export function CustomerList() {
                   <td className="text-muted-foreground px-4 py-3">{customer.company}</td>
                   <td className="px-4 py-3">
                     <Badge
-                      variant={customer.status === "active" ? "success" : "secondary"}
+                      variant={customer.status === "active" ? "success" : "danger"}
                       skin="light"
                     >
                       {t(`status.${customer.status}`)}

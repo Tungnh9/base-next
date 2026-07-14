@@ -16,6 +16,9 @@ const PUBLIC_PATHS = [
   "/reset-password",
   "/verify-email",
   "/two-step-verification",
+  "/maintenance",
+  "/coming-soon",
+  "/not-authorized",
   "/api/health",
 ]
 // URL prefixes to skip entirely (static assets)
