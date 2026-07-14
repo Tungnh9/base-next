@@ -52,15 +52,14 @@ Tất cả nằm trong `src/components/ui/`.
 
 ## Overlay & Feedback
 
-| Component           | Mô tả                                                     |
-| ------------------- | --------------------------------------------------------- |
-| `tooltip`           | Placements: top/right/bottom/left                         |
-| `popover`           | PopoverTrigger, PopoverContent, PopoverTitle, PopoverBody |
-| `dropdown-menu`     | Items, checkbox, radio, submenus, separators, shortcuts   |
-| `dialog`            | Modal với DialogHeader/Body/Footer/Close                  |
-| `alert`             | Variants; icon; closable                                  |
-| `toast` + `toaster` | shadcn Toast (Radix) — dùng với `useToast()`              |
-| `sonner`            | Sonner toast library wrapper                              |
+| Component       | Mô tả                                                     |
+| --------------- | --------------------------------------------------------- |
+| `tooltip`       | Placements: top/right/bottom/left                         |
+| `popover`       | PopoverTrigger, PopoverContent, PopoverTitle, PopoverBody |
+| `dropdown-menu` | Items, checkbox, radio, submenus, separators, shortcuts   |
+| `dialog`        | Modal với DialogHeader/Body/Footer/Close                  |
+| `alert`         | Variants; icon; closable                                  |
+| `sonner`        | Sonner toast — wrapper duy nhất cho notifications         |
 
 ## Khác
 
@@ -74,37 +73,22 @@ Tất cả nằm trong `src/components/ui/`.
 
 ## Toast
 
-### Sonner (simple)
+Dự án dùng **Sonner** duy nhất — đã remove Radix Toast. Import trực tiếp từ `"sonner"`.
 
 ```ts
 import { toast } from "sonner"
 
 toast.success("Đã lưu")
 toast.error("Có lỗi xảy ra")
+toast.warning("Cảnh báo")
+toast.info("Thông tin")
 
-// Loading → Success pattern
+// Loading → kết quả (cùng id)
 const id = toast.loading("Đang xử lý...")
 toast.success("Hoàn thành!", { id })
-```
 
-### useToast (rich)
-
-```ts
-import { toast } from "@/hooks/use-toast"
-
-// Rich toast (không tự đóng, có icon trạng thái)
-toast({
-  type: "rich",
-  variant: "success", // default | primary | success | danger | warning | info
-  title: "Thành công!",
-  description: "Dữ liệu đã được cập nhật.",
-})
-
-// Toast có action button
-toast({
-  type: "rich",
-  variant: "danger",
-  title: "Xóa mục này?",
-  action: { label: "Hoàn tác", onClick: () => restore() },
+// Có action button
+toast.success("Đã tạo bản ghi", {
+  action: { label: "Hoàn tác", onClick: () => undo() },
 })
 ```
