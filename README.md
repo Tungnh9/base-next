@@ -50,3 +50,4 @@ npm run test:coverage        # Test + coverage report
 | [docs/editor.md](docs/editor.md)               | Rich text editor (TipTap), extensions, upload |
 | [docs/i18n.md](docs/i18n.md)                   | Thêm ngôn ngữ, thêm string dịch               |
 | [docs/environment.md](docs/environment.md)     | Biến môi trường                               |
+| [docs/contributing.md](docs/contributing.md)   | Commit types, branch naming, quy trình push   |
