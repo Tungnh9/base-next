@@ -4,20 +4,20 @@ Next.js 16 base template — scalable, production-ready, dùng được cho mọ
 
 ## Stack
 
-|               |                                    |
-| ------------- | ---------------------------------- |
-| Framework     | Next.js 16 (App Router, Turbopack) |
-| Language      | TypeScript 5 (strict)              |
-| Styling       | Tailwind CSS v4 + shadcn/ui        |
-| State         | Zustand                            |
-| i18n          | next-intl (vi mặc định, en)        |
-| Auth          | JWT via `jose` + cookie httpOnly   |
-| Forms         | react-hook-form + Zod              |
-| HTTP Client   | axios (via `ApiClient` class)      |
-| Tables        | TanStack Table v8                  |
-| Icons         | lucide-react                       |
-| Notifications | Sonner + shadcn Toast (Radix)      |
-| Rich Text     | TipTap v3 (ProseMirror)            |
+|               |                                       |
+| ------------- | ------------------------------------- |
+| Framework     | Next.js 16 (App Router, Turbopack)    |
+| Language      | TypeScript 5 (strict)                 |
+| Styling       | Tailwind CSS v4 + shadcn/ui           |
+| State         | Zustand                               |
+| i18n          | next-intl (vi mặc định, en)           |
+| Auth          | JWT via `jose` + cookie httpOnly      |
+| Forms         | react-hook-form + Zod                 |
+| HTTP Client   | axios (via `ApiClient` class)         |
+| Tables        | TanStack Table v8                     |
+| Icons         | lucide-react                          |
+| Notifications | Sonner + shadcn Toast (Radix)         |
+| Rich Text     | TipTap v3 (ProseMirror, @tiptap/core) |
 
 ---
 
