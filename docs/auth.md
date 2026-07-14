@@ -70,8 +70,8 @@ Chạy trước khi bất kỳ component nào render. Verify JWT từ session co
 src/proxy.ts
 ├── Bỏ qua: /_next/*, file tĩnh có extension (.svg, .png, ...)
 ├── PUBLIC_PATHS (không có locale prefix — proxy tự stripLocale()):
-│     /login, /register, /forgot-password, /reset-password,
-│     /verify-email, /two-step-verification, /api/health
+│     /login, /register, /forgot-password, /forgot-password-verify,
+│     /reset-password, /verify-email, /two-step-verification, /api/health
 ├── Unauthenticated → redirect /[locale]/login?callbackUrl=...
 └─ Dùng jose để verify JWT (không cần DB call)
 ```
