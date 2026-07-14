@@ -171,7 +171,7 @@
     "noResults": "No results found"
   },
   "editor": {
-    "placeholder": "Start writing...",
+    "placeholder": "Type '/' for commands, '@' to mention someone…",
     "heading": {
       "paragraph": "Paragraph",
       "h1": "Heading 1",

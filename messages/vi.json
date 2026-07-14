@@ -171,7 +171,7 @@
     "noResults": "Không tìm thấy kết quả"
   },
   "editor": {
-    "placeholder": "Bắt đầu viết...",
+    "placeholder": "Gõ '/' để chèn nội dung, '@' để đề cập ai đó…",
     "heading": {
       "paragraph": "Đoạn văn",
       "h1": "Tiêu đề 1",
