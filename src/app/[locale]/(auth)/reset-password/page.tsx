@@ -8,8 +8,8 @@ import { ResetPasswordForm } from "@/features/auth/components/reset-password-for
 export const dynamic = "force-dynamic"
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("auth")
-  return { title: t("resetPassword") }
+  const t = await getTranslations("metadata")
+  return { title: `${t("resetPassword")} — ${t("siteName")}` }
 }
 
 type Props = {

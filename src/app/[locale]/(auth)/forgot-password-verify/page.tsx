@@ -4,8 +4,8 @@ import type { Metadata } from "next"
 import { ForgotPasswordVerifyForm } from "@/features/auth/components/forgot-password-verify-form"
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("auth")
-  return { title: t("forgotPasswordVerifyTitle") }
+  const t = await getTranslations("metadata")
+  return { title: `${t("forgotPassword")} — ${t("siteName")}` }
 }
 
 type Props = {

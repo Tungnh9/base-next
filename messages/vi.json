@@ -92,8 +92,8 @@
   "nav": {
     "home": "Trang chủ",
     "dashboard": "Bảng điều khiển",
-    "analytics": "Phân tích",
-    "calendar": "Lịch",
+    "customers": "Khách hàng",
+    "employees": "Nhân viên",
     "sectionAppsAndPages": "Ứng dụng & Trang"
   },
   "errors": {
@@ -323,5 +323,54 @@
     },
     "characters": "{count} ký tự",
     "charactersMax": "{count}/{max} ký tự"
+  },
+  "metadata": {
+    "dashboard": "Bảng điều khiển",
+    "customers": "Khách hàng",
+    "employees": "Nhân viên",
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
+    "forgotPassword": "Quên mật khẩu",
+    "resetPassword": "Đặt lại mật khẩu",
+    "verifyEmail": "Xác thực email",
+    "twoStepVerification": "Xác thực 2 bước",
+    "siteName": "Vuexy"
+  },
+  "customers": {
+    "title": "Khách hàng",
+    "description": "Quản lý danh sách khách hàng",
+    "addNew": "Thêm khách hàng",
+    "edit": "Chỉnh sửa",
+    "delete": "Xóa",
+    "confirmDelete": "Bạn có chắc muốn xóa khách hàng này?",
+    "columns": {
+      "name": "Họ tên",
+      "email": "Email",
+      "phone": "Số điện thoại",
+      "company": "Công ty",
+      "status": "Trạng thái",
+      "createdAt": "Ngày tạo"
+    },
+    "status": {
+      "active": "Hoạt động",
+      "inactive": "Không hoạt động"
+    },
+    "form": {
+      "title": "Thêm khách hàng",
+      "titleEdit": "Chỉnh sửa khách hàng",
+      "name": "Họ tên",
+      "namePlaceholder": "Nguyễn Văn A",
+      "email": "Email",
+      "emailPlaceholder": "example@email.com",
+      "phone": "Số điện thoại",
+      "phonePlaceholder": "0901234567",
+      "company": "Công ty",
+      "companyPlaceholder": "Tên công ty",
+      "status": "Trạng thái",
+      "submit": "Lưu",
+      "cancel": "Hủy"
+    },
+    "empty": "Chưa có khách hàng nào",
+    "searchPlaceholder": "Tìm theo tên, email..."
   }
 }

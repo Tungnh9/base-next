@@ -4,8 +4,8 @@ import type { Metadata } from "next"
 import { LoginForm } from "@/features/auth/components/login-form"
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("auth")
-  return { title: t("login") }
+  const t = await getTranslations("metadata")
+  return { title: `${t("login")} — ${t("siteName")}` }
 }
 
 export default async function LoginPage() {

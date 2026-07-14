@@ -92,8 +92,8 @@
   "nav": {
     "home": "Home",
     "dashboard": "Dashboard",
-    "analytics": "Analytics",
-    "calendar": "Calendar",
+    "customers": "Customers",
+    "employees": "Employees",
     "sectionAppsAndPages": "Apps & Pages"
   },
   "errors": {
@@ -323,5 +323,54 @@
     },
     "characters": "{count} characters",
     "charactersMax": "{count}/{max} characters"
+  },
+  "metadata": {
+    "dashboard": "Dashboard",
+    "customers": "Customers",
+    "employees": "Employees",
+    "login": "Login",
+    "register": "Register",
+    "forgotPassword": "Forgot Password",
+    "resetPassword": "Reset Password",
+    "verifyEmail": "Verify Email",
+    "twoStepVerification": "Two-Step Verification",
+    "siteName": "Vuexy"
+  },
+  "customers": {
+    "title": "Customers",
+    "description": "Manage your customer list",
+    "addNew": "Add Customer",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirmDelete": "Are you sure you want to delete this customer?",
+    "columns": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "company": "Company",
+      "status": "Status",
+      "createdAt": "Created At"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "form": {
+      "title": "Add Customer",
+      "titleEdit": "Edit Customer",
+      "name": "Full Name",
+      "namePlaceholder": "John Doe",
+      "email": "Email",
+      "emailPlaceholder": "example@email.com",
+      "phone": "Phone",
+      "phonePlaceholder": "+1 234 567 890",
+      "company": "Company",
+      "companyPlaceholder": "Company name",
+      "status": "Status",
+      "submit": "Save",
+      "cancel": "Cancel"
+    },
+    "empty": "No customers yet",
+    "searchPlaceholder": "Search by name, email..."
   }
 }

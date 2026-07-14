@@ -10,8 +10,8 @@ type Props = {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("auth")
-  return { title: t("verifyEmailTitle") }
+  const t = await getTranslations("metadata")
+  return { title: `${t("verifyEmail")} — ${t("siteName")}` }
 }
 
 export default async function VerifyEmailPage({ searchParams }: Props) {
