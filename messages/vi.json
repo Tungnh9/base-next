@@ -21,6 +21,7 @@
     "confirmPassword": "Xác nhận mật khẩu",
     "name": "Họ và tên",
     "forgotPassword": "Quên mật khẩu?",
+    "rememberMe": "Ghi nhớ đăng nhập",
     "loginSuccess": "Đăng nhập thành công",
     "logoutSuccess": "Đăng xuất thành công",
     "loginFailed": "Đăng nhập thất bại, vui lòng thử lại",

@@ -6,6 +6,13 @@ process.env.JWT_SECRET = "test-jwt-secret-that-is-at-least-32-characters-long"
 process.env.API_BASE_URL = "http://localhost:4000"
 process.env.NODE_ENV = "test"
 
+// jsdom has no ResizeObserver — Radix primitives (e.g. Checkbox) call it on mount
+global.ResizeObserver = class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
 // next/navigation — redirect, router, pathname
 vi.mock("next/navigation", () => ({
   redirect: vi.fn(),
