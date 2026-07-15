@@ -19,7 +19,7 @@ vi.mock("next/headers", () => ({
 }))
 
 import { redirect } from "next/navigation"
-import { signToken, requireRole } from "../auth"
+import { signToken, requireRole, requireSession, unauthorizedError } from "../auth"
 
 describe("requireRole", () => {
   beforeEach(() => {
@@ -41,5 +41,31 @@ describe("requireRole", () => {
     cookieValue = await signToken({ userId: "1", email: "admin@example.com", role: "admin" })
 
     await expect(requireRole("vi", ["admin"])).resolves.toMatchObject({ role: "admin" })
+  })
+})
+
+describe("requireSession", () => {
+  beforeEach(() => {
+    cookieValue = undefined
+  })
+
+  it("returns null when there is no session — never redirects", async () => {
+    await expect(requireSession()).resolves.toBeNull()
+  })
+
+  it("returns the decoded session when a valid cookie is present", async () => {
+    cookieValue = await signToken({ userId: "1", email: "user@example.com", role: "user" })
+
+    await expect(requireSession()).resolves.toMatchObject({ userId: "1", role: "user" })
+  })
+})
+
+describe("unauthorizedError", () => {
+  it("returns a 401 ApiError shape", () => {
+    expect(unauthorizedError()).toMatchObject({
+      code: "UNAUTHORIZED",
+      status: 401,
+      message: expect.any(String),
+    })
   })
 })
