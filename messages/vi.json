@@ -92,8 +92,8 @@
   "nav": {
     "home": "Trang chủ",
     "dashboard": "Bảng điều khiển",
-    "analytics": "Phân tích",
-    "calendar": "Lịch",
+    "customers": "Khách hàng",
+    "employees": "Nhân viên",
     "sectionAppsAndPages": "Ứng dụng & Trang"
   },
   "errors": {
@@ -323,5 +323,86 @@
     },
     "characters": "{count} ký tự",
     "charactersMax": "{count}/{max} ký tự"
+  },
+  "metadata": {
+    "dashboard": "Bảng điều khiển",
+    "customers": "Khách hàng",
+    "employees": "Nhân viên",
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
+    "forgotPassword": "Quên mật khẩu",
+    "resetPassword": "Đặt lại mật khẩu",
+    "verifyEmail": "Xác thực email",
+    "twoStepVerification": "Xác thực 2 bước",
+    "maintenance": "Đang bảo trì",
+    "comingSoon": "Sắp ra mắt",
+    "notAuthorized": "Không có quyền truy cập",
+    "siteName": "Vuexy"
+  },
+  "customers": {
+    "title": "Khách hàng",
+    "description": "Quản lý danh sách khách hàng",
+    "addNew": "Thêm khách hàng",
+    "edit": "Chỉnh sửa",
+    "delete": "Xóa",
+    "deleteTitle": "Xóa khách hàng",
+    "confirmDelete": "Bạn có chắc muốn xóa khách hàng <b>{name}</b> này?",
+    "confirmDeleteMany": "Bạn có chắc muốn xóa {count} khách hàng đã chọn?",
+    "deleteSelected": "Xóa đã chọn ({count})",
+    "selectAll": "Chọn tất cả",
+    "selectRow": "Chọn {name}",
+    "toast": {
+      "deleteSuccess": "Đã xóa khách hàng",
+      "deleteManySuccess": "Đã xóa {count} khách hàng",
+      "deleteManyPartialFail": "Xóa thất bại {failed}/{total} khách hàng"
+    },
+    "columns": {
+      "name": "Họ tên",
+      "email": "Email",
+      "phone": "Số điện thoại",
+      "company": "Công ty",
+      "status": "Trạng thái",
+      "createdAt": "Ngày tạo"
+    },
+    "status": {
+      "active": "Hoạt động",
+      "inactive": "Không hoạt động"
+    },
+    "form": {
+      "title": "Thêm khách hàng",
+      "titleEdit": "Chỉnh sửa khách hàng",
+      "name": "Họ tên",
+      "namePlaceholder": "Nguyễn Văn A",
+      "email": "Email",
+      "emailPlaceholder": "example@email.com",
+      "phone": "Số điện thoại",
+      "phonePlaceholder": "0901234567",
+      "company": "Công ty",
+      "companyPlaceholder": "Tên công ty",
+      "status": "Trạng thái",
+      "submit": "Lưu",
+      "cancel": "Hủy"
+    },
+    "empty": "Chưa có khách hàng nào",
+    "searchPlaceholder": "Tìm theo tên, email..."
+  },
+  "misc": {
+    "maintenance": {
+      "title": "Đang bảo trì!",
+      "subtitle": "Xin lỗi vì sự bất tiện này, chúng tôi đang thực hiện bảo trì hệ thống.",
+      "action": "Xác minh tài khoản"
+    },
+    "comingSoon": {
+      "title": "Sắp ra mắt",
+      "subtitle": "Chúng tôi đang tạo ra điều gì đó tuyệt vời. Hãy đăng ký để nhận thông báo khi sẵn sàng!",
+      "emailPlaceholder": "Nhập email",
+      "action": "Thông báo cho tôi",
+      "successToast": "Chúng tôi sẽ liên hệ lại cho bạn ! 😊"
+    },
+    "notAuthorized": {
+      "title": "Bạn không có quyền truy cập!",
+      "subtitle": "Bạn không có quyền xem trang này với thông tin đăng nhập hiện tại. Vui lòng liên hệ quản trị viên.",
+      "action": "Xác minh tài khoản"
+    }
   }
 }

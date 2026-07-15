@@ -1,6 +1,8 @@
 import { SignJWT, jwtVerify, type JWTPayload } from "jose"
 import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
 import { env } from "@/lib/env"
+import { ROUTES } from "@/lib/constants"
 
 export interface SessionPayload extends JWTPayload {
   userId: string
@@ -52,4 +54,18 @@ export async function setSessionCookie(token: string): Promise<void> {
 export async function clearSessionCookie(): Promise<void> {
   const cookieStore = await cookies()
   cookieStore.delete(env.SESSION_COOKIE_NAME)
+}
+
+// Authorization guard — call from a Server Component/page with the current locale.
+// Assumes the (protected) layout already redirected unauthenticated users to /login;
+// this only adds the role check on top and redirects to /not-authorized on mismatch.
+export async function requireRole(locale: string, allowedRoles: string[]): Promise<SessionPayload> {
+  const session = await getSession()
+  if (!session) {
+    redirect(`/${locale}${ROUTES.login}`)
+  }
+  if (!session.role || !allowedRoles.includes(session.role)) {
+    redirect(`/${locale}${ROUTES.notAuthorized}`)
+  }
+  return session
 }

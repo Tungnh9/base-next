@@ -20,6 +20,19 @@ src/features/[feature-name]/
     └── [name]-card.tsx
 ```
 
+## Feature CRUD mẫu
+
+`src/features/customers/` là feature CRUD đầy đủ — dùng làm tham khảo khi bắt đầu feature mới:
+
+- **types.ts** — `Customer`, `CustomerStatus`, `CreateCustomerInput`, `UpdateCustomerInput`
+- **schemas.ts** — `createCustomerSchema`, `updateCustomerSchema` (Zod) + `CreateCustomerFormValues`, `UpdateCustomerFormValues` types
+- **mock-data.ts** — 5 fixture customers + `customerMockApi` (getAll, getById, create, update, delete)
+- **api.ts** — `customerApi = USE_MOCK_API ? customerMockApi : customerRealApi`
+- **actions.ts** — Server Actions với Zod validation, trả về `{ data, error }`
+- **hooks/use-customers.ts** — tick-based refresh pattern (thoả mãn `react-hooks/set-state-in-effect`)
+- **components/customer-list.tsx** — table với search, skeleton, edit/delete
+- **components/customer-form.tsx** — dialog tạo/sửa với RHF + zodResolver
+
 ## Route page — shell mỏng
 
 Page component chỉ import và render component từ `features/`, không chứa business logic:
@@ -32,6 +45,22 @@ export default function ProductsPage() {
   return <ProductList />
 }
 ```
+
+## Page metadata động
+
+Mọi page trong `(protected)/` và `(auth)/` phải có `generateMetadata()`. Dùng namespace `"metadata"` trong `messages/vi.json` và `messages/en.json`:
+
+```tsx
+import { getTranslations } from "next-intl/server"
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "metadata" })
+  return { title: `${t("customers")} — ${t("siteName")}` }
+}
+```
+
+Format chuẩn: `"<Tên trang> — Vuexy"` (em dash, không phải hyphen). Thêm key mới vào namespace `"metadata"` khi tạo page mới.
 
 ## Scaffold tự động
 

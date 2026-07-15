@@ -8,8 +8,8 @@ type Props = {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("auth")
-  return { title: t("twoStepTitle") }
+  const t = await getTranslations("metadata")
+  return { title: `${t("twoStepVerification")} — ${t("siteName")}` }
 }
 
 export default async function TwoStepVerificationPage({ searchParams }: Props) {

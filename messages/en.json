@@ -92,8 +92,8 @@
   "nav": {
     "home": "Home",
     "dashboard": "Dashboard",
-    "analytics": "Analytics",
-    "calendar": "Calendar",
+    "customers": "Customers",
+    "employees": "Employees",
     "sectionAppsAndPages": "Apps & Pages"
   },
   "errors": {
@@ -323,5 +323,86 @@
     },
     "characters": "{count} characters",
     "charactersMax": "{count}/{max} characters"
+  },
+  "metadata": {
+    "dashboard": "Dashboard",
+    "customers": "Customers",
+    "employees": "Employees",
+    "login": "Login",
+    "register": "Register",
+    "forgotPassword": "Forgot Password",
+    "resetPassword": "Reset Password",
+    "verifyEmail": "Verify Email",
+    "twoStepVerification": "Two-Step Verification",
+    "maintenance": "Under Maintenance",
+    "comingSoon": "Coming Soon",
+    "notAuthorized": "Not Authorized",
+    "siteName": "Vuexy"
+  },
+  "customers": {
+    "title": "Customers",
+    "description": "Manage your customer list",
+    "addNew": "Add Customer",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteTitle": "Delete customer",
+    "confirmDelete": "Are you sure you want to delete customer <b>{name}</b>?",
+    "confirmDeleteMany": "Are you sure you want to delete {count} selected customers?",
+    "deleteSelected": "Delete selected ({count})",
+    "selectAll": "Select all",
+    "selectRow": "Select {name}",
+    "toast": {
+      "deleteSuccess": "Customer deleted",
+      "deleteManySuccess": "{count} customers deleted",
+      "deleteManyPartialFail": "Failed to delete {failed}/{total} customers"
+    },
+    "columns": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "company": "Company",
+      "status": "Status",
+      "createdAt": "Created At"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "form": {
+      "title": "Add Customer",
+      "titleEdit": "Edit Customer",
+      "name": "Full Name",
+      "namePlaceholder": "John Doe",
+      "email": "Email",
+      "emailPlaceholder": "example@email.com",
+      "phone": "Phone",
+      "phonePlaceholder": "+1 234 567 890",
+      "company": "Company",
+      "companyPlaceholder": "Company name",
+      "status": "Status",
+      "submit": "Save",
+      "cancel": "Cancel"
+    },
+    "empty": "No customers yet",
+    "searchPlaceholder": "Search by name, email..."
+  },
+  "misc": {
+    "maintenance": {
+      "title": "Under Maintenance!",
+      "subtitle": "Sorry for the inconvenience but we're performing some maintenance at the moment",
+      "action": "Verify my account"
+    },
+    "comingSoon": {
+      "title": "We are launching soon",
+      "subtitle": "We're creating something awesome. Please subscribe to get notified when it's ready!",
+      "emailPlaceholder": "Enter Email",
+      "action": "Notify",
+      "successToast": "We'll get back to you! 😊"
+    },
+    "notAuthorized": {
+      "title": "You are not authorized!",
+      "subtitle": "You do not have permission to view this page using the credentials that you have provided while login. Please contact your site administrator.",
+      "action": "Verify my account"
+    }
   }
 }

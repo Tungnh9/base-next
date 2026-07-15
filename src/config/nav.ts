@@ -1,4 +1,4 @@
-import { BarChart2, Calendar, LayoutDashboard } from "lucide-react"
+import { LayoutDashboard, UsersRound, UserCheck } from "lucide-react"
 import type * as React from "react"
 import { ROUTES } from "@/lib/constants"
 
@@ -8,6 +8,8 @@ export interface NavItem {
   href: string
   icon: React.ComponentType<{ className?: string }>
   badge?: number
+  // When set, only sessions with this role see the item in the sidebar
+  requiredRole?: string
 }
 
 export interface NavSection {
@@ -25,8 +27,13 @@ export function createNavConfig(): NavSection[] {
     {
       title: "nav.sectionAppsAndPages",
       items: [
-        { label: "nav.analytics", href: ROUTES.analytics, icon: BarChart2 },
-        { label: "nav.calendar", href: ROUTES.calendar, icon: Calendar },
+        { label: "nav.customers", href: ROUTES.customers, icon: UsersRound },
+        {
+          label: "nav.employees",
+          href: ROUTES.employees,
+          icon: UserCheck,
+          requiredRole: "admin",
+        },
       ],
     },
   ]

@@ -56,10 +56,10 @@ base-next/
     │   │   ├── language-switcher.tsx   # EN/VI switcher
     │   │   └── user-menu.tsx     # Radix DropdownMenu với Logout action
     │   └── common/
-    │       └── providers.tsx     # NextIntlClientProvider + ThemeProvider + TooltipProvider + Toaster
+    │       └── providers.tsx     # NextIntlClientProvider + ThemeProvider + TooltipProvider + SonnerToaster
     │
     ├── features/                 # Feature-sliced: mỗi tính năng là 1 module độc lập
-    │   └── auth/                 # Module xác thực
+    │   ├── auth/                 # Module xác thực
     │       ├── types.ts          # User, Session, AuthResponse, VerifyForgotPasswordCodeResponse
     │       ├── schemas.ts        # Zod schemas (static) + factory fns với i18n messages (client)
     │       ├── actions.ts        # Server Actions: login, register, forgotPassword, verifyForgotPasswordCode,
@@ -79,6 +79,20 @@ base-next/
     │           ├── verify-email-resend.tsx
     │           ├── two-step-form.tsx
     │           └── otp-input.tsx
+    │   └── customers/            # Module khách hàng (CRUD mẫu — tham khảo khi làm feature mới)
+    │       ├── index.ts          # Barrel exports
+    │       ├── types.ts          # Customer, CustomerStatus, CreateCustomerInput, UpdateCustomerInput, CustomerFilters
+    │       ├── schemas.ts        # createCustomerSchema, updateCustomerSchema (Zod) + FormValues types
+    │       ├── api.ts            # customerApi: switch mock/real qua USE_MOCK_API
+    │       ├── actions.ts        # Server Actions: getCustomers, createCustomer, updateCustomer, deleteCustomer
+    │       ├── mock-data.ts      # customerMockApi: fixture data
+    │       ├── hooks/
+    │       │   └── use-customers.ts  # useCustomers() — tick-based refresh pattern
+    │       ├── components/
+    │       │   ├── customer-list.tsx  # Table với search, skeleton, CRUD actions
+    │       │   └── customer-form.tsx  # Dialog form tạo/sửa (RHF + zodResolver)
+    │       └── __tests__/
+    │           └── schemas.test.ts    # 8 test cases cho Zod schemas
     │
     ├── lib/                      # Tiện ích thuần — không phụ thuộc vào React
     │   ├── env.ts                # Zod validate biến môi trường lúc build
@@ -96,9 +110,6 @@ base-next/
     │   ├── index.ts              # Re-export tất cả stores
     │   ├── ui-store.ts           # sidebarCollapsed (persist) + sidebarOpen (không persist)
     │   └── user-store.ts         # user hiện tại — display cache, KHÔNG phải source of truth cho auth
-    │
-    ├── hooks/                    # Custom React hooks dùng chung
-    │   └── use-toast.ts          # useToast() + toast() — hệ thống toast notification
     │
     ├── config/
     │   └── nav.ts                # createNavConfig() → NAV sections + NAV_ITEMS flat list

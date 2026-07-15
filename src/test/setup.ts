@@ -15,10 +15,14 @@ vi.mock("next/navigation", () => ({
 }))
 
 // next-intl — useTranslations returns key as value, no throws
-vi.mock("next-intl", () => ({
-  useTranslations: () => (key: string) => key,
-  useLocale: () => "vi",
-}))
+vi.mock("next-intl", () => {
+  const t = (key: string) => key
+  t.rich = (key: string) => key
+  return {
+    useTranslations: () => t,
+    useLocale: () => "vi",
+  }
+})
 vi.mock("next-intl/server", () => ({
   getTranslations: async () => (key: string) => key,
   getLocale: async () => "vi",

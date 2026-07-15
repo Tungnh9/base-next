@@ -16,6 +16,9 @@ const PUBLIC_PATHS = [
   "/reset-password",
   "/verify-email",
   "/two-step-verification",
+  "/maintenance",
+  "/coming-soon",
+  "/not-authorized",
   "/api/health",
 ]
 // URL prefixes to skip entirely (static assets)
@@ -52,15 +55,21 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Public paths — check after stripping locale prefix
   const normalizedPath = stripLocale(pathname)
+  const locale = extractLocale(pathname)
+
+  // Site-wide maintenance mode — redirect everything except the maintenance page itself
+  if (process.env.MAINTENANCE_MODE === "true" && normalizedPath !== "/maintenance") {
+    return NextResponse.redirect(new URL(`/${locale}/maintenance`, request.url))
+  }
+
+  // Public paths — check after stripping locale prefix
   if (PUBLIC_PATHS.some((p) => normalizedPath === p || normalizedPath.startsWith(p + "/"))) {
     return NextResponse.next()
   }
 
   const sessionCookieName = process.env.SESSION_COOKIE_NAME ?? "session"
   const token = request.cookies.get(sessionCookieName)?.value
-  const locale = extractLocale(pathname)
 
   if (!token) {
     const loginUrl = new URL(`/${locale}/login`, request.url)
