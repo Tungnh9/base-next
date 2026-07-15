@@ -94,6 +94,17 @@ describe("LoginForm", () => {
     expect(passwordInput).toHaveAttribute("type", "password")
   })
 
+  it("toggles the Remember Me checkbox", async () => {
+    const user = userEvent.setup()
+    render(<LoginForm />)
+
+    const checkbox = screen.getByRole("checkbox", { name: /rememberMe/i })
+    expect(checkbox).not.toBeChecked()
+
+    await user.click(checkbox)
+    expect(checkbox).toBeChecked()
+  })
+
   it("calls action with FormData on valid submit", async () => {
     const user = userEvent.setup()
     render(<LoginForm />)

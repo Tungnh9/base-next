@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Eye, EyeOff } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import {
   Form,
@@ -41,6 +42,7 @@ export function LoginForm() {
   const { state, action, isPending } = useLoginAction()
   const setUser = useUserStore((s) => s.setUser)
   const [showPassword, setShowPassword] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false)
   // Latch: set true on submit, stays true until navigation (unmount) or error (state.error resets derived value)
   const [isNavigating, setIsNavigating] = useState(false)
   const showLoading = isPending || (isNavigating && !state.error)
@@ -77,7 +79,7 @@ export function LoginForm() {
           name="email"
           render={({ field }) => (
             <FormItem className="gap-1">
-              <FormLabel className="text-[13px] font-normal text-[#5d596c]">
+              <FormLabel className="text-foreground text-[13px] font-normal">
                 {tAuth("emailOrUsername")}
               </FormLabel>
               <FormControl>
@@ -99,7 +101,7 @@ export function LoginForm() {
           render={({ field }) => (
             <FormItem className="gap-1">
               <div className="flex items-center justify-between">
-                <FormLabel className="text-[13px] font-normal text-[#5d596c]">
+                <FormLabel className="text-foreground text-[13px] font-normal">
                   {tAuth("password")}
                 </FormLabel>
                 <Link
@@ -132,6 +134,20 @@ export function LoginForm() {
             </FormItem>
           )}
         />
+
+        <div className="flex items-center gap-1.5">
+          <Checkbox
+            id="remember-me"
+            checked={rememberMe}
+            onCheckedChange={(checked) => setRememberMe(checked === true)}
+          />
+          <label
+            htmlFor="remember-me"
+            className="text-muted-foreground cursor-pointer text-[15px] leading-[22px]"
+          >
+            {tAuth("rememberMe")}
+          </label>
+        </div>
 
         <Button type="submit" className="mt-1 w-full" disabled={showLoading}>
           {showLoading ? (

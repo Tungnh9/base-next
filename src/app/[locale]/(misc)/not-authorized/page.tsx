@@ -47,7 +47,7 @@ export default async function NotAuthorizedPage({
       />
 
       <div className="relative z-10 flex flex-col items-center gap-[6px] text-center">
-        <h1 className="text-[32px] leading-[44px] font-semibold text-[#5d596c]">{t("title")}</h1>
+        <h1 className="text-foreground text-[32px] leading-[44px] font-semibold">{t("title")}</h1>
         <p className="max-w-md text-[15px] leading-[22px] text-[var(--text-body)]">
           {t("subtitle")}
         </p>

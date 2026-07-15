@@ -21,6 +21,7 @@
     "confirmPassword": "Confirm password",
     "name": "Full name",
     "forgotPassword": "Forgot password?",
+    "rememberMe": "Remember Me",
     "loginSuccess": "Logged in successfully",
     "logoutSuccess": "Logged out successfully",
     "loginFailed": "Login failed, please try again",
