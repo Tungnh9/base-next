@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { locales, type Locale } from "@/i18n/config"
 
 const LOCALE_LABELS: Record<Locale, string> = {
@@ -15,6 +16,7 @@ const LOCALE_FLAGS: Record<Locale, string> = {
 }
 
 export function LanguageSwitcher({ currentLocale }: { currentLocale: Locale }) {
+  const t = useTranslations("languageSwitcher")
   const [open, setOpen] = React.useState(false)
   const ref = React.useRef<HTMLDivElement>(null)
   const pathname = usePathname()
@@ -52,7 +54,7 @@ export function LanguageSwitcher({ currentLocale }: { currentLocale: Locale }) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        aria-label="Change language"
+        aria-label={t("changeLabel")}
         aria-expanded={open}
         className="flex size-[26px] cursor-pointer items-center justify-center rounded-full transition-opacity hover:opacity-80"
       >

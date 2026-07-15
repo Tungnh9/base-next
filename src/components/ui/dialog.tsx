@@ -3,31 +3,24 @@
 import * as React from "react"
 import { XIcon } from "lucide-react"
 import { Dialog as DialogPrimitive } from "radix-ui"
+import { useTranslations } from "next-intl"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
-function Dialog({
-  ...props
-}: React.ComponentProps<typeof DialogPrimitive.Root>) {
+function Dialog({ ...props }: React.ComponentProps<typeof DialogPrimitive.Root>) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />
 }
 
-function DialogTrigger({
-  ...props
-}: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
+function DialogTrigger({ ...props }: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
   return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
 }
 
-function DialogPortal({
-  ...props
-}: React.ComponentProps<typeof DialogPrimitive.Portal>) {
+function DialogPortal({ ...props }: React.ComponentProps<typeof DialogPrimitive.Portal>) {
   return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />
 }
 
-function DialogClose({
-  ...props
-}: React.ComponentProps<typeof DialogPrimitive.Close>) {
+function DialogClose({ ...props }: React.ComponentProps<typeof DialogPrimitive.Close>) {
   return <DialogPrimitive.Close data-slot="dialog-close" {...props} />
 }
 
@@ -57,6 +50,8 @@ function DialogContent({
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
 }) {
+  const t = useTranslations("common")
+
   return (
     <DialogPortal data-slot="dialog-portal">
       <DialogOverlay />
@@ -64,7 +59,7 @@ function DialogContent({
         data-slot="dialog-content"
         className={cn(
           "fixed top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2",
-          "flex flex-col w-full max-w-[calc(100%-2rem)] sm:max-w-[500px]",
+          "flex w-full max-w-[calc(100%-2rem)] flex-col sm:max-w-[500px]",
           "bg-background rounded-xl outline-none",
           "shadow-[0_4px_18px_rgba(75,70,92,0.12)]",
           "duration-200",
@@ -82,14 +77,14 @@ function DialogContent({
               "absolute top-[18px] right-4 size-8",
               "flex items-center justify-center rounded-md",
               "text-muted-foreground hover:bg-accent hover:text-foreground",
-              "transition-colors cursor-pointer outline-none",
-              "focus-visible:ring-2 focus-visible:ring-ring",
+              "cursor-pointer transition-colors outline-none",
+              "focus-visible:ring-ring focus-visible:ring-2",
               "disabled:pointer-events-none",
               "[&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-[18px]"
             )}
           >
             <XIcon />
-            <span className="sr-only">Close</span>
+            <span className="sr-only">{t("close")}</span>
           </DialogPrimitive.Close>
         )}
       </DialogPrimitive.Content>
@@ -101,23 +96,14 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="dialog-header"
-      className={cn(
-        "flex flex-col gap-1 px-6 py-5 pr-12",
-        className
-      )}
+      className={cn("flex flex-col gap-1 px-6 py-5 pr-12", className)}
       {...props}
     />
   )
 }
 
 function DialogBody({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="dialog-body"
-      className={cn("px-6 py-5", className)}
-      {...props}
-    />
-  )
+  return <div data-slot="dialog-body" className={cn("px-6 py-5", className)} {...props} />
 }
 
 function DialogFooter({
@@ -128,18 +114,17 @@ function DialogFooter({
 }: React.ComponentProps<"div"> & {
   showCloseButton?: boolean
 }) {
+  const t = useTranslations("common")
+
   return (
     <div
       data-slot="dialog-footer"
-      className={cn(
-        "flex flex-row justify-end gap-3 px-6 py-4",
-        className
-      )}
+      className={cn("flex flex-row justify-end gap-3 px-6 py-4", className)}
       {...props}
     >
       {showCloseButton && (
         <DialogPrimitive.Close asChild>
-          <Button variant="outline">Close</Button>
+          <Button variant="outline">{t("close")}</Button>
         </DialogPrimitive.Close>
       )}
       {children}
@@ -147,14 +132,11 @@ function DialogFooter({
   )
 }
 
-function DialogTitle({
-  className,
-  ...props
-}: React.ComponentProps<typeof DialogPrimitive.Title>) {
+function DialogTitle({ className, ...props }: React.ComponentProps<typeof DialogPrimitive.Title>) {
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn("text-[18px] leading-[24px] font-semibold text-foreground", className)}
+      className={cn("text-foreground text-[18px] leading-[24px] font-semibold", className)}
       {...props}
     />
   )

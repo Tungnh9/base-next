@@ -28,7 +28,7 @@ export function Sidebar({ role }: SidebarProps) {
         <button
           type="button"
           onClick={toggleSidebar}
-          aria-label="Open sidebar"
+          aria-label={t("sidebar.openLabel")}
           className="bg-sidebar fixed top-4 left-4 z-50 flex size-9 items-center justify-center rounded-md shadow-md lg:hidden"
         >
           <Menu className="text-sidebar-foreground size-5" />
@@ -63,7 +63,7 @@ export function Sidebar({ role }: SidebarProps) {
             <button
               onClick={toggleSidebarCollapsed}
               className="border-sidebar-border text-sidebar-foreground hover:bg-sidebar-accent flex size-5 cursor-pointer items-center justify-center rounded-full border transition-colors"
-              aria-label="Expand sidebar"
+              aria-label={t("sidebar.expandLabel")}
             >
               <ChevronRight className="size-3" />
             </button>
@@ -81,12 +81,12 @@ export function Sidebar({ role }: SidebarProps) {
                   priority
                   className="h-[23px] w-[34px]"
                 />
-                <span>Vuexy</span>
+                <span>{t("metadata.siteName")}</span>
               </Link>
               <button
                 onClick={toggleSidebarCollapsed}
                 className="border-sidebar-border text-sidebar-foreground hover:bg-sidebar-accent flex size-5 cursor-pointer items-center justify-center rounded-full border transition-colors"
-                aria-label="Collapse sidebar"
+                aria-label={t("sidebar.collapseLabel")}
               >
                 <ChevronLeft className="size-3" />
               </button>

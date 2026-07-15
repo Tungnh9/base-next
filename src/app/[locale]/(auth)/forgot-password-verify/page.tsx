@@ -1,6 +1,7 @@
-import Image from "next/image"
 import { getTranslations } from "next-intl/server"
 import type { Metadata } from "next"
+import { AuthCard } from "@/components/common/auth-card"
+import { AuthCardHeader } from "@/components/common/auth-card-header"
 import { ForgotPasswordVerifyForm } from "@/features/auth/components/forgot-password-verify-form"
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -18,11 +19,8 @@ export default async function ForgotPasswordVerifyPage({ searchParams }: Props) 
   const appName = process.env.NEXT_PUBLIC_APP_NAME ?? "App"
 
   return (
-    <div className="bg-card relative z-10 flex w-full max-w-[450px] flex-col gap-6 rounded-md p-8 shadow-[0px_4px_9px_rgba(75,70,92,0.1)] dark:shadow-[0px_4px_20px_rgba(15,20,34,0.4)]">
-      <div className="flex items-center justify-center gap-2.5 py-2.5">
-        <Image src="/logo.svg" alt={appName} width={30} height={30} className="h-[30px] w-[30px]" />
-        <span className="text-foreground text-[26px] leading-[36px] font-bold">{appName}</span>
-      </div>
+    <AuthCard>
+      <AuthCardHeader appName={appName} />
 
       <div className="flex flex-col gap-[26px]">
         <div className="flex flex-col gap-1.5">
@@ -37,6 +35,6 @@ export default async function ForgotPasswordVerifyPage({ searchParams }: Props) 
 
         <ForgotPasswordVerifyForm email={email} />
       </div>
-    </div>
+    </AuthCard>
   )
 }

@@ -8,7 +8,8 @@
     "save": "Lưu",
     "delete": "Xóa",
     "edit": "Chỉnh sửa",
-    "back": "Quay lại"
+    "back": "Quay lại",
+    "close": "Đóng"
   },
   "auth": {
     "login": "Đăng nhập",
@@ -154,6 +155,14 @@
         "time": "24/07, 10:30"
       }
     }
+  },
+  "sidebar": {
+    "openLabel": "Mở sidebar",
+    "expandLabel": "Mở rộng sidebar",
+    "collapseLabel": "Thu gọn sidebar"
+  },
+  "languageSwitcher": {
+    "changeLabel": "Đổi ngôn ngữ"
   },
   "shortcuts": {
     "openLabel": "Lối tắt",

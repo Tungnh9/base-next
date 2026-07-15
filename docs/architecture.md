@@ -14,15 +14,17 @@ base-next/
 │   └── en.json                   # Tiếng Anh
 │
 └── src/
-    ├── proxy.ts                  # Auth guard tầng 1 (Next.js 16 — thay thế middleware.ts)
+    ├── proxy.ts                  # Auth guard tầng 1 (Next.js 16 — thay thế middleware.ts) + MAINTENANCE_MODE
     ├── app/                      # Next.js App Router — chỉ chứa file routing
-    │   ├── layout.tsx            # Root layout: <html lang> tự động theo locale
+    │   ├── layout.tsx            # Root layout: <html lang>, bọc <Providers> (NextIntlClientProvider +
+    │   │                         #   ThemeProvider) — bọc TẤT CẢ route kể cả error.tsx/not-found.tsx
     │   ├── page.tsx              # Redirect / → /vi
-    │   ├── error.tsx             # Global error boundary (client component)
-    │   ├── global-error.tsx      # Lỗi bọc ngoài root layout
-    │   ├── not-found.tsx         # Trang 404
+    │   ├── error.tsx             # Error boundary theo segment (client component) — nằm trong <Providers>
+    │   ├── global-error.tsx      # Lỗi bọc ngoài chính root layout — KHÔNG nằm trong <Providers>
+    │   │                         #   (thay thế toàn bộ <html>/<body>), không dùng next-intl được
+    │   ├── not-found.tsx         # Trang 404 — dùng chung MiscIllustratedPage với route group (misc)
     │   └── [locale]/             # Dynamic segment — locale trong URL (/vi, /en)
-    │       ├── layout.tsx        # Cung cấp NextIntlClientProvider cho toàn app
+    │       ├── layout.tsx        # Chỉ validate locale param → notFound() nếu sai; KHÔNG còn giữ Providers
     │       ├── page.tsx          # Trang chủ
     │       ├── (auth)/           # Route group: trang xác thực (không bảo vệ)
     │       │   ├── layout.tsx            # Lavender background + 4 decorative shapes, card 450px
@@ -33,9 +35,16 @@ base-next/
     │       │   ├── reset-password/page.tsx    # Reads ?token&email; guard: no token → redirect forgot-password
     │       │   ├── verify-email/page.tsx      # Reads ?email, Skip + Resend actions
     │       │   └── two-step-verification/page.tsx  # OTP 6-box, reads ?phone, demo code 230320
+    │       ├── (misc)/           # Route group: trang public tiện ích, không sidebar/header
+    │       │   ├── layout.tsx        # bg-background — không phải feature, xem README "Trang tiện ích"
+    │       │   ├── maintenance/page.tsx      # Hiện khi MAINTENANCE_MODE=true (proxy.ts redirect toàn bộ)
+    │       │   ├── coming-soon/page.tsx      # Dùng ComingSoonForm (components/common)
+    │       │   └── not-authorized/page.tsx   # Hiện khi requireRole() không khớp role
     │       └── (protected)/      # Route group: yêu cầu đăng nhập
     │           ├── layout.tsx    # Server check session → redirect /login nếu chưa login
-    │           └── dashboard/page.tsx
+    │           ├── dashboard/page.tsx
+    │           ├── customers/page.tsx   # Delegates to features/customers → CustomerList
+    │           └── employees/page.tsx   # requireRole(locale, ["admin"]) — non-admin → /not-authorized
     │
     ├── components/
     │   ├── ui/                   # shadcn/ui primitives
@@ -56,7 +65,12 @@ base-next/
     │   │   ├── language-switcher.tsx   # EN/VI switcher
     │   │   └── user-menu.tsx     # Radix DropdownMenu với Logout action
     │   └── common/
-    │       └── providers.tsx     # NextIntlClientProvider + ThemeProvider + TooltipProvider + SonnerToaster
+    │       ├── providers.tsx           # NextIntlClientProvider + ThemeProvider + TooltipProvider + SonnerToaster
+    │       ├── back-button.tsx         # router.back() button — dùng ở (misc) và not-found
+    │       ├── coming-soon-form.tsx    # Email capture form cho /coming-soon (dùng BackButton sau khi submit)
+    │       ├── auth-card.tsx           # Shell card dùng chung cho (auth) pages (trừ two-step-verification)
+    │       ├── auth-card-header.tsx    # Logo + tên app — dùng ở tất cả (auth) pages
+    │       └── misc-illustrated-page.tsx  # Shell dùng chung cho (misc) pages + not-found.tsx
     │
     ├── features/                 # Feature-sliced: mỗi tính năng là 1 module độc lập
     │   ├── auth/                 # Module xác thực
@@ -68,6 +82,7 @@ base-next/
     │       ├── api.ts            # authApi: switch mock/real qua USE_MOCK_API
     │       ├── mock-data.ts      # authMockApi: fixture data, fixed test cases
     │       ├── services.ts       # authService: business logic, sign JWT, set/clear cookie
+    │       ├── utils.ts          # maskPhone() — dùng ở two-step-verification/page.tsx
     │       ├── hooks/
     │       │   └── use-auth.ts   # useLoginAction, useRegisterAction, useForgotPasswordAction...
     │       └── components/
@@ -85,6 +100,7 @@ base-next/
     │       ├── schemas.ts        # createCustomerSchema, updateCustomerSchema (Zod) + FormValues types
     │       ├── api.ts            # customerApi: switch mock/real qua USE_MOCK_API
     │       ├── actions.ts        # Server Actions: getCustomers, createCustomer, updateCustomer, deleteCustomer
+    │       │                     #   — mỗi action gọi requireSession() (@/lib/auth) trước khi chạy
     │       ├── mock-data.ts      # customerMockApi: fixture data
     │       ├── hooks/
     │       │   └── use-customers.ts  # useCustomers() — tick-based refresh pattern
@@ -99,7 +115,10 @@ base-next/
     │   ├── api-client.ts         # ApiClient class (axios facade) + ApiClientError
     │   ├── base-api.service.ts   # BaseApiService abstract class — extend cho feature services
     │   ├── api.ts                # serverApi<T>() + clientApi<T>() + serverHttpClient/browserHttpClient
-    │   ├── auth.ts               # signToken, verifyToken, getSession (React cache), set/clearSessionCookie
+    │   ├── auth.ts               # signToken, verifyToken, getSession, set/clearSessionCookie,
+    │   │                         #   requireRole() (page/layout guard, redirect), requireSession()/
+    │   │                         #   unauthorizedError() (Server Action guard, không redirect)
+    │   ├── rate-limit.ts         # checkRateLimit/recordFailedAttempt/resetRateLimit — in-memory, dùng cho loginAction
     │   ├── mock.ts               # mockApi(), mockApiError(), USE_MOCK_API flag
     │   ├── constants.ts          # ROUTES object — tất cả path string đặt ở đây
     │   ├── field-variants.ts     # FIELD_SIZE + FIELD_VALIDATION_CLASSES dùng chung cho Input/Textarea/Select
