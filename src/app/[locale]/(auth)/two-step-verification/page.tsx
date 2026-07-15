@@ -1,7 +1,8 @@
-import Image from "next/image"
 import { getTranslations } from "next-intl/server"
 import type { Metadata } from "next"
+import { AuthCardHeader } from "@/components/common/auth-card-header"
 import { TwoStepForm } from "@/features/auth/components/two-step-form"
+import { maskPhone } from "@/features/auth/utils"
 
 type Props = {
   searchParams: Promise<{ phone?: string }>
@@ -17,17 +18,11 @@ export default async function TwoStepVerificationPage({ searchParams }: Props) {
   const { phone = "" } = await searchParams
   const appName = process.env.NEXT_PUBLIC_APP_NAME ?? "App"
 
-  // Mask phone: keep last 4 digits, replace the rest with ⁎
-  const maskedPhone = phone
-    ? "⁎".repeat(Math.max(0, phone.length - 4)) + phone.slice(-4)
-    : "⁎⁎⁎⁎⁎⁎9763"
+  const maskedPhone = maskPhone(phone)
 
   return (
     <div className="border-primary/25 bg-card relative z-10 flex w-full max-w-[450px] flex-col gap-6 rounded-md border-2 border-dashed p-8">
-      <div className="flex items-center justify-center gap-2.5 py-2.5">
-        <Image src="/logo.svg" alt={appName} width={30} height={30} className="h-[30px] w-[30px]" />
-        <span className="text-foreground text-[26px] leading-[36px] font-bold">{appName}</span>
-      </div>
+      <AuthCardHeader appName={appName} />
 
       <div className="flex flex-col gap-[26px]">
         <div className="flex flex-col gap-1.5">

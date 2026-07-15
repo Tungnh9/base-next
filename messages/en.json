@@ -8,7 +8,8 @@
     "save": "Save",
     "delete": "Delete",
     "edit": "Edit",
-    "back": "Back"
+    "back": "Back",
+    "close": "Close"
   },
   "auth": {
     "login": "Login",
@@ -25,6 +26,7 @@
     "loginSuccess": "Logged in successfully",
     "logoutSuccess": "Logged out successfully",
     "loginFailed": "Login failed, please try again",
+    "tooManyAttempts": "Too many failed login attempts, please try again in 15 minutes",
     "registerFailed": "Registration failed, please try again",
     "registerSuccess": "Registration successful",
     "invalidCredentials": "Invalid email or password",
@@ -153,6 +155,14 @@
         "time": "24/07, 10:30"
       }
     }
+  },
+  "sidebar": {
+    "openLabel": "Open sidebar",
+    "expandLabel": "Expand sidebar",
+    "collapseLabel": "Collapse sidebar"
+  },
+  "languageSwitcher": {
+    "changeLabel": "Change language"
   },
   "shortcuts": {
     "openLabel": "Shortcuts",

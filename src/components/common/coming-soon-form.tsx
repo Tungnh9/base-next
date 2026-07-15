@@ -3,8 +3,7 @@
 import { useState } from "react"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
+import { BackButton } from "./back-button"
 
 interface ComingSoonFormProps {
   backLabel: string
@@ -13,7 +12,6 @@ interface ComingSoonFormProps {
 
 export function ComingSoonForm({ backLabel, successToast }: ComingSoonFormProps) {
   const t = useTranslations("misc.comingSoon")
-  const router = useRouter()
   const [email, setEmail] = useState("")
   const [submitted, setSubmitted] = useState(false)
 
@@ -24,11 +22,7 @@ export function ComingSoonForm({ backLabel, successToast }: ComingSoonFormProps)
   }
 
   if (submitted) {
-    return (
-      <Button className="relative z-10 mt-6" onClick={() => router.back()}>
-        {backLabel}
-      </Button>
-    )
+    return <BackButton label={backLabel} />
   }
 
   return (
