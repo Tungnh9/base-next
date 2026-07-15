@@ -15,7 +15,7 @@ export default async function EmployeesPage({ params }: { params: Promise<{ loca
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-2 p-6 text-center">
-      <h2 className="text-lg font-semibold text-[#5d596c]">{t("title")}</h2>
+      <h2 className="text-foreground text-lg font-semibold">{t("title")}</h2>
       <p className="text-muted-foreground max-w-md text-sm">{t("subtitle")}</p>
       <Image
         src="/images/notify/launching-soon.png"
