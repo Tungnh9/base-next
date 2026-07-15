@@ -345,7 +345,17 @@
     "addNew": "Thêm khách hàng",
     "edit": "Chỉnh sửa",
     "delete": "Xóa",
-    "confirmDelete": "Bạn có chắc muốn xóa khách hàng này?",
+    "deleteTitle": "Xóa khách hàng",
+    "confirmDelete": "Bạn có chắc muốn xóa khách hàng <b>{name}</b> này?",
+    "confirmDeleteMany": "Bạn có chắc muốn xóa {count} khách hàng đã chọn?",
+    "deleteSelected": "Xóa đã chọn ({count})",
+    "selectAll": "Chọn tất cả",
+    "selectRow": "Chọn {name}",
+    "toast": {
+      "deleteSuccess": "Đã xóa khách hàng",
+      "deleteManySuccess": "Đã xóa {count} khách hàng",
+      "deleteManyPartialFail": "Xóa thất bại {failed}/{total} khách hàng"
+    },
     "columns": {
       "name": "Họ tên",
       "email": "Email",

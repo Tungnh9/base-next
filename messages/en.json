@@ -345,7 +345,17 @@
     "addNew": "Add Customer",
     "edit": "Edit",
     "delete": "Delete",
-    "confirmDelete": "Are you sure you want to delete this customer?",
+    "deleteTitle": "Delete customer",
+    "confirmDelete": "Are you sure you want to delete customer <b>{name}</b>?",
+    "confirmDeleteMany": "Are you sure you want to delete {count} selected customers?",
+    "deleteSelected": "Delete selected ({count})",
+    "selectAll": "Select all",
+    "selectRow": "Select {name}",
+    "toast": {
+      "deleteSuccess": "Customer deleted",
+      "deleteManySuccess": "{count} customers deleted",
+      "deleteManyPartialFail": "Failed to delete {failed}/{total} customers"
+    },
     "columns": {
       "name": "Name",
       "email": "Email",
