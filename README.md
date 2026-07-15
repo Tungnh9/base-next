@@ -66,6 +66,12 @@ Các trang public không cần xác thực, không có sidebar/header:
 
 Route group `(misc)` — thêm route mới vào `src/app/[locale]/(misc)/` và khai báo trong `src/proxy.ts` → `PUBLIC_PATHS`.
 
+Logic hiển thị đã gắn vào 3 trang này:
+
+- `/maintenance` — bật bằng biến môi trường `MAINTENANCE_MODE=true`; `proxy.ts` redirect toàn bộ traffic sang trang này (trừ chính nó).
+- `/not-authorized` — trả về khi `requireRole()` (`src/lib/auth.ts`) phát hiện session không đủ quyền. Ví dụ: route `/employees` yêu cầu role `admin`.
+- `/coming-soon` — nội dung (`misc.comingSoon`) được tái sử dụng ở trang `/employees` cho user có quyền nhưng feature chưa build xong.
+
 ## Quy ước Button
 
 - Mọi `<button>` đều có `cursor: pointer` (khai báo trong `globals.css @layer base`)

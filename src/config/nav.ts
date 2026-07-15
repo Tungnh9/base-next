@@ -8,6 +8,8 @@ export interface NavItem {
   href: string
   icon: React.ComponentType<{ className?: string }>
   badge?: number
+  // When set, only sessions with this role see the item in the sidebar
+  requiredRole?: string
 }
 
 export interface NavSection {
@@ -26,7 +28,12 @@ export function createNavConfig(): NavSection[] {
       title: "nav.sectionAppsAndPages",
       items: [
         { label: "nav.customers", href: ROUTES.customers, icon: UsersRound },
-        { label: "nav.employees", href: ROUTES.employees, icon: UserCheck },
+        {
+          label: "nav.employees",
+          href: ROUTES.employees,
+          icon: UserCheck,
+          requiredRole: "admin",
+        },
       ],
     },
   ]

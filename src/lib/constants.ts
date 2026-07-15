@@ -10,6 +10,9 @@ export const ROUTES = {
   verifyEmail: "/verify-email",
   twoStepVerification: "/two-step-verification",
   forgotPasswordVerify: "/forgot-password-verify",
+  maintenance: "/maintenance",
+  comingSoon: "/coming-soon",
+  notAuthorized: "/not-authorized",
 } as const
 
 export type Route = (typeof ROUTES)[keyof typeof ROUTES]

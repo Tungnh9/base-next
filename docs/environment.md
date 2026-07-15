@@ -4,16 +4,17 @@ Tất cả biến được validate lúc build bằng Zod (`src/lib/env.ts`). Bu
 
 ## Danh sách
 
-| Biến                       | Bắt buộc | Mô tả                                                                |
-| -------------------------- | -------- | -------------------------------------------------------------------- |
-| `NEXT_PUBLIC_APP_URL`      | ✓        | URL của app (VD: `http://localhost:3000`)                            |
-| `JWT_SECRET`               | ✓        | Khóa ký JWT, tối thiểu 32 ký tự                                      |
-| `API_BASE_URL`             | ✓        | URL backend API (server-side)                                        |
-| `NEXT_PUBLIC_APP_NAME`     |          | Tên app hiển thị                                                     |
-| `SESSION_COOKIE_NAME`      |          | Tên cookie session (mặc định: `session`)                             |
-| `NEXT_PUBLIC_API_BASE_URL` |          | URL backend API (client-side, nếu khác server)                       |
-| `NODE_ENV`                 |          | `development` \| `production` \| `test`                              |
-| `NEXT_PUBLIC_USE_MOCK_API` |          | `true` để dùng mock data thay vì gọi backend thật (mặc định `false`) |
+| Biến                       | Bắt buộc | Mô tả                                                                     |
+| -------------------------- | -------- | ------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_APP_URL`      | ✓        | URL của app (VD: `http://localhost:3000`)                                 |
+| `JWT_SECRET`               | ✓        | Khóa ký JWT, tối thiểu 32 ký tự                                           |
+| `API_BASE_URL`             | ✓        | URL backend API (server-side)                                             |
+| `NEXT_PUBLIC_APP_NAME`     |          | Tên app hiển thị                                                          |
+| `SESSION_COOKIE_NAME`      |          | Tên cookie session (mặc định: `session`)                                  |
+| `NEXT_PUBLIC_API_BASE_URL` |          | URL backend API (client-side, nếu khác server)                            |
+| `NODE_ENV`                 |          | `development` \| `production` \| `test`                                   |
+| `NEXT_PUBLIC_USE_MOCK_API` |          | `true` để dùng mock data thay vì gọi backend thật (mặc định `false`)      |
+| `MAINTENANCE_MODE`         |          | `true` để redirect toàn bộ traffic sang `/maintenance` (mặc định `false`) |
 
 ## Setup
 

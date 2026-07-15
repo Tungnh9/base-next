@@ -71,21 +71,35 @@ src/proxy.ts
 ├── Bỏ qua: /_next/*, file tĩnh có extension (.svg, .png, ...)
 ├── PUBLIC_PATHS (không có locale prefix — proxy tự stripLocale()):
 │     /login, /register, /forgot-password, /forgot-password-verify,
-│     /reset-password, /verify-email, /two-step-verification, /api/health
+│     /reset-password, /verify-email, /two-step-verification,
+│     /maintenance, /coming-soon, /not-authorized, /api/health
+├── MAINTENANCE_MODE=true → redirect mọi path (trừ /maintenance) sang /[locale]/maintenance
 ├── Unauthenticated → redirect /[locale]/login?callbackUrl=...
 └─ Dùng jose để verify JWT (không cần DB call)
 ```
 
 > Để thêm public path: thêm vào mảng `PUBLIC_PATHS` trong `src/proxy.ts` — không cần locale prefix.
 
-> **Lưu ý:** i18n constants trong proxy.ts được inline trực tiếp (không import `@/i18n/config`) vì Turbopack biên dịch proxy trong isolated context, không resolve tsconfig path alias ổn định.
+> **Lưu ý:** i18n constants trong proxy.ts được inline trực tiếp (không import `@/i18n/config`) vì Turbopack biên dịch proxy trong isolated context, không resolve tsconfig path alias ổn định. Vì lý do tương tự, `MAINTENANCE_MODE` được đọc trực tiếp từ `process.env` thay vì qua `@/lib/env`.
 
 ### Tầng 2 — `(protected)/layout.tsx` (server component)
 
-Double-check session trong React render tree. `getSession()` đã được wrap bằng React `cache()` nên chỉ verify JWT **1 lần/render** dù được gọi nhiều nơi.
+Double-check session trong React render tree.
 
 ```ts
 // src/app/[locale]/(protected)/layout.tsx
 const session = await getSession()
 if (!session) redirect(`/${locale}${ROUTES.login}`)
 ```
+
+### Tầng 3 — `requireRole()` (authorization, theo route)
+
+`proxy.ts` và tầng 2 chỉ xác thực (đã đăng nhập hay chưa) — không kiểm tra quyền. Route cần giới hạn theo `role` gọi thêm `requireRole()` (`src/lib/auth.ts`) ngay trong page:
+
+```ts
+// src/app/[locale]/(protected)/employees/page.tsx
+const { locale } = await params
+await requireRole(locale, ["admin"]) // không đủ quyền → redirect /[locale]/not-authorized
+```
+
+Nav item tương ứng trong `src/config/nav.ts` khai báo `requiredRole: "admin"` để `Sidebar` tự ẩn mục đó với user không đủ quyền (tránh hiển thị link luôn dẫn tới trang không có quyền).

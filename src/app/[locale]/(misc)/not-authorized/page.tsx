@@ -1,6 +1,9 @@
 import Image from "next/image"
+import Link from "next/link"
 import { getTranslations } from "next-intl/server"
 import { BackButton } from "@/components/common/back-button"
+import { Button } from "@/components/ui/button"
+import { ROUTES } from "@/lib/constants"
 import type { Metadata } from "next"
 
 export async function generateMetadata({
@@ -13,8 +16,13 @@ export async function generateMetadata({
   return { title: `${t("notAuthorized")} — ${t("siteName")}` }
 }
 
-export default async function NotAuthorizedPage() {
-  const [t, tCommon] = await Promise.all([
+export default async function NotAuthorizedPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}) {
+  const [{ locale }, t, tCommon] = await Promise.all([
+    params,
     getTranslations("misc.notAuthorized"),
     getTranslations("common"),
   ])
@@ -44,7 +52,12 @@ export default async function NotAuthorizedPage() {
           {t("subtitle")}
         </p>
       </div>
-      <BackButton label={tCommon("back")} />
+      <div className="relative z-10 mt-6 flex items-center gap-3">
+        <BackButton label={tCommon("back")} className="mt-0" />
+        <Button asChild>
+          <Link href={`/${locale}${ROUTES.login}`}>{t("action")}</Link>
+        </Button>
+      </div>
       <Image
         src="/images/notify/you-are-not-authorized.png"
         alt=""
