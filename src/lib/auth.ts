@@ -3,6 +3,7 @@ import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 import { env } from "@/lib/env"
 import { ROUTES } from "@/lib/constants"
+import type { ApiError } from "@/types"
 
 export interface SessionPayload extends JWTPayload {
   userId: string
@@ -68,4 +69,23 @@ export async function requireRole(locale: string, allowedRoles: string[]): Promi
     redirect(`/${locale}${ROUTES.notAuthorized}`)
   }
   return session
+}
+
+// Session guard for Server Actions that return an {data, error} ApiResponse to
+// a client caller — distinct from requireRole(), which is for pages/layouts
+// and redirects. Redirecting mid-mutation would break the {data,error} API
+// contract callers rely on (e.g. useCustomers() awaits a resolved value, not
+// a thrown redirect).
+export async function requireSession(): Promise<SessionPayload | null> {
+  return getSession()
+}
+
+// Shared 401 payload for the requireSession() failure path, so every Server
+// Action using it returns an identical, testable error shape.
+export function unauthorizedError(): ApiError {
+  return {
+    message: "Phiên đăng nhập đã hết hạn hoặc bạn chưa đăng nhập",
+    code: "UNAUTHORIZED",
+    status: 401,
+  }
 }

@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation"
 import { getLocale } from "next-intl/server"
 import { ROUTES } from "@/lib/constants"
+import { checkRateLimit, recordFailedAttempt, resetRateLimit } from "@/lib/rate-limit"
 import {
   loginSchema,
   registerSchema,
@@ -16,11 +17,16 @@ import type { User } from "./types"
 export type AuthErrorCode =
   | "loginFailed"
   | "invalidCredentials"
+  | "tooManyAttempts"
   | "registerFailed"
   | "resetPasswordFailed"
   | "forgotPasswordFailed"
   | "resendFailed"
   | "invalidVerificationCode"
+
+// Brute-force guard for loginAction — see src/lib/rate-limit.ts for the
+// in-memory implementation and its known limitations.
+const LOGIN_RATE_LIMIT = { windowMs: 15 * 60 * 1000, max: 5 }
 
 export interface ActionState {
   error?: AuthErrorCode
@@ -44,12 +50,22 @@ export async function loginAction(
   const parsed = loginSchema.safeParse(raw)
   if (!parsed.success) return { error: "invalidCredentials" }
 
+  const identifier = parsed.data.email.trim().toLowerCase()
+  if (!checkRateLimit(identifier, LOGIN_RATE_LIMIT).allowed) {
+    return { error: "tooManyAttempts" }
+  }
+
   let result: { requiresTwoFactor: boolean; twoFactorPhone?: string; user?: User }
   try {
     result = await authService.login(parsed.data)
   } catch {
+    recordFailedAttempt(identifier, LOGIN_RATE_LIMIT)
     return { error: "loginFailed" }
   }
+
+  // Correct credentials — reset the counter whether this resolves immediately
+  // or continues into 2FA, since both mean the password was right.
+  resetRateLimit(identifier)
 
   if (result.requiresTwoFactor) {
     return { requiresTwoFactor: true, twoFactorPhone: result.twoFactorPhone }
