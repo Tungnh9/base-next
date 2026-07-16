@@ -39,12 +39,12 @@ describe("loginAction — rate limiting", () => {
     mockCheckRateLimit.mockReturnValue({ allowed: true, remaining: 5, retryAfterMs: 0 })
   })
 
-  it("returns tooManyAttempts and never calls authService.login when the rate limit denies", async () => {
+  it("returns tooManyAttempts with retryAfterMs and never calls authService.login when the rate limit denies", async () => {
     mockCheckRateLimit.mockReturnValue({ allowed: false, remaining: 0, retryAfterMs: 60_000 })
 
     const result = await loginAction({}, formDataFor("user@example.com"))
 
-    expect(result).toEqual({ error: "tooManyAttempts" })
+    expect(result).toEqual({ error: "tooManyAttempts", retryAfterMs: 60_000 })
     expect(mockLogin).not.toHaveBeenCalled()
   })
 
@@ -146,8 +146,8 @@ describe("resetPasswordAction", () => {
     return fd
   }
 
-  it("returns success (no server redirect) when the reset succeeds", async () => {
-    mockResetPassword.mockResolvedValue(undefined)
+  it("returns success and clears the login rate limit for the email the server resolved the token to", async () => {
+    mockResetPassword.mockResolvedValue("User@Example.com")
 
     const result = await resetPasswordAction({}, formDataForReset())
 
@@ -156,6 +156,7 @@ describe("resetPasswordAction", () => {
       password: "NewPass123!",
       token: "demo-reset-token",
     })
+    expect(mockResetRateLimit).toHaveBeenCalledWith("user@example.com")
   })
 
   it("returns resetPasswordFailed when the password fails the strength schema", async () => {
@@ -165,11 +166,31 @@ describe("resetPasswordAction", () => {
     expect(mockResetPassword).not.toHaveBeenCalled()
   })
 
-  it("returns resetPasswordFailed when authService.resetPassword rejects", async () => {
+  // Regression test for a real vulnerability: resetPasswordAction used to
+  // read `email` straight from the submitted FormData and use it to clear
+  // the rate limit, with no check that it matched the token's actual owner.
+  // That let an attacker request their own valid reset token, submit it
+  // alongside a victim's email, and clear the victim's login lockout —
+  // completely defeating the brute-force protection. The email must now
+  // come only from authService.resetPassword()'s server-verified return
+  // value, never from client input.
+  it("ignores a client-submitted email and only trusts the server-verified one", async () => {
+    mockResetPassword.mockResolvedValue("real-owner@example.com")
+
+    const fd = formDataForReset()
+    fd.set("email", "victim@example.com")
+    await resetPasswordAction({}, fd)
+
+    expect(mockResetRateLimit).toHaveBeenCalledWith("real-owner@example.com")
+    expect(mockResetRateLimit).not.toHaveBeenCalledWith("victim@example.com")
+  })
+
+  it("returns resetPasswordFailed when authService.resetPassword rejects, and does not clear the rate limit", async () => {
     mockResetPassword.mockRejectedValue(new Error("invalid or expired token"))
 
     const result = await resetPasswordAction({}, formDataForReset())
 
     expect(result).toEqual({ error: "resetPasswordFailed" })
+    expect(mockResetRateLimit).not.toHaveBeenCalled()
   })
 })

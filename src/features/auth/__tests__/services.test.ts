@@ -173,12 +173,20 @@ describe("authService.forgotPassword", () => {
 describe("authService.resetPassword", () => {
   beforeEach(() => vi.clearAllMocks())
 
-  it("resolves without error on success", async () => {
-    mockResetPassword.mockResolvedValue({ data: undefined, error: null })
+  it("resolves with the server-verified email on success", async () => {
+    mockResetPassword.mockResolvedValue({ data: { email: "user@example.com" }, error: null })
 
     await expect(
       authService.resetPassword({ password: "newpass123", token: "valid-token" })
-    ).resolves.toBeUndefined()
+    ).resolves.toBe("user@example.com")
+  })
+
+  it("throws AuthError when the response is missing the email", async () => {
+    mockResetPassword.mockResolvedValue({ data: {} as never, error: null })
+
+    await expect(
+      authService.resetPassword({ password: "newpass123", token: "valid-token" })
+    ).rejects.toThrow(AuthError)
   })
 
   it("throws AuthError on API error", async () => {

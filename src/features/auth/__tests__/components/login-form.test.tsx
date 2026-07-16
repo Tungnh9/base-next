@@ -1,6 +1,6 @@
 import { render, screen, act } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { describe, it, expect, vi, beforeEach } from "vitest"
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 
 vi.mock("../../hooks/use-auth")
 vi.mock("sonner", () => ({ toast: { error: vi.fn(), success: vi.fn() } }))
@@ -34,6 +34,10 @@ describe("LoginForm", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockUseLoginAction.mockReturnValue({ state: {}, action: mockAction, isPending: false })
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
   })
 
   it("renders email input, password input, and submit button", () => {
@@ -129,5 +133,32 @@ describe("LoginForm", () => {
     await user.click(screen.getByRole("button", { name: /login/i }))
 
     expect(mockAction).toHaveBeenCalled()
+  })
+
+  it("disables the submit button and shows a countdown when rate-limited, then re-enables at zero", async () => {
+    vi.useFakeTimers()
+    mockUseLoginAction.mockReturnValue({
+      state: { error: "tooManyAttempts", retryAfterMs: 90_000 },
+      action: mockAction,
+      isPending: false,
+    })
+
+    act(() => {
+      render(<LoginForm />)
+    })
+
+    // t("tryAgainIn", {...}) → "tryAgainIn" in test env (mock ignores params)
+    const button = screen.getByRole("button", { name: /tryAgainIn/i })
+    expect(button).toBeDisabled()
+
+    act(() => {
+      vi.advanceTimersByTime(30_000)
+    })
+    expect(button).toBeDisabled()
+
+    act(() => {
+      vi.advanceTimersByTime(60_000)
+    })
+    expect(button).not.toBeDisabled()
   })
 })
