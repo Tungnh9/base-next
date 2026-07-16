@@ -7,6 +7,7 @@ import {
   otpSchema,
   createLoginSchema,
   createRegisterSchema,
+  createResetPasswordSchema,
 } from "../schemas"
 
 // Mock t() for i18n factory schemas — returns key as value
@@ -80,26 +81,100 @@ describe("forgotPasswordSchema", () => {
 // ─── resetPasswordSchema ──────────────────────────────────────────────────────
 
 describe("resetPasswordSchema", () => {
-  it("passes when passwords match and are long enough", () => {
+  it("passes when passwords match and meet the strength requirements", () => {
     const result = resetPasswordSchema.safeParse({
-      password: "newpass123",
-      confirmPassword: "newpass123",
+      password: "NewPass123!",
+      confirmPassword: "NewPass123!",
     })
     expect(result.success).toBe(true)
   })
 
   it("fails when passwords don't match", () => {
     const result = resetPasswordSchema.safeParse({
-      password: "newpass123",
+      password: "NewPass123!",
       confirmPassword: "different",
     })
     expect(result.success).toBe(false)
-    expect(result.error?.issues[0].path[0]).toBe("confirmPassword")
+    expect(result.error?.issues.some((i) => i.path[0] === "confirmPassword")).toBe(true)
   })
 
-  it("fails with password shorter than 6 chars", () => {
-    const result = resetPasswordSchema.safeParse({ password: "123", confirmPassword: "123" })
+  it("fails with password shorter than 8 chars", () => {
+    const result = resetPasswordSchema.safeParse({ password: "Aa1!", confirmPassword: "Aa1!" })
     expect(result.success).toBe(false)
+  })
+
+  it("fails with password missing an uppercase letter", () => {
+    const result = resetPasswordSchema.safeParse({
+      password: "newpass123!",
+      confirmPassword: "newpass123!",
+    })
+    expect(result.success).toBe(false)
+  })
+
+  it("fails with password missing a lowercase letter", () => {
+    const result = resetPasswordSchema.safeParse({
+      password: "NEWPASS123!",
+      confirmPassword: "NEWPASS123!",
+    })
+    expect(result.success).toBe(false)
+  })
+
+  it("fails with password missing a digit", () => {
+    const result = resetPasswordSchema.safeParse({
+      password: "NewPassword!",
+      confirmPassword: "NewPassword!",
+    })
+    expect(result.success).toBe(false)
+  })
+
+  it("fails with password missing a special character", () => {
+    const result = resetPasswordSchema.safeParse({
+      password: "NewPass123",
+      confirmPassword: "NewPass123",
+    })
+    expect(result.success).toBe(false)
+  })
+})
+
+// ─── i18n factory: createResetPasswordSchema ─────────────────────────────────
+
+describe("createResetPasswordSchema (i18n factory)", () => {
+  const schema = createResetPasswordSchema(t)
+
+  it("passes with a compliant password", () => {
+    const result = schema.safeParse({
+      password: "NewPass123!",
+      confirmPassword: "NewPass123!",
+    })
+    expect(result.success).toBe(true)
+  })
+
+  it("uses custom error key for password shorter than 8 chars", () => {
+    const result = schema.safeParse({ password: "Aa1!", confirmPassword: "Aa1!" })
+    expect(result.success).toBe(false)
+    expect(result.error?.issues[0].message).toBe("passwordMinStrong")
+  })
+
+  it("uses custom error key for password missing required character classes", () => {
+    const result = schema.safeParse({
+      password: "newpassword",
+      confirmPassword: "newpassword",
+    })
+    expect(result.success).toBe(false)
+    expect(result.error?.issues[0].message).toBe("passwordStrength")
+  })
+
+  it("uses custom error key when passwords don't match", () => {
+    const result = schema.safeParse({
+      password: "NewPass123!",
+      confirmPassword: "different",
+    })
+    expect(result.success).toBe(false)
+    expect(
+      result.error?.issues.some(
+        (i) => i.path[0] === "confirmPassword" && i.message === "passwordMismatch"
+      )
+    ).toBe(true)
   })
 })
 

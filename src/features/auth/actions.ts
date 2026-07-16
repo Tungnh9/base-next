@@ -93,8 +93,9 @@ export async function registerAction(
     return { error: "registerFailed" }
   }
 
-  const locale = await getLocale()
-  redirect(`/${locale}${ROUTES.verifyEmail}?email=${encodeURIComponent(raw.email)}`)
+  // Client-side navigation (not redirect()) so the caller can show a success
+  // toast before leaving the page — same pattern as loginAction.
+  return { success: true }
 }
 
 export async function forgotPasswordAction(
@@ -152,8 +153,9 @@ export async function resetPasswordAction(
     return { error: "resetPasswordFailed" }
   }
 
-  const locale = await getLocale()
-  redirect(`/${locale}${ROUTES.login}`)
+  // Client-side navigation (not redirect()) so the caller can show a success
+  // toast before leaving the page — same pattern as loginAction.
+  return { success: true }
 }
 
 export async function logoutAction(): Promise<void> {

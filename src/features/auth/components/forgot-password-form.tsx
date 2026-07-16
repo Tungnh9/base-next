@@ -39,6 +39,7 @@ export function ForgotPasswordForm() {
 
   useEffect(() => {
     if (state.requiresEmailVerification) {
+      toast.success(tAuth("resendSuccess"))
       router.push(
         `/${locale}${ROUTES.forgotPasswordVerify}?email=${encodeURIComponent(submittedEmail)}`
       )

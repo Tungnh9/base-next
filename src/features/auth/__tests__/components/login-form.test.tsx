@@ -26,6 +26,7 @@ import { toast } from "sonner"
 
 const mockUseLoginAction = vi.mocked(useLoginAction)
 const mockToastError = vi.mocked(toast.error)
+const mockToastSuccess = vi.mocked(toast.success)
 
 describe("LoginForm", () => {
   const mockAction = vi.fn()
@@ -63,6 +64,20 @@ describe("LoginForm", () => {
 
     // t("loginFailed") returns "loginFailed" in test env
     expect(mockToastError).toHaveBeenCalledWith("loginFailed")
+  })
+
+  it("fires toast.success when state.success is set", async () => {
+    mockUseLoginAction.mockReturnValue({
+      state: { success: true },
+      action: mockAction,
+      isPending: false,
+    })
+
+    await act(async () => {
+      render(<LoginForm />)
+    })
+
+    expect(mockToastSuccess).toHaveBeenCalledWith("loginSuccess")
   })
 
   it("disables submit button and shows loggingIn text while isPending", () => {
