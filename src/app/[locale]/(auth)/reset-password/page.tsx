@@ -43,7 +43,7 @@ export default async function ResetPasswordPage({ params, searchParams }: Props)
           )}
         </div>
 
-        <ResetPasswordForm token={token} />
+        <ResetPasswordForm token={token} email={email} />
       </div>
     </AuthCard>
   )

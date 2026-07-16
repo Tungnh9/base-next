@@ -26,7 +26,7 @@ export type AuthErrorCode =
 
 // Brute-force guard for loginAction — see src/lib/rate-limit.ts for the
 // in-memory implementation and its known limitations.
-const LOGIN_RATE_LIMIT = { windowMs: 15 * 60 * 1000, max: 5 }
+const LOGIN_RATE_LIMIT = { windowMs: 10 * 60 * 1000, max: 5 }
 
 export interface ActionState {
   error?: AuthErrorCode
@@ -36,6 +36,7 @@ export interface ActionState {
   requiresEmailVerification?: boolean
   resetToken?: string
   user?: User
+  retryAfterMs?: number
 }
 
 export async function loginAction(
@@ -51,8 +52,9 @@ export async function loginAction(
   if (!parsed.success) return { error: "invalidCredentials" }
 
   const identifier = parsed.data.email.trim().toLowerCase()
-  if (!checkRateLimit(identifier, LOGIN_RATE_LIMIT).allowed) {
-    return { error: "tooManyAttempts" }
+  const rateLimitStatus = checkRateLimit(identifier, LOGIN_RATE_LIMIT)
+  if (!rateLimitStatus.allowed) {
+    return { error: "tooManyAttempts", retryAfterMs: rateLimitStatus.retryAfterMs }
   }
 
   let result: { requiresTwoFactor: boolean; twoFactorPhone?: string; user?: User }
@@ -138,6 +140,7 @@ export async function resetPasswordAction(
   formData: FormData
 ): Promise<ActionState> {
   const token = formData.get("token") as string
+  const email = formData.get("email") as string | null
   const raw = {
     password: formData.get("password") as string,
     confirmPassword: formData.get("confirmPassword") as string,
@@ -151,6 +154,11 @@ export async function resetPasswordAction(
   } catch {
     return { error: "resetPasswordFailed" }
   }
+
+  // A successful password reset proves ownership of the account — clear any
+  // login lockout for this email so the user isn't stuck waiting after
+  // recovering access via forgot-password.
+  if (email) resetRateLimit(email.trim().toLowerCase())
 
   const locale = await getLocale()
   redirect(`/${locale}${ROUTES.login}`)

@@ -4,6 +4,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest"
 vi.mock("../services", () => ({
   authService: {
     login: vi.fn(),
+    resetPassword: vi.fn(),
   },
 }))
 
@@ -13,14 +14,19 @@ vi.mock("@/lib/rate-limit", () => ({
   resetRateLimit: vi.fn(),
 }))
 
-import { loginAction } from "../actions"
+// next/navigation (redirect) and next-intl/server (getLocale) are already
+// globally mocked in src/test/setup.ts — reuse those mocks here.
+import { redirect } from "next/navigation"
+import { loginAction, resetPasswordAction } from "../actions"
 import { authService } from "../services"
 import { checkRateLimit, recordFailedAttempt, resetRateLimit } from "@/lib/rate-limit"
 
 const mockLogin = vi.mocked(authService.login)
+const mockResetPassword = vi.mocked(authService.resetPassword)
 const mockCheckRateLimit = vi.mocked(checkRateLimit)
 const mockRecordFailedAttempt = vi.mocked(recordFailedAttempt)
 const mockResetRateLimit = vi.mocked(resetRateLimit)
+const mockRedirect = vi.mocked(redirect)
 
 function formDataFor(email: string, password = "password123") {
   const fd = new FormData()
@@ -35,12 +41,12 @@ describe("loginAction — rate limiting", () => {
     mockCheckRateLimit.mockReturnValue({ allowed: true, remaining: 5, retryAfterMs: 0 })
   })
 
-  it("returns tooManyAttempts and never calls authService.login when the rate limit denies", async () => {
+  it("returns tooManyAttempts with retryAfterMs and never calls authService.login when the rate limit denies", async () => {
     mockCheckRateLimit.mockReturnValue({ allowed: false, remaining: 0, retryAfterMs: 60_000 })
 
     const result = await loginAction({}, formDataFor("user@example.com"))
 
-    expect(result).toEqual({ error: "tooManyAttempts" })
+    expect(result).toEqual({ error: "tooManyAttempts", retryAfterMs: 60_000 })
     expect(mockLogin).not.toHaveBeenCalled()
   })
 
@@ -89,5 +95,45 @@ describe("loginAction — rate limiting", () => {
     await loginAction({}, formDataFor("User@Example.com"))
 
     expect(mockCheckRateLimit).toHaveBeenCalledWith("user@example.com", expect.any(Object))
+  })
+})
+
+describe("resetPasswordAction — clears login lockout on success", () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockResetPassword.mockResolvedValue(undefined)
+  })
+
+  function formDataForReset(email?: string) {
+    const fd = new FormData()
+    fd.set("password", "newpassword123")
+    fd.set("confirmPassword", "newpassword123")
+    fd.set("token", "demo-reset-token")
+    if (email !== undefined) fd.set("email", email)
+    return fd
+  }
+
+  it("clears the login rate limit for the normalized email after a successful reset", async () => {
+    await resetPasswordAction({}, formDataForReset("User@Example.com"))
+
+    expect(mockResetRateLimit).toHaveBeenCalledWith("user@example.com")
+    expect(mockRedirect).toHaveBeenCalledWith("/vi/login")
+  })
+
+  it("does not call resetRateLimit when no email was submitted", async () => {
+    await resetPasswordAction({}, formDataForReset())
+
+    expect(mockResetRateLimit).not.toHaveBeenCalled()
+    expect(mockRedirect).toHaveBeenCalledWith("/vi/login")
+  })
+
+  it("does not clear the rate limit when the reset itself fails", async () => {
+    mockResetPassword.mockRejectedValue(new Error("invalid token"))
+
+    const result = await resetPasswordAction({}, formDataForReset("user@example.com"))
+
+    expect(result).toEqual({ error: "resetPasswordFailed" })
+    expect(mockResetRateLimit).not.toHaveBeenCalled()
+    expect(mockRedirect).not.toHaveBeenCalled()
   })
 })
