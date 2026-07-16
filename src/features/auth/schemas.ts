@@ -41,9 +41,12 @@ export function createForgotPasswordSchema(t: (key: string) => string) {
   })
 }
 
+// Requires at least 1 lowercase, 1 uppercase, 1 digit, and 1 special character.
+const STRONG_PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9\s]).*$/
+
 export const resetPasswordSchema = z
   .object({
-    password: z.string().min(6),
+    password: z.string().min(8).regex(STRONG_PASSWORD_REGEX),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -55,7 +58,10 @@ export type ResetPasswordInput = { password: string; token: string }
 export function createResetPasswordSchema(t: (key: string) => string) {
   return z
     .object({
-      password: z.string().min(6, t("passwordMin")),
+      password: z
+        .string()
+        .min(8, t("passwordMinStrong"))
+        .regex(STRONG_PASSWORD_REGEX, t("passwordStrength")),
       confirmPassword: z.string(),
     })
     .refine((data) => data.password === data.confirmPassword, {

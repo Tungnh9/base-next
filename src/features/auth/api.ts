@@ -1,7 +1,12 @@
 import { serverApi } from "@/lib/api"
 import { USE_MOCK_API } from "@/lib/mock"
 import { authMockApi } from "./mock-data"
-import type { User, AuthResponse, VerifyForgotPasswordCodeResponse } from "./types"
+import type {
+  User,
+  AuthResponse,
+  VerifyForgotPasswordCodeResponse,
+  ResetPasswordResponse,
+} from "./types"
 import type { LoginInput, RegisterInput } from "./schemas"
 
 const authRealApi = {
@@ -28,7 +33,7 @@ const authRealApi = {
     }),
 
   resetPassword: (data: { password: string; token: string }) =>
-    serverApi<void>("/auth/reset-password", {
+    serverApi<ResetPasswordResponse>("/auth/reset-password", {
       method: "POST",
       body: JSON.stringify(data),
     }),

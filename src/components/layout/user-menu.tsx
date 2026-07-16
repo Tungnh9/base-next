@@ -3,6 +3,7 @@
 import * as React from "react"
 import { CreditCard, DollarSign, Info, LifeBuoy, LogOut, Settings, UserCheck } from "lucide-react"
 import { useTranslations } from "next-intl"
+import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
@@ -105,6 +106,7 @@ export function UserMenu({ email, name, role, avatar }: UserMenuProps) {
             )}
             onSelect={() => {
               clearUser()
+              toast.success(t("auth.logoutSuccess"))
               logoutAction()
             }}
           >

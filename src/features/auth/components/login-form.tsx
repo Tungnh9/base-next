@@ -22,7 +22,9 @@ import {
 import { ROUTES } from "@/lib/constants"
 import { useUserStore } from "@/stores"
 import { useLoginAction } from "../hooks/use-auth"
+import { useCountdownMs } from "../hooks/use-countdown"
 import { createLoginSchema, type LoginInput } from "../schemas"
+import { formatCountdown } from "../utils"
 
 function AnimatedEllipsis() {
   const [count, setCount] = useState(1)
@@ -32,6 +34,26 @@ function AnimatedEllipsis() {
   }, [])
   // fixed width prevents layout shift as dot count changes
   return <span className="inline-block w-[18px] text-left">{".".repeat(count)}</span>
+}
+
+interface LockedSubmitButtonProps {
+  retryAfterMs: number
+  tAuth: (key: string, values?: Record<string, string>) => string
+}
+
+// Mounted fresh (via `key={state.retryAfterMs}` in the parent) each time a new
+// lockout starts, so `Date.now()` is only ever read once — inside the useState
+// lazy initializer — rather than synchronously during render or an effect body.
+function LockedSubmitButton({ retryAfterMs, tAuth }: LockedSubmitButtonProps) {
+  const [targetTimestamp] = useState(() => Date.now() + retryAfterMs)
+  const remainingMs = useCountdownMs(targetTimestamp)
+  const isLocked = remainingMs > 0
+
+  return (
+    <Button type="submit" className="mt-1 w-full" disabled={isLocked}>
+      {isLocked ? tAuth("tryAgainIn", { time: formatCountdown(remainingMs) }) : tAuth("login")}
+    </Button>
+  )
 }
 
 export function LoginForm() {
@@ -46,6 +68,7 @@ export function LoginForm() {
   // Latch: set true on submit, stays true until navigation (unmount) or error (state.error resets derived value)
   const [isNavigating, setIsNavigating] = useState(false)
   const showLoading = isPending || (isNavigating && !state.error)
+  const retryAfterMs = state.error === "tooManyAttempts" ? state.retryAfterMs : undefined
 
   const form = useForm<LoginInput>({
     resolver: zodResolver(createLoginSchema(tVal)),
@@ -55,6 +78,7 @@ export function LoginForm() {
   useEffect(() => {
     if (state.success) {
       if (state.user) setUser(state.user)
+      toast.success(tAuth("loginSuccess"))
       router.push(`/${locale}${ROUTES.dashboard}`)
     } else if (state.requiresTwoFactor) {
       const phone = state.twoFactorPhone ? `?phone=${encodeURIComponent(state.twoFactorPhone)}` : ""
@@ -149,16 +173,20 @@ export function LoginForm() {
           </label>
         </div>
 
-        <Button type="submit" className="mt-1 w-full" disabled={showLoading}>
-          {showLoading ? (
-            <>
-              {tAuth("loggingIn")}
-              <AnimatedEllipsis />
-            </>
-          ) : (
-            tAuth("login")
-          )}
-        </Button>
+        {retryAfterMs ? (
+          <LockedSubmitButton key={retryAfterMs} retryAfterMs={retryAfterMs} tAuth={tAuth} />
+        ) : (
+          <Button type="submit" className="mt-1 w-full" disabled={showLoading}>
+            {showLoading ? (
+              <>
+                {tAuth("loggingIn")}
+                <AnimatedEllipsis />
+              </>
+            ) : (
+              tAuth("login")
+            )}
+          </Button>
+        )}
 
         <p className="text-center text-[15px] leading-[22px] text-[var(--text-body)]">
           {tAuth("newOnPlatform")}{" "}

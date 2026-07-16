@@ -26,7 +26,7 @@ export type AuthErrorCode =
 
 // Brute-force guard for loginAction — see src/lib/rate-limit.ts for the
 // in-memory implementation and its known limitations.
-const LOGIN_RATE_LIMIT = { windowMs: 15 * 60 * 1000, max: 5 }
+const LOGIN_RATE_LIMIT = { windowMs: 10 * 60 * 1000, max: 5 }
 
 export interface ActionState {
   error?: AuthErrorCode
@@ -36,6 +36,7 @@ export interface ActionState {
   requiresEmailVerification?: boolean
   resetToken?: string
   user?: User
+  retryAfterMs?: number
 }
 
 export async function loginAction(
@@ -51,8 +52,9 @@ export async function loginAction(
   if (!parsed.success) return { error: "invalidCredentials" }
 
   const identifier = parsed.data.email.trim().toLowerCase()
-  if (!checkRateLimit(identifier, LOGIN_RATE_LIMIT).allowed) {
-    return { error: "tooManyAttempts" }
+  const rateLimitStatus = checkRateLimit(identifier, LOGIN_RATE_LIMIT)
+  if (!rateLimitStatus.allowed) {
+    return { error: "tooManyAttempts", retryAfterMs: rateLimitStatus.retryAfterMs }
   }
 
   let result: { requiresTwoFactor: boolean; twoFactorPhone?: string; user?: User }
@@ -93,8 +95,9 @@ export async function registerAction(
     return { error: "registerFailed" }
   }
 
-  const locale = await getLocale()
-  redirect(`/${locale}${ROUTES.verifyEmail}?email=${encodeURIComponent(raw.email)}`)
+  // Client-side navigation (not redirect()) so the caller can show a success
+  // toast before leaving the page — same pattern as loginAction.
+  return { success: true }
 }
 
 export async function forgotPasswordAction(
@@ -146,14 +149,24 @@ export async function resetPasswordAction(
   const parsed = resetPasswordSchema.safeParse(raw)
   if (!parsed.success) return { error: "resetPasswordFailed" }
 
+  let verifiedEmail: string
   try {
-    await authService.resetPassword({ password: parsed.data.password, token })
+    verifiedEmail = await authService.resetPassword({ password: parsed.data.password, token })
   } catch {
     return { error: "resetPasswordFailed" }
   }
 
-  const locale = await getLocale()
-  redirect(`/${locale}${ROUTES.login}`)
+  // A successful password reset proves ownership of the account — clear any
+  // login lockout for this email so the user isn't stuck waiting after
+  // recovering access via forgot-password. Uses the email the server
+  // resolved the token to, NOT client-submitted input — trusting the latter
+  // would let anyone launder a victim's lockout reset through their own
+  // valid token.
+  resetRateLimit(verifiedEmail.trim().toLowerCase())
+
+  // Client-side navigation (not redirect()) so the caller can show a success
+  // toast before leaving the page — same pattern as loginAction.
+  return { success: true }
 }
 
 export async function logoutAction(): Promise<void> {

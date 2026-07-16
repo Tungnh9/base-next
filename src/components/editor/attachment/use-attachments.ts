@@ -38,12 +38,13 @@ export function useAttachments() {
   // On unmount: cancel in-flight timers (prevents post-unmount blob creation)
   // then revoke any blob URLs that were already stored.
   useEffect(() => {
+    const pendingTimers = pendingTimersRef.current
     return () => {
-      pendingTimersRef.current.forEach(({ interval, timeout }) => {
+      pendingTimers.forEach(({ interval, timeout }) => {
         clearInterval(interval)
         clearTimeout(timeout)
       })
-      pendingTimersRef.current.clear()
+      pendingTimers.clear()
       attachmentsRef.current.forEach((a) => {
         if (a.url) URL.revokeObjectURL(a.url)
       })

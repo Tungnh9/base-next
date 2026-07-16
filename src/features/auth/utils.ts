@@ -17,3 +17,40 @@ export function maskPhone(phone: string): string {
   const maskedLength = Math.max(0, phone.length - visible.length)
   return "⁎".repeat(maskedLength) + visible
 }
+
+// Character-class rules mirror STRONG_PASSWORD_REGEX in schemas.ts, split out
+// individually so each can drive its own checklist row in the UI.
+export interface PasswordRequirement {
+  key: "minLength" | "uppercase" | "lowercase" | "digit" | "specialChar"
+  test: (password: string) => boolean
+}
+
+export const PASSWORD_REQUIREMENTS: PasswordRequirement[] = [
+  { key: "minLength", test: (v) => v.length >= 8 },
+  { key: "uppercase", test: (v) => /[A-Z]/.test(v) },
+  { key: "lowercase", test: (v) => /[a-z]/.test(v) },
+  { key: "digit", test: (v) => /\d/.test(v) },
+  { key: "specialChar", test: (v) => /[^A-Za-z0-9\s]/.test(v) },
+]
+
+export type PasswordStrength = "weak" | "medium" | "strong"
+
+export function getPasswordStrength(password: string): PasswordStrength {
+  if (!password) return "weak"
+  const passed = PASSWORD_REQUIREMENTS.filter((r) => r.test(password)).length
+  if (passed <= 2) return "weak"
+  if (passed <= 4) return "medium"
+  return "strong"
+}
+
+/**
+ * Formats a millisecond duration as "m:ss" for a countdown display.
+ * Rounds up to the next second so the display never shows "0:00" while time
+ * still remains.
+ */
+export function formatCountdown(ms: number): string {
+  const totalSeconds = Math.max(0, Math.ceil(ms / 1000))
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+  return `${minutes}:${String(seconds).padStart(2, "0")}`
+}

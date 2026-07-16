@@ -1,6 +1,6 @@
 import { render, screen, act } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { describe, it, expect, vi, beforeEach } from "vitest"
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 
 vi.mock("../../hooks/use-auth")
 vi.mock("sonner", () => ({ toast: { error: vi.fn(), success: vi.fn() } }))
@@ -26,6 +26,7 @@ import { toast } from "sonner"
 
 const mockUseLoginAction = vi.mocked(useLoginAction)
 const mockToastError = vi.mocked(toast.error)
+const mockToastSuccess = vi.mocked(toast.success)
 
 describe("LoginForm", () => {
   const mockAction = vi.fn()
@@ -33,6 +34,10 @@ describe("LoginForm", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockUseLoginAction.mockReturnValue({ state: {}, action: mockAction, isPending: false })
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
   })
 
   it("renders email input, password input, and submit button", () => {
@@ -63,6 +68,20 @@ describe("LoginForm", () => {
 
     // t("loginFailed") returns "loginFailed" in test env
     expect(mockToastError).toHaveBeenCalledWith("loginFailed")
+  })
+
+  it("fires toast.success when state.success is set", async () => {
+    mockUseLoginAction.mockReturnValue({
+      state: { success: true },
+      action: mockAction,
+      isPending: false,
+    })
+
+    await act(async () => {
+      render(<LoginForm />)
+    })
+
+    expect(mockToastSuccess).toHaveBeenCalledWith("loginSuccess")
   })
 
   it("disables submit button and shows loggingIn text while isPending", () => {
@@ -114,5 +133,32 @@ describe("LoginForm", () => {
     await user.click(screen.getByRole("button", { name: /login/i }))
 
     expect(mockAction).toHaveBeenCalled()
+  })
+
+  it("disables the submit button and shows a countdown when rate-limited, then re-enables at zero", async () => {
+    vi.useFakeTimers()
+    mockUseLoginAction.mockReturnValue({
+      state: { error: "tooManyAttempts", retryAfterMs: 90_000 },
+      action: mockAction,
+      isPending: false,
+    })
+
+    act(() => {
+      render(<LoginForm />)
+    })
+
+    // t("tryAgainIn", {...}) → "tryAgainIn" in test env (mock ignores params)
+    const button = screen.getByRole("button", { name: /tryAgainIn/i })
+    expect(button).toBeDisabled()
+
+    act(() => {
+      vi.advanceTimersByTime(30_000)
+    })
+    expect(button).toBeDisabled()
+
+    act(() => {
+      vi.advanceTimersByTime(60_000)
+    })
+    expect(button).not.toBeDisabled()
   })
 })
