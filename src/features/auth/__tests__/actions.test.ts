@@ -101,36 +101,48 @@ describe("loginAction — rate limiting", () => {
 describe("resetPasswordAction — clears login lockout on success", () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockResetPassword.mockResolvedValue(undefined)
   })
 
-  function formDataForReset(email?: string) {
+  function formDataForReset() {
     const fd = new FormData()
     fd.set("password", "newpassword123")
     fd.set("confirmPassword", "newpassword123")
     fd.set("token", "demo-reset-token")
-    if (email !== undefined) fd.set("email", email)
     return fd
   }
 
-  it("clears the login rate limit for the normalized email after a successful reset", async () => {
-    await resetPasswordAction({}, formDataForReset("User@Example.com"))
+  it("clears the login rate limit for the email the server resolved the token to", async () => {
+    mockResetPassword.mockResolvedValue("User@Example.com")
+
+    await resetPasswordAction({}, formDataForReset())
 
     expect(mockResetRateLimit).toHaveBeenCalledWith("user@example.com")
     expect(mockRedirect).toHaveBeenCalledWith("/vi/login")
   })
 
-  it("does not call resetRateLimit when no email was submitted", async () => {
-    await resetPasswordAction({}, formDataForReset())
+  // Regression test for a real vulnerability: resetPasswordAction used to
+  // read `email` straight from the submitted FormData and use it to clear
+  // the rate limit, with no check that it matched the token's actual owner.
+  // That let an attacker request their own valid reset token, submit it
+  // alongside a victim's email, and clear the victim's login lockout —
+  // completely defeating the brute-force protection. The email must now
+  // come only from authService.resetPassword()'s server-verified return
+  // value, never from client input.
+  it("ignores a client-submitted email and only trusts the server-verified one", async () => {
+    mockResetPassword.mockResolvedValue("real-owner@example.com")
 
-    expect(mockResetRateLimit).not.toHaveBeenCalled()
-    expect(mockRedirect).toHaveBeenCalledWith("/vi/login")
+    const fd = formDataForReset()
+    fd.set("email", "victim@example.com")
+    await resetPasswordAction({}, fd)
+
+    expect(mockResetRateLimit).toHaveBeenCalledWith("real-owner@example.com")
+    expect(mockResetRateLimit).not.toHaveBeenCalledWith("victim@example.com")
   })
 
   it("does not clear the rate limit when the reset itself fails", async () => {
     mockResetPassword.mockRejectedValue(new Error("invalid token"))
 
-    const result = await resetPasswordAction({}, formDataForReset("user@example.com"))
+    const result = await resetPasswordAction({}, formDataForReset())
 
     expect(result).toEqual({ error: "resetPasswordFailed" })
     expect(mockResetRateLimit).not.toHaveBeenCalled()

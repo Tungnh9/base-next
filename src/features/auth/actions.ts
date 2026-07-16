@@ -140,7 +140,6 @@ export async function resetPasswordAction(
   formData: FormData
 ): Promise<ActionState> {
   const token = formData.get("token") as string
-  const email = formData.get("email") as string | null
   const raw = {
     password: formData.get("password") as string,
     confirmPassword: formData.get("confirmPassword") as string,
@@ -149,16 +148,20 @@ export async function resetPasswordAction(
   const parsed = resetPasswordSchema.safeParse(raw)
   if (!parsed.success) return { error: "resetPasswordFailed" }
 
+  let verifiedEmail: string
   try {
-    await authService.resetPassword({ password: parsed.data.password, token })
+    verifiedEmail = await authService.resetPassword({ password: parsed.data.password, token })
   } catch {
     return { error: "resetPasswordFailed" }
   }
 
   // A successful password reset proves ownership of the account — clear any
   // login lockout for this email so the user isn't stuck waiting after
-  // recovering access via forgot-password.
-  if (email) resetRateLimit(email.trim().toLowerCase())
+  // recovering access via forgot-password. Uses the email the server
+  // resolved the token to, NOT client-submitted input — trusting the latter
+  // would let anyone launder a victim's lockout reset through their own
+  // valid token.
+  resetRateLimit(verifiedEmail.trim().toLowerCase())
 
   const locale = await getLocale()
   redirect(`/${locale}${ROUTES.login}`)

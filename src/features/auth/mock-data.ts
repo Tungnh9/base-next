@@ -1,5 +1,10 @@
 import { mockApi, mockApiError } from "@/lib/mock"
-import type { AuthResponse, User, VerifyForgotPasswordCodeResponse } from "./types"
+import type {
+  AuthResponse,
+  User,
+  VerifyForgotPasswordCodeResponse,
+  ResetPasswordResponse,
+} from "./types"
 import type { LoginInput, RegisterInput } from "./schemas"
 
 const MOCK_USER: User = {
@@ -17,6 +22,12 @@ const MOCK_FAIL_EMAIL = "wrong@example.com"
 const MOCK_2FA_CODE = "230320"
 const MOCK_FORGOT_PASSWORD_CODE = "120820"
 const MOCK_RESET_TOKEN = "demo-reset-token"
+
+// Simulates a real backend binding a reset token to the account that
+// requested it. resetPassword() must resolve the email from this map — never
+// from client-submitted input — so a caller can't launder an unrelated
+// email's rate-limit reset through their own valid token.
+const resetTokenOwner = new Map<string, string>()
 
 export const authMockApi = {
   login: ({ email }: LoginInput) => {
@@ -55,15 +66,22 @@ export const authMockApi = {
 
   forgotPassword: (_data: { email: string }) => mockApi<void>(undefined),
 
-  resetPassword: (data: { password: string; token: string }) =>
-    data.token === MOCK_RESET_TOKEN
-      ? mockApi<void>(undefined)
-      : mockApiError({ message: "Invalid or expired token", code: "INVALID_TOKEN", status: 400 }),
+  resetPassword: (data: { password: string; token: string }) => {
+    const ownerEmail = resetTokenOwner.get(data.token)
+    if (data.token !== MOCK_RESET_TOKEN || !ownerEmail) {
+      return mockApiError({ message: "Invalid or expired token", code: "INVALID_TOKEN", status: 400 })
+    }
+    resetTokenOwner.delete(data.token) // one-time use
+    return mockApi<ResetPasswordResponse>({ email: ownerEmail })
+  },
 
-  verifyForgotPasswordCode: (data: { email: string; code: string }) =>
-    data.code === MOCK_FORGOT_PASSWORD_CODE
-      ? mockApi<VerifyForgotPasswordCodeResponse>({ resetToken: MOCK_RESET_TOKEN })
-      : mockApiError({ message: "Invalid verification code", code: "INVALID_CODE", status: 400 }),
+  verifyForgotPasswordCode: (data: { email: string; code: string }) => {
+    if (data.code !== MOCK_FORGOT_PASSWORD_CODE) {
+      return mockApiError({ message: "Invalid verification code", code: "INVALID_CODE", status: 400 })
+    }
+    resetTokenOwner.set(MOCK_RESET_TOKEN, data.email)
+    return mockApi<VerifyForgotPasswordCodeResponse>({ resetToken: MOCK_RESET_TOKEN })
+  },
 
   resendVerificationEmail: (_data: { email: string }) => mockApi<void>(undefined),
 

@@ -68,9 +68,14 @@ export const authService = {
     if (error) throw new AuthError(error.message, "FORGOT_PASSWORD_FAILED")
   },
 
-  async resetPassword(data: { password: string; token: string }): Promise<void> {
-    const { error } = await authApi.resetPassword(data)
+  // Returns the email the token was issued for — verified server-side, never
+  // the client's own claim — so callers can safely key security-sensitive
+  // operations (like clearing a login lockout) off the real account owner.
+  async resetPassword(data: { password: string; token: string }): Promise<string> {
+    const { data: result, error } = await authApi.resetPassword(data)
     if (error) throw new AuthError(error.message, "RESET_PASSWORD_FAILED")
+    if (!result?.email) throw new AuthError("Unexpected response from server", "INVALID_RESPONSE")
+    return result.email
   },
 
   async verifyForgotPasswordCode(data: { email: string; code: string }): Promise<string> {

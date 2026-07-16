@@ -22,10 +22,9 @@ import { createResetPasswordSchema, type ResetPasswordFormInput } from "../schem
 
 interface ResetPasswordFormProps {
   token: string
-  email?: string
 }
 
-export function ResetPasswordForm({ token, email }: ResetPasswordFormProps) {
+export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   const tAuth = useTranslations("auth")
   const tVal = useTranslations("validation")
   const locale = useLocale()
@@ -43,7 +42,6 @@ export function ResetPasswordForm({ token, email }: ResetPasswordFormProps) {
     fd.set("password", data.password)
     fd.set("confirmPassword", data.confirmPassword)
     fd.set("token", token)
-    fd.set("email", email ?? "")
     action(fd)
   }
 

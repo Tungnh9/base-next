@@ -22,3 +22,9 @@ export interface AuthResponse {
 export interface VerifyForgotPasswordCodeResponse {
   resetToken: string
 }
+
+// Real backend resolves the token to the account it belongs to and returns
+// that email — callers must never trust a client-submitted email instead.
+export interface ResetPasswordResponse {
+  email: string
+}
