@@ -1,11 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useTranslations, useLocale } from "next-intl"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ChevronLeft, Eye, EyeOff } from "lucide-react"
+import { ChevronLeft, CheckCircle2, Eye, EyeOff, Lightbulb } from "lucide-react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -19,6 +21,7 @@ import {
 import { ROUTES } from "@/lib/constants"
 import { useResetPasswordAction } from "../hooks/use-auth"
 import { createResetPasswordSchema, type ResetPasswordFormInput } from "../schemas"
+import { PasswordStrengthMeter } from "./password-strength-meter"
 
 interface ResetPasswordFormProps {
   token: string
@@ -28,6 +31,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   const tAuth = useTranslations("auth")
   const tVal = useTranslations("validation")
   const locale = useLocale()
+  const router = useRouter()
   const { state, action, isPending } = useResetPasswordAction()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -36,6 +40,16 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
     resolver: zodResolver(createResetPasswordSchema(tVal)),
     defaultValues: { password: "", confirmPassword: "" },
   })
+  const password = useWatch({ control: form.control, name: "password" })
+  const confirmPassword = useWatch({ control: form.control, name: "confirmPassword" })
+  const confirmPasswordMatches = confirmPassword.length > 0 && confirmPassword === password
+
+  useEffect(() => {
+    if (state.success) {
+      toast.success(tAuth("resetPasswordSuccess"))
+      router.push(`/${locale}${ROUTES.login}`)
+    }
+  }, [state, locale, router, tAuth])
 
   function onSubmit(data: ResetPasswordFormInput) {
     const fd = new FormData()
@@ -80,6 +94,8 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
           )}
         />
 
+        <PasswordStrengthMeter password={password} />
+
         <FormField
           control={form.control}
           name="confirmPassword"
@@ -93,6 +109,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="••••••"
                   autoComplete="new-password"
+                  isValid={confirmPasswordMatches}
                   endIcon={
                     <button
                       type="button"
@@ -109,6 +126,12 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
                   {...field}
                 />
               </FormControl>
+              {confirmPasswordMatches && (
+                <p className="text-success flex items-center gap-1 text-[13px]">
+                  <CheckCircle2 className="size-3.5" />
+                  {tAuth("passwordConfirmMatch")}
+                </p>
+              )}
               <FormMessage />
             </FormItem>
           )}
@@ -128,6 +151,14 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
             <ChevronLeft className="size-4" />
             {tAuth("backToLogin")}
           </Link>
+        </div>
+
+        <div className="bg-info/10 flex items-start gap-2 rounded-md p-3">
+          <Lightbulb className="text-info mt-0.5 size-4 shrink-0" />
+          <p className="text-muted-foreground text-[13px]">
+            <span className="text-foreground font-medium">{tAuth("securityTipTitle")}: </span>
+            {tAuth("securityTipBody")}
+          </p>
         </div>
       </form>
     </Form>

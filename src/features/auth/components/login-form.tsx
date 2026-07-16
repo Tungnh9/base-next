@@ -55,6 +55,7 @@ export function LoginForm() {
   useEffect(() => {
     if (state.success) {
       if (state.user) setUser(state.user)
+      toast.success(tAuth("loginSuccess"))
       router.push(`/${locale}${ROUTES.dashboard}`)
     } else if (state.requiresTwoFactor) {
       const phone = state.twoFactorPhone ? `?phone=${encodeURIComponent(state.twoFactorPhone)}` : ""

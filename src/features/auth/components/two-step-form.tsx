@@ -4,6 +4,7 @@ import type { FormEvent } from "react"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useTranslations, useLocale } from "next-intl"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { OtpInput } from "./otp-input"
 import { ROUTES } from "@/lib/constants"
@@ -28,9 +29,18 @@ export function TwoStepForm() {
   useEffect(() => {
     if (state.success) {
       if (state.user) setUser(state.user)
+      toast.success(tAuth("loginSuccess"))
       router.push(`/${locale}${ROUTES.dashboard}`)
     }
-  }, [state, locale, router, setUser])
+  }, [state, locale, router, setUser, tAuth])
+
+  // Separate effect: the resend action has its own independent error state
+  // (resendState), previously never surfaced anywhere on failure.
+  useEffect(() => {
+    if (resendState.error) {
+      toast.error(tAuth(resendState.error))
+    }
+  }, [resendState, tAuth])
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault()

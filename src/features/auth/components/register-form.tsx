@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useTranslations, useLocale } from "next-intl"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -26,14 +27,19 @@ export function RegisterForm() {
   const tAuth = useTranslations("auth")
   const tVal = useTranslations("validation")
   const locale = useLocale()
+  const router = useRouter()
   const { state, action, isPending } = useRegisterAction()
   const [showPassword, setShowPassword] = useState(false)
+  const [submittedEmail, setSubmittedEmail] = useState("")
 
   useEffect(() => {
-    if (state.error) {
+    if (state.success) {
+      toast.success(tAuth("registerSuccess"))
+      router.push(`/${locale}${ROUTES.verifyEmail}?email=${encodeURIComponent(submittedEmail)}`)
+    } else if (state.error) {
       toast.error(tAuth(state.error))
     }
-  }, [state, tAuth])
+  }, [state, tAuth, locale, router, submittedEmail])
 
   const form = useForm<RegisterFormInput>({
     resolver: zodResolver(createRegisterSchema(tVal)),
@@ -41,6 +47,7 @@ export function RegisterForm() {
   })
 
   function onSubmit(data: RegisterFormInput) {
+    setSubmittedEmail(data.email)
     const fd = new FormData()
     fd.set("username", data.username)
     fd.set("email", data.email)
