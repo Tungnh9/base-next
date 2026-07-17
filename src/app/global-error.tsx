@@ -4,6 +4,7 @@ import { useEffect } from "react"
 import "@/app/globals.css"
 import { inter } from "@/lib/fonts"
 import { Button } from "@/components/ui/button"
+import { logger } from "@/lib/logger"
 import viMessages from "../../messages/vi.json"
 import enMessages from "../../messages/en.json"
 
@@ -27,7 +28,7 @@ function detectLocale(): keyof typeof MESSAGES {
 
 export default function GlobalError({ error, reset }: GlobalErrorProps) {
   useEffect(() => {
-    console.error(error)
+    logger.error("Unhandled critical render error", error)
   }, [error])
 
   const locale = detectLocale()

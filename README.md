@@ -27,6 +27,10 @@ Next.js 16 base template — scalable, production-ready, dùng được cho mọ
 cp .env.example .env.local   # điền JWT_SECRET và API_BASE_URL
 npm install                  # legacy-peer-deps tự động qua .npmrc
 npm run dev                  # http://localhost:3000 → redirect /vi
+npm run build                # Production build (CI + pre-push hook chạy bước này)
+npm run start                # Chạy bản đã build (sau npm run build)
+npm run lint                 # ESLint — 0 error trước khi commit
+npm run format                # Prettier --write toàn bộ project
 npm run test                 # Vitest watch mode
 npm run test:run             # Chạy toàn bộ test một lần (CI / pre-commit)
 npm run test:coverage        # Test + coverage report

@@ -1,4 +1,8 @@
 import { z } from "zod"
+// Relative, not "@/lib/logger" — next.config.ts imports this file for
+// build-time validation, and next-config-ts's transpile step doesn't
+// reliably resolve tsconfig path aliases (same class of issue as proxy.ts).
+import { logger } from "./logger"
 
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
@@ -31,7 +35,7 @@ const envSchema = z.object({
 const parsed = envSchema.safeParse(process.env)
 
 if (!parsed.success) {
-  console.error("❌ Invalid environment variables:", parsed.error.flatten().fieldErrors)
+  logger.error("Invalid environment variables", parsed.error.flatten().fieldErrors)
   throw new Error("Invalid environment configuration. See above for details.")
 }
 
