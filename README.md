@@ -38,7 +38,7 @@ npm run test:coverage        # Test + coverage report
 
 > `.npmrc` đã cấu hình `legacy-peer-deps=true` để xử lý conflict giữa `@emoji-mart/react` và React 19.
 
-> **Node.js:** yêu cầu >= 20.9.0 (khai báo trong `package.json` → `engines`, Vercel/CI cũng đọc field này để chọn đúng runtime). Dùng `nvm use 22` nếu đang chạy Node 18.
+> **Node.js:** yêu cầu >= 20.19.0 (khai báo trong `package.json` → `engines`, Vercel/CI cũng đọc field này để chọn đúng runtime — floor này do `vite`/`vitest` yêu cầu, không phải Next.js). Dùng `nvm use 22` nếu đang chạy Node 18.
 
 ---
 

@@ -51,8 +51,13 @@ jobs:
       - name: Build
         run: npm run build
 
-  # Verifies the package.json "engines" floor (>=20.9.0) actually still
-  # works — build-and-test alone only ever ran on Node 22.
+  # Verifies the package.json "engines" floor (>=20.19.0) actually still
+  # works — build-and-test alone only ever ran on Node 22. This job is what
+  # caught the floor being wrong in the first place: it used to say
+  # >=20.9.0, but vite@8/vitest 4's toolchain needs node:util's styleText
+  # (added in Node 20.12) and vite itself declares >=20.19.0 — anything
+  # below that fails at startup with "does not provide an export named
+  # 'styleText'", not a normal test failure.
   compat-node-min:
     runs-on: ubuntu-latest
     steps:
@@ -62,7 +67,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20.9.0"
+          node-version: "20.19.0"
           cache: npm
 
       - name: Install dependencies
