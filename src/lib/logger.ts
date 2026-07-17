@@ -17,7 +17,14 @@ function write(level: LogLevel, message: string, context?: Record<string, unknow
     timestamp: new Date().toISOString(),
     ...(context ? { context } : {}),
   }
-  const line = JSON.stringify(entry)
+  // A logging call must never itself throw — fall back to a plain message
+  // if the context isn't JSON-serializable (e.g. a circular reference).
+  let line: string
+  try {
+    line = JSON.stringify(entry)
+  } catch {
+    line = JSON.stringify({ level, message, timestamp: entry.timestamp })
+  }
   if (level === "error") console.error(line)
   else if (level === "warn") console.warn(line)
   else console.log(line)
