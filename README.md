@@ -42,6 +42,13 @@ npm run test:coverage        # Test + coverage report
 
 ---
 
+## Bảo mật
+
+- **Response headers** (`next.config.ts`): CSP, X-Frame-Options, HSTS, X-Content-Type-Options, Referrer-Policy, Permissions-Policy. `connect-src` trong CSP tự thêm origin của `NEXT_PUBLIC_API_BASE_URL`/`API_BASE_URL` — nhớ cập nhật nếu đổi domain backend.
+- **Session cookie & access token**, **rate limiting**: xem [docs/auth.md](docs/auth.md).
+
+---
+
 ## Tài liệu
 
 | File                                           | Nội dung                                      |
