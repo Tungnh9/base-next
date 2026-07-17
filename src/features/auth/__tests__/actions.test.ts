@@ -82,7 +82,7 @@ describe("loginAction — rate limiting", () => {
 
     expect(result).toEqual({ error: "loginFailed" })
     expect(mockRecordFailedAttempt).toHaveBeenCalledWith(
-      "user@example.com",
+      "login:user@example.com",
       expect.objectContaining({ max: 5 })
     )
     expect(mockResetRateLimit).not.toHaveBeenCalled()
@@ -94,7 +94,7 @@ describe("loginAction — rate limiting", () => {
     const result = await loginAction({}, formDataFor("user@example.com"))
 
     expect(result).toEqual({ success: true, user: { id: "1" } })
-    expect(mockResetRateLimit).toHaveBeenCalledWith("user@example.com")
+    expect(mockResetRateLimit).toHaveBeenCalledWith("login:user@example.com")
     expect(mockRecordFailedAttempt).not.toHaveBeenCalled()
   })
 
@@ -103,7 +103,7 @@ describe("loginAction — rate limiting", () => {
 
     await loginAction({}, formDataFor("user@example.com"))
 
-    expect(mockResetRateLimit).toHaveBeenCalledWith("user@example.com")
+    expect(mockResetRateLimit).toHaveBeenCalledWith("login:user@example.com")
   })
 
   it("does not consume a rate-limit check for malformed input (schema validation failure)", async () => {
@@ -119,7 +119,7 @@ describe("loginAction — rate limiting", () => {
 
     await loginAction({}, formDataFor("User@Example.com"))
 
-    expect(mockCheckRateLimit).toHaveBeenCalledWith("user@example.com", expect.any(Object))
+    expect(mockCheckRateLimit).toHaveBeenCalledWith("login:user@example.com", expect.any(Object))
   })
 })
 
@@ -137,12 +137,16 @@ describe("registerAction", () => {
     return fd
   }
 
-  it("returns success (no server redirect) when registration succeeds", async () => {
+  it("returns success (no server redirect) when registration succeeds, and counts the attempt", async () => {
     mockRegister.mockResolvedValue(undefined)
 
     const result = await registerAction({}, formDataForRegister())
 
     expect(result).toEqual({ success: true })
+    expect(mockRecordFailedAttempt).toHaveBeenCalledWith(
+      "register:user@example.com",
+      expect.objectContaining({ max: 5 })
+    )
   })
 
   it("returns registerFailed when the schema rejects malformed input", async () => {
@@ -158,6 +162,15 @@ describe("registerAction", () => {
     const result = await registerAction({}, formDataForRegister())
 
     expect(result).toEqual({ error: "registerFailed" })
+  })
+
+  it("returns tooManyRequests and never calls authService.register when the rate limit denies", async () => {
+    mockCheckRateLimit.mockReturnValue({ allowed: false, remaining: 0, retryAfterMs: 45_000 })
+
+    const result = await registerAction({}, formDataForRegister())
+
+    expect(result).toEqual({ error: "tooManyRequests", retryAfterMs: 45_000 })
+    expect(mockRegister).not.toHaveBeenCalled()
   })
 })
 
@@ -184,7 +197,7 @@ describe("resetPasswordAction", () => {
       password: "NewPass123!",
       token: "demo-reset-token",
     })
-    expect(mockResetRateLimit).toHaveBeenCalledWith("user@example.com")
+    expect(mockResetRateLimit).toHaveBeenCalledWith("login:user@example.com")
   })
 
   it("returns resetPasswordFailed when the password fails the strength schema", async () => {
@@ -209,8 +222,8 @@ describe("resetPasswordAction", () => {
     fd.set("email", "victim@example.com")
     await resetPasswordAction({}, fd)
 
-    expect(mockResetRateLimit).toHaveBeenCalledWith("real-owner@example.com")
-    expect(mockResetRateLimit).not.toHaveBeenCalledWith("victim@example.com")
+    expect(mockResetRateLimit).toHaveBeenCalledWith("login:real-owner@example.com")
+    expect(mockResetRateLimit).not.toHaveBeenCalledWith("login:victim@example.com")
   })
 
   it("returns resetPasswordFailed when authService.resetPassword rejects, and does not clear the rate limit", async () => {
@@ -242,7 +255,7 @@ describe("forgotPasswordAction", () => {
 
     expect(result).toEqual({ requiresEmailVerification: true })
     expect(mockRecordFailedAttempt).toHaveBeenCalledWith(
-      "user@example.com",
+      "forgot-password:user@example.com",
       expect.objectContaining({ max: 3 })
     )
   })
@@ -291,7 +304,7 @@ describe("verifyForgotPasswordCodeAction", () => {
     const result = await verifyForgotPasswordCodeAction({}, formDataForVerify())
 
     expect(result).toEqual({ success: true, resetToken: "reset-token-1" })
-    expect(mockResetRateLimit).toHaveBeenCalledWith("user@example.com")
+    expect(mockResetRateLimit).toHaveBeenCalledWith("verify-code:user@example.com")
   })
 
   it("records a failed attempt and returns invalidVerificationCode when the code is wrong", async () => {
@@ -301,7 +314,7 @@ describe("verifyForgotPasswordCodeAction", () => {
 
     expect(result).toEqual({ error: "invalidVerificationCode" })
     expect(mockRecordFailedAttempt).toHaveBeenCalledWith(
-      "user@example.com",
+      "verify-code:user@example.com",
       expect.objectContaining({ max: 5 })
     )
     expect(mockResetRateLimit).not.toHaveBeenCalled()
@@ -427,7 +440,7 @@ describe("resendVerificationEmailAction", () => {
 
     expect(result).toEqual({ success: true })
     expect(mockRecordFailedAttempt).toHaveBeenCalledWith(
-      "user@example.com",
+      "resend-verify:user@example.com",
       expect.objectContaining({ max: 3 })
     )
   })

@@ -36,6 +36,10 @@
   /* Was #b2b0c0 (~2:1 against --background) — fails WCAG AA for normal
      text. Reuse --text-body's color, already ~4.85:1 here. */
   --muted-foreground: var(--text-body);
+  /* Lighter than --text-body so a Select's placeholder still reads as
+     visually distinct from a selected value, but still ~4.69:1 against
+     --card — same AA bar as --muted-foreground, not the old failing one. */
+  --placeholder-foreground: #757282;
   --accent: #f0eff5;
   --accent-foreground: #4b465c;
   --destructive: #ea5455;
@@ -82,6 +86,10 @@
   /* Was #7983bb (~3.95:1 against --background) — fails WCAG AA for normal
      text. Reuse --text-body's color, already ~6.18:1 here. */
   --muted-foreground: var(--text-body);
+  /* Lighter than --text-body so a Select's placeholder still reads as
+     visually distinct from a selected value, but still ~4.69:1 against
+     --card — same AA bar as --muted-foreground, not the old failing one. */
+  --placeholder-foreground: #9a9eb2;
   --accent: #3b4261;
   --accent-foreground: #d0d4f1;
   --destructive: #ea5455;
@@ -121,6 +129,7 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+  --color-placeholder-foreground: var(--placeholder-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);

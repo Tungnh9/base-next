@@ -32,6 +32,11 @@ export type AuthErrorCode =
 //  - spam/notification-cost guards (register, forgot-password, resend*):
 //    count every attempt regardless of outcome, since even a "successful"
 //    call sends a real email/SMS.
+// Every key is prefixed with the action name (e.g. "login:") even when
+// keyed by the same email — the underlying store is a single flat map, so
+// without a prefix two actions for the same email would share one bucket:
+// failing login 5x would also trip forgot-password's (lower) limit, and
+// resetting one action's counter on success would silently reset another's.
 const LOGIN_RATE_LIMIT = { windowMs: 10 * 60 * 1000, max: 5 }
 const REGISTER_RATE_LIMIT = { windowMs: 60 * 60 * 1000, max: 5 }
 const FORGOT_PASSWORD_RATE_LIMIT = { windowMs: 15 * 60 * 1000, max: 3 }
@@ -63,7 +68,7 @@ export async function loginAction(
   const parsed = loginSchema.safeParse(raw)
   if (!parsed.success) return { error: "invalidCredentials" }
 
-  const identifier = parsed.data.email.trim().toLowerCase()
+  const identifier = `login:${parsed.data.email.trim().toLowerCase()}`
   const rateLimitStatus = checkRateLimit(identifier, LOGIN_RATE_LIMIT)
   if (!rateLimitStatus.allowed) {
     return { error: "tooManyAttempts", retryAfterMs: rateLimitStatus.retryAfterMs }
@@ -101,7 +106,7 @@ export async function registerAction(
   const parsed = registerSchema.safeParse(raw)
   if (!parsed.success) return { error: "registerFailed" }
 
-  const identifier = parsed.data.email.trim().toLowerCase()
+  const identifier = `register:${parsed.data.email.trim().toLowerCase()}`
   const rateLimitStatus = checkRateLimit(identifier, REGISTER_RATE_LIMIT)
   if (!rateLimitStatus.allowed) {
     return { error: "tooManyRequests", retryAfterMs: rateLimitStatus.retryAfterMs }
@@ -128,7 +133,7 @@ export async function forgotPasswordAction(
   const parsed = forgotPasswordSchema.safeParse(raw)
   if (!parsed.success) return { error: "forgotPasswordFailed" }
 
-  const identifier = parsed.data.email.trim().toLowerCase()
+  const identifier = `forgot-password:${parsed.data.email.trim().toLowerCase()}`
   const rateLimitStatus = checkRateLimit(identifier, FORGOT_PASSWORD_RATE_LIMIT)
   if (!rateLimitStatus.allowed) {
     return { error: "tooManyRequests", retryAfterMs: rateLimitStatus.retryAfterMs }
@@ -152,7 +157,7 @@ export async function verifyForgotPasswordCodeAction(
   const parsedCode = otpSchema.safeParse(formData.get("code"))
   if (!email || !parsedCode.success) return { error: "invalidVerificationCode" }
 
-  const identifier = email.trim().toLowerCase()
+  const identifier = `verify-code:${email.trim().toLowerCase()}`
   const rateLimitStatus = checkRateLimit(identifier, VERIFY_CODE_RATE_LIMIT)
   if (!rateLimitStatus.allowed) {
     return { error: "tooManyRequests", retryAfterMs: rateLimitStatus.retryAfterMs }
@@ -195,8 +200,10 @@ export async function resetPasswordAction(
   // recovering access via forgot-password. Uses the email the server
   // resolved the token to, NOT client-submitted input — trusting the latter
   // would let anyone launder a victim's lockout reset through their own
-  // valid token.
-  resetRateLimit(verifiedEmail.trim().toLowerCase())
+  // valid token. Targets the "login:" bucket specifically — every
+  // rate-limited action here has its own prefixed key so clearing one
+  // can't accidentally reset another action's counter for the same email.
+  resetRateLimit(`login:${verifiedEmail.trim().toLowerCase()}`)
 
   // Client-side navigation (not redirect()) so the caller can show a success
   // toast before leaving the page — same pattern as loginAction.
@@ -253,7 +260,7 @@ export async function resendVerificationEmailAction(
   const email = formData.get("email") as string
   if (!email) return { error: "resendFailed" }
 
-  const identifier = email.trim().toLowerCase()
+  const identifier = `resend-verify:${email.trim().toLowerCase()}`
   const rateLimitStatus = checkRateLimit(identifier, RESEND_EMAIL_RATE_LIMIT)
   if (!rateLimitStatus.allowed) {
     return { error: "tooManyRequests", retryAfterMs: rateLimitStatus.retryAfterMs }

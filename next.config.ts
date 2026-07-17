@@ -1,8 +1,9 @@
 import type { NextConfig } from "next"
 import createNextIntlPlugin from "next-intl/plugin"
 
-// Validate env at build time — throws if required vars are missing
-import "./src/lib/env"
+// Validate env at build time — throws if required vars are missing. Also
+// used below to allow the real backend origin through connect-src.
+import { env } from "./src/lib/env"
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts")
 
@@ -12,13 +13,18 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts")
 // requires per-request nonces threaded through proxy.ts, a bigger change
 // out of scope here.
 const isDev = process.env.NODE_ENV !== "production"
+// browserHttpClient (src/lib/api.ts) calls this origin directly from the
+// browser once NEXT_PUBLIC_USE_MOCK_API is off — without it here,
+// connect-src 'self' would silently block every clientApi() call to a
+// real backend on a different origin/port.
+const apiOrigin = env.NEXT_PUBLIC_API_BASE_URL ?? env.API_BASE_URL
 const contentSecurityPolicy = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
-  "connect-src 'self'",
+  `connect-src 'self' ${apiOrigin}`,
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",

@@ -103,3 +103,16 @@ await requireRole(locale, ["admin"]) // không đủ quyền → redirect /[loca
 ```
 
 Nav item tương ứng trong `src/config/nav.ts` khai báo `requiredRole: "admin"` để `Sidebar` tự ẩn mục đó với user không đủ quyền (tránh hiển thị link luôn dẫn tới trang không có quyền).
+
+## Session cookie & access token
+
+Session identity (`userId`/`email`/`role`) và backend access token nằm ở **2 cookie riêng** (`src/lib/auth.ts`):
+
+- `session` — JWT ký bằng `JWT_SECRET` (`jose`), chỉ chứa thông tin định danh, dùng cho `getSession()`/`requireRole()`/`requireSession()`.
+- `access_token` — token thật của backend, lưu riêng (httpOnly, không nằm trong JWT). JWT chỉ ký chứ không mã hoá nên không được nhét secret thật vào payload; `serverApi()` (`src/lib/api.ts`) đọc token này qua `getAccessToken()` để gắn `Authorization: Bearer` khi gọi backend thật.
+
+`setSession(payload, accessToken)`/`clearSession()` luôn set/xoá cả 2 cookie cùng lúc.
+
+## Rate limiting
+
+`src/lib/rate-limit.ts` — in-memory, theo cửa sổ cố định (không dùng được khi deploy nhiều instance/serverless, xem comment trong file). Mỗi action tự chọn key có prefix riêng (`login:`, `register:`, `forgot-password:`, `verify-code:`, `resend-verify:`, `2fa:`, `2fa-resend:`) để tránh 2 action khác nhau dùng chung 1 bucket rate-limit của cùng 1 email/IP.
