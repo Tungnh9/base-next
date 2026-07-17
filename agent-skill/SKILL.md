@@ -34,6 +34,8 @@ Yêu cầu đến
     ├── Sắp commit / push? ──────────────────────→ [commit-protocol]
     │   └── (bước 3 trong protocol) ───────────→ [review-gates]
     │
+    ├── Merge nhánh / chọn base PR / hotfix? ────→ [git-flow]
+    │
     └── Review code độc lập? ────────────────────→ [review-gates]
 ```
 
@@ -586,6 +588,8 @@ Nếu sau 2 lần thử vẫn không reproduce được lỗi → DỪNG, báo c
 ## [commit-protocol] — Commit & Version Control
 
 **Dùng khi:** Sắp commit bất kỳ thay đổi nào.
+
+> Sơ đồ nhánh đầy đủ (main/develop/feature/hotfix), quy tắc chọn base PR, và các bài học thực tế khi merge — xem `agent-skill/references/git-flow.md`. Đặc biệt lưu ý: merge vào `main` ngoài `hotfix/*` luôn phải hỏi lại user trước.
 
 ### Pre-commit checklist (KHÔNG SKIP)
 
