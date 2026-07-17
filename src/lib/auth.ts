@@ -10,11 +10,26 @@ export interface SessionPayload extends JWTPayload {
   email: string
   name?: string
   role?: string
-  accessToken?: string
 }
+
+// Separate cookie for the raw backend access token — kept out of the JWT
+// payload above. JWT here is signed (JWS), not encrypted: anyone who can
+// read the cookie can base64-decode its payload, so a real secret has no
+// business living inside it. httpOnly still keeps it out of reach of JS/XSS.
+const ACCESS_TOKEN_COOKIE_NAME = "access_token"
 
 function getSecret() {
   return new TextEncoder().encode(env.JWT_SECRET)
+}
+
+function cookieOptions() {
+  return {
+    httpOnly: true,
+    secure: env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+    maxAge: 60 * 60 * 24 * 7, // 7 days
+    path: "/",
+  }
 }
 
 export async function signToken(payload: SessionPayload): Promise<string> {
@@ -41,20 +56,29 @@ export async function getSession(): Promise<SessionPayload | null> {
   return verifyToken(token)
 }
 
-export async function setSessionCookie(token: string): Promise<void> {
+// Sets the signed session-identity cookie and the access-token cookie
+// together, since every caller (login, register, 2FA verify) always
+// establishes both at once.
+export async function setSession(payload: SessionPayload, accessToken: string): Promise<void> {
+  const token = await signToken(payload)
   const cookieStore = await cookies()
-  cookieStore.set(env.SESSION_COOKIE_NAME, token, {
-    httpOnly: true,
-    secure: env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 7, // 7 days
-    path: "/",
-  })
+  const opts = cookieOptions()
+  cookieStore.set(env.SESSION_COOKIE_NAME, token, opts)
+  cookieStore.set(ACCESS_TOKEN_COOKIE_NAME, accessToken, opts)
 }
 
-export async function clearSessionCookie(): Promise<void> {
+export async function clearSession(): Promise<void> {
   const cookieStore = await cookies()
   cookieStore.delete(env.SESSION_COOKIE_NAME)
+  cookieStore.delete(ACCESS_TOKEN_COOKIE_NAME)
+}
+
+// For serverApi() to attach as a Bearer token when calling the real backend —
+// deliberately reads the cookie directly rather than going through the JWT
+// session, since the access token is no longer part of that payload.
+export async function getAccessToken(): Promise<string | undefined> {
+  const cookieStore = await cookies()
+  return cookieStore.get(ACCESS_TOKEN_COOKIE_NAME)?.value
 }
 
 // Authorization guard — call from a Server Component/page with the current locale.

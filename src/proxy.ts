@@ -94,6 +94,11 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Exclude: Next.js internals, static files with extensions (.svg, .png, .ico, etc.)
-  matcher: ["/((?!_next/static|_next/image|favicon\\.ico|api/health)(?!.*\\.[^/]*$).*)"],
+  // Exclude: Next.js internals, health check, and a known static-asset
+  // extension list only — NOT "any path with a dot in it", which used to let
+  // a protected route bypass this auth check entirely just by having a file
+  // extension in its path (e.g. /api/export.pdf, /dashboard/report.csv).
+  matcher: [
+    "/((?!_next/static|_next/image|favicon\\.ico|api/health)(?!.*\\.(?:png|jpe?g|gif|svg|webp|ico|css|js|woff2?|ttf|eot|map|txt|xml|webmanifest)$).*)",
+  ],
 }

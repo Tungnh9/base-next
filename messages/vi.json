@@ -27,6 +27,7 @@
     "logoutSuccess": "Đăng xuất thành công",
     "loginFailed": "Đăng nhập thất bại, vui lòng thử lại",
     "tooManyAttempts": "Bạn đã đăng nhập sai quá nhiều lần, vui lòng thử lại sau 10 phút",
+    "tooManyRequests": "Quá nhiều yêu cầu, vui lòng thử lại sau ít phút",
     "tryAgainIn": "Thử lại sau {time}",
     "registerFailed": "Đăng ký thất bại, vui lòng thử lại",
     "registerSuccess": "Đăng ký thành công",
