@@ -123,7 +123,8 @@
     "notFoundDescription": "Rất tiếc! 😞 Trang bạn yêu cầu không tồn tại trên hệ thống.",
     "backToHome": "Về trang chủ",
     "serverError": "Lỗi máy chủ",
-    "unauthorized": "Bạn không có quyền truy cập"
+    "unauthorized": "Bạn không có quyền truy cập",
+    "criticalError": "Lỗi nghiêm trọng"
   },
   "carousel": {
     "prevSlide": "Slide trước",
