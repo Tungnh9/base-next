@@ -371,6 +371,7 @@
     "title": "Customers",
     "description": "Manage your customer list",
     "addNew": "Add Customer",
+    "view": "View details",
     "edit": "Edit",
     "delete": "Delete",
     "deleteTitle": "Delete customer",
@@ -382,7 +383,8 @@
     "toast": {
       "deleteSuccess": "Customer deleted",
       "deleteManySuccess": "{count} customers deleted",
-      "deleteManyPartialFail": "Failed to delete {failed}/{total} customers"
+      "deleteManyPartialFail": "Failed to delete {failed}/{total} customers",
+      "updateSuccess": "Updated successfully"
     },
     "columns": {
       "name": "Name",
@@ -409,10 +411,15 @@
       "companyPlaceholder": "Company name",
       "status": "Status",
       "submit": "Save",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "discardTitle": "Discard changes?",
+      "discardDescription": "You have unsaved changes. If you discard, these changes will be lost.",
+      "discardCancel": "Continue editing",
+      "discardConfirm": "Discard changes"
     },
     "empty": "No customers yet",
-    "searchPlaceholder": "Search by name, email..."
+    "searchPlaceholder": "Search by name, email...",
+    "backToList": "Back to list"
   },
   "misc": {
     "maintenance": {
