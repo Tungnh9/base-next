@@ -117,6 +117,17 @@ describe("customers actions — auth guard", () => {
     expect(result).toEqual({ data: [], error: null })
   })
 
+  it("getCustomerById delegates to customerApi.getById when a session exists", async () => {
+    mockRequireSession.mockResolvedValue(mockSession as never)
+    const customer = { id: "1", ...validInput, createdAt: "now" }
+    mockGetById.mockResolvedValue({ data: customer, error: null })
+
+    const result = await getCustomerById("1")
+
+    expect(mockGetById).toHaveBeenCalledWith("1")
+    expect(result).toEqual({ data: customer, error: null })
+  })
+
   it("createCustomer still returns VALIDATION_ERROR for invalid input when a session exists", async () => {
     mockRequireSession.mockResolvedValue(mockSession as never)
 

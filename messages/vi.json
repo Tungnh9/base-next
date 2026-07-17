@@ -371,6 +371,7 @@
     "title": "Khách hàng",
     "description": "Quản lý danh sách khách hàng",
     "addNew": "Thêm khách hàng",
+    "view": "Xem chi tiết",
     "edit": "Chỉnh sửa",
     "delete": "Xóa",
     "deleteTitle": "Xóa khách hàng",
@@ -382,7 +383,8 @@
     "toast": {
       "deleteSuccess": "Đã xóa khách hàng",
       "deleteManySuccess": "Đã xóa {count} khách hàng",
-      "deleteManyPartialFail": "Xóa thất bại {failed}/{total} khách hàng"
+      "deleteManyPartialFail": "Xóa thất bại {failed}/{total} khách hàng",
+      "updateSuccess": "Cập nhật thành công"
     },
     "columns": {
       "name": "Họ tên",
@@ -409,10 +411,15 @@
       "companyPlaceholder": "Tên công ty",
       "status": "Trạng thái",
       "submit": "Lưu",
-      "cancel": "Hủy"
+      "cancel": "Hủy",
+      "discardTitle": "Hủy thay đổi?",
+      "discardDescription": "Bạn có thay đổi chưa lưu. Nếu hủy, các thay đổi này sẽ mất.",
+      "discardCancel": "Tiếp tục chỉnh sửa",
+      "discardConfirm": "Hủy thay đổi"
     },
     "empty": "Chưa có khách hàng nào",
-    "searchPlaceholder": "Tìm theo tên, email..."
+    "searchPlaceholder": "Tìm theo tên, email...",
+    "backToList": "Quay lại danh sách"
   },
   "misc": {
     "maintenance": {

@@ -113,4 +113,16 @@ describe("CustomerList — delete confirmation", () => {
     const rowCheckboxes = screen.getAllByRole("checkbox", { name: "selectRow" })
     rowCheckboxes.forEach((checkbox) => expect(checkbox).toBeChecked())
   })
+
+  it("the view icon and the customer name both link to the detail page", () => {
+    render(<CustomerList />)
+
+    const viewLinks = screen.getAllByRole("link", { name: "view" })
+    expect(viewLinks[0]).toHaveAttribute("href", "/vi/customers/1")
+
+    expect(screen.getByRole("link", { name: "Nguyễn Văn An" })).toHaveAttribute(
+      "href",
+      "/vi/customers/1"
+    )
+  })
 })
