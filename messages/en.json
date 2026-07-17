@@ -27,6 +27,7 @@
     "logoutSuccess": "Logged out successfully",
     "loginFailed": "Login failed, please try again",
     "tooManyAttempts": "Too many failed login attempts, please try again in 10 minutes",
+    "tooManyRequests": "Too many requests, please try again shortly",
     "tryAgainIn": "Try again in {time}",
     "registerFailed": "Registration failed, please try again",
     "registerSuccess": "Registration successful",

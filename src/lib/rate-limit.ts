@@ -4,6 +4,8 @@
 // backend/multi-instance deployment exists, swap the internals for a shared
 // store (e.g. Upstash Redis) while keeping these same function signatures.
 
+import { headers } from "next/headers"
+
 export interface RateLimitConfig {
   windowMs: number
   max: number
@@ -55,4 +57,15 @@ export function recordFailedAttempt(key: string, config: RateLimitConfig): void 
 
 export function resetRateLimit(key: string): void {
   buckets.delete(key)
+}
+
+// Best-effort client identifier for actions with no other natural rate-limit
+// key (e.g. 2FA code verification, which only receives the OTP itself).
+// Trusts x-forwarded-for/x-real-ip as set by the platform's edge proxy —
+// fine for throttling abuse, not meant as a strong client identity.
+export async function getClientIp(): Promise<string> {
+  const h = await headers()
+  const forwardedFor = h.get("x-forwarded-for")
+  if (forwardedFor) return forwardedFor.split(",")[0].trim()
+  return h.get("x-real-ip") ?? "unknown"
 }

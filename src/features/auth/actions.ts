@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation"
 import { getLocale } from "next-intl/server"
 import { ROUTES } from "@/lib/constants"
-import { checkRateLimit, recordFailedAttempt, resetRateLimit } from "@/lib/rate-limit"
+import { checkRateLimit, recordFailedAttempt, resetRateLimit, getClientIp } from "@/lib/rate-limit"
 import {
   loginSchema,
   registerSchema,
@@ -18,15 +18,27 @@ export type AuthErrorCode =
   | "loginFailed"
   | "invalidCredentials"
   | "tooManyAttempts"
+  | "tooManyRequests"
   | "registerFailed"
   | "resetPasswordFailed"
   | "forgotPasswordFailed"
   | "resendFailed"
   | "invalidVerificationCode"
 
-// Brute-force guard for loginAction — see src/lib/rate-limit.ts for the
-// in-memory implementation and its known limitations.
+// Rate-limit guards — see src/lib/rate-limit.ts for the in-memory
+// implementation and its known limitations. Two shapes:
+//  - brute-force guards (login, code verification): count only failed
+//    attempts, reset on success.
+//  - spam/notification-cost guards (register, forgot-password, resend*):
+//    count every attempt regardless of outcome, since even a "successful"
+//    call sends a real email/SMS.
 const LOGIN_RATE_LIMIT = { windowMs: 10 * 60 * 1000, max: 5 }
+const REGISTER_RATE_LIMIT = { windowMs: 60 * 60 * 1000, max: 5 }
+const FORGOT_PASSWORD_RATE_LIMIT = { windowMs: 15 * 60 * 1000, max: 3 }
+const VERIFY_CODE_RATE_LIMIT = { windowMs: 10 * 60 * 1000, max: 5 }
+const RESEND_EMAIL_RATE_LIMIT = { windowMs: 15 * 60 * 1000, max: 3 }
+const TWO_STEP_RATE_LIMIT = { windowMs: 10 * 60 * 1000, max: 5 }
+const RESEND_TWO_STEP_RATE_LIMIT = { windowMs: 15 * 60 * 1000, max: 3 }
 
 export interface ActionState {
   error?: AuthErrorCode
@@ -89,6 +101,13 @@ export async function registerAction(
   const parsed = registerSchema.safeParse(raw)
   if (!parsed.success) return { error: "registerFailed" }
 
+  const identifier = parsed.data.email.trim().toLowerCase()
+  const rateLimitStatus = checkRateLimit(identifier, REGISTER_RATE_LIMIT)
+  if (!rateLimitStatus.allowed) {
+    return { error: "tooManyRequests", retryAfterMs: rateLimitStatus.retryAfterMs }
+  }
+  recordFailedAttempt(identifier, REGISTER_RATE_LIMIT)
+
   try {
     await authService.register(parsed.data)
   } catch {
@@ -109,6 +128,13 @@ export async function forgotPasswordAction(
   const parsed = forgotPasswordSchema.safeParse(raw)
   if (!parsed.success) return { error: "forgotPasswordFailed" }
 
+  const identifier = parsed.data.email.trim().toLowerCase()
+  const rateLimitStatus = checkRateLimit(identifier, FORGOT_PASSWORD_RATE_LIMIT)
+  if (!rateLimitStatus.allowed) {
+    return { error: "tooManyRequests", retryAfterMs: rateLimitStatus.retryAfterMs }
+  }
+  recordFailedAttempt(identifier, FORGOT_PASSWORD_RATE_LIMIT)
+
   try {
     await authService.forgotPassword(parsed.data.email)
   } catch {
@@ -126,13 +152,21 @@ export async function verifyForgotPasswordCodeAction(
   const parsedCode = otpSchema.safeParse(formData.get("code"))
   if (!email || !parsedCode.success) return { error: "invalidVerificationCode" }
 
+  const identifier = email.trim().toLowerCase()
+  const rateLimitStatus = checkRateLimit(identifier, VERIFY_CODE_RATE_LIMIT)
+  if (!rateLimitStatus.allowed) {
+    return { error: "tooManyRequests", retryAfterMs: rateLimitStatus.retryAfterMs }
+  }
+
   let resetToken: string
   try {
     resetToken = await authService.verifyForgotPasswordCode({ email, code: parsedCode.data })
   } catch {
+    recordFailedAttempt(identifier, VERIFY_CODE_RATE_LIMIT)
     return { error: "invalidVerificationCode" }
   }
 
+  resetRateLimit(identifier)
   return { success: true, resetToken }
 }
 
@@ -190,13 +224,23 @@ export async function twoStepVerificationAction(
   }
   const code = parsed.data
 
+  // No email/user identifier is available at this step (see authMockApi.verifyTwoStep) —
+  // fall back to client IP as the brute-force guard key.
+  const identifier = `2fa:${await getClientIp()}`
+  const rateLimitStatus = checkRateLimit(identifier, TWO_STEP_RATE_LIMIT)
+  if (!rateLimitStatus.allowed) {
+    return { error: "tooManyRequests", retryAfterMs: rateLimitStatus.retryAfterMs }
+  }
+
   let user: User
   try {
     user = await authService.verifyTwoStep(code)
   } catch {
+    recordFailedAttempt(identifier, TWO_STEP_RATE_LIMIT)
     return { error: "invalidVerificationCode" }
   }
 
+  resetRateLimit(identifier)
   // Client-side navigation (not redirect()) so the caller can persist `user`
   // to localStorage first — same pattern as loginAction.
   return { success: true, user }
@@ -208,6 +252,13 @@ export async function resendVerificationEmailAction(
 ): Promise<ActionState> {
   const email = formData.get("email") as string
   if (!email) return { error: "resendFailed" }
+
+  const identifier = email.trim().toLowerCase()
+  const rateLimitStatus = checkRateLimit(identifier, RESEND_EMAIL_RATE_LIMIT)
+  if (!rateLimitStatus.allowed) {
+    return { error: "tooManyRequests", retryAfterMs: rateLimitStatus.retryAfterMs }
+  }
+  recordFailedAttempt(identifier, RESEND_EMAIL_RATE_LIMIT)
 
   try {
     await authService.resendVerificationEmail(email)
@@ -222,6 +273,13 @@ export async function resendTwoStepCodeAction(
   _prevState: ActionState,
   _formData: FormData
 ): Promise<ActionState> {
+  const identifier = `2fa-resend:${await getClientIp()}`
+  const rateLimitStatus = checkRateLimit(identifier, RESEND_TWO_STEP_RATE_LIMIT)
+  if (!rateLimitStatus.allowed) {
+    return { error: "tooManyRequests", retryAfterMs: rateLimitStatus.retryAfterMs }
+  }
+  recordFailedAttempt(identifier, RESEND_TWO_STEP_RATE_LIMIT)
+
   try {
     await authService.resendTwoStepCode()
   } catch {

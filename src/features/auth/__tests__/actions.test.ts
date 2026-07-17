@@ -99,6 +99,7 @@ describe("loginAction — rate limiting", () => {
 describe("registerAction", () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockCheckRateLimit.mockReturnValue({ allowed: true, remaining: 5, retryAfterMs: 0 })
   })
 
   function formDataForRegister(overrides: Partial<Record<string, string>> = {}) {
