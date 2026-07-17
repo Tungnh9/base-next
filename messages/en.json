@@ -122,7 +122,8 @@
     "notFoundDescription": "Oops! 😞 The requested URL was not found on this server.",
     "backToHome": "Back to Home",
     "serverError": "Server error",
-    "unauthorized": "You are not authorized to access this page"
+    "unauthorized": "You are not authorized to access this page",
+    "criticalError": "Something went wrong"
   },
   "carousel": {
     "prevSlide": "Previous slide",

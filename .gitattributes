@@ -1,0 +1,3 @@
+# Force LF regardless of the OS/editor that checked the file out — CRLF in a
+# shell script breaks it on Linux/macOS bash (e.g. "$'\r': command not found").
+*.sh text eol=lf

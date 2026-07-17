@@ -33,7 +33,9 @@
   --secondary: #808390;
   --secondary-foreground: #ffffff;
   --muted: #f0eff5;
-  --muted-foreground: #b2b0c0;
+  /* Was #b2b0c0 (~2:1 against --background) — fails WCAG AA for normal
+     text. Reuse --text-body's color, already ~4.85:1 here. */
+  --muted-foreground: var(--text-body);
   --accent: #f0eff5;
   --accent-foreground: #4b465c;
   --destructive: #ea5455;
@@ -77,7 +79,9 @@
   --secondary: #3b4261;
   --secondary-foreground: #d0d4f1;
   --muted: #3b4261;
-  --muted-foreground: #7983bb;
+  /* Was #7983bb (~3.95:1 against --background) — fails WCAG AA for normal
+     text. Reuse --text-body's color, already ~6.18:1 here. */
+  --muted-foreground: var(--text-body);
   --accent: #3b4261;
   --accent-foreground: #d0d4f1;
   --destructive: #ea5455;
