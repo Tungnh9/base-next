@@ -48,13 +48,14 @@ UserMenu → clearUser() (Zustand) + logoutAction
 
 ### Mock test cases (NEXT_PUBLIC_USE_MOCK_API=true)
 
-| Email / Code        | Kết quả                                |
-| ------------------- | -------------------------------------- |
-| Bất kỳ email        | Login thành công                       |
-| `2fa@example.com`   | Trigger 2FA flow, phone `+84900000000` |
-| `wrong@example.com` | Login thất bại (401)                   |
-| OTP `230320`        | 2FA verify thành công                  |
-| OTP `120820`        | Forgot password code thành công        |
+| Email / Code        | Kết quả                                                                                        |
+| ------------------- | ---------------------------------------------------------------------------------------------- |
+| Bất kỳ email        | Login thành công, role `user`                                                                  |
+| `admin@example.com` | Login thành công, role `admin` — cách duy nhất để vào route admin-only (`/employees`) khi mock |
+| `2fa@example.com`   | Trigger 2FA flow, phone `+84900000000`                                                         |
+| `wrong@example.com` | Login thất bại (401)                                                                           |
+| OTP `230320`        | 2FA verify thành công                                                                          |
+| OTP `120820`        | Forgot password code thành công                                                                |
 
 ---
 
