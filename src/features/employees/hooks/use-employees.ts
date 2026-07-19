@@ -105,6 +105,7 @@ export function useEmployees() {
     totalPages,
     page,
     setPage,
+    pageSize: PAGE_SIZE,
     search,
     setSearch: updateSearch,
     isLoading,
