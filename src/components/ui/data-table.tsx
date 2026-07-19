@@ -10,21 +10,34 @@ import {
   type SortingState,
   type RowSelectionState,
 } from "@tanstack/react-table"
-import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react"
+import { ChevronUp, ChevronDown, ChevronsUpDown, ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
   Table,
   TableHeader,
   TableBody,
+  TableFooter,
   TableRow,
   TableHead,
   TableCell,
 } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Button } from "@/components/ui/button"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type { ColumnDef as DataTableColumnDef }
+
+export interface DataTablePaginationProps {
+  /** 1-based current page — matches PaginatedResponse.page, not TanStack's 0-based index */
+  page: number
+  totalPages: number
+  onPageChange: (page: number) => void
+  previousLabel: string
+  nextLabel: string
+  /** Pre-formatted by the caller (e.g. via next-intl) — DataTable renders it as-is */
+  summary?: string
+}
 
 interface DataTableProps<TData> {
   columns: ColumnDef<TData>[]
@@ -41,6 +54,8 @@ interface DataTableProps<TData> {
   bordered?: boolean
   /** Message shown when data is empty */
   emptyMessage?: string
+  /** Server-side pagination controls — omit for an unpaginated table */
+  pagination?: DataTablePaginationProps
   className?: string
 }
 
@@ -55,6 +70,7 @@ function DataTable<TData>({
   hoverable = true,
   bordered = true,
   emptyMessage = "No results.",
+  pagination,
   className,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
@@ -179,6 +195,44 @@ function DataTable<TData>({
           </TableRow>
         )}
       </TableBody>
+
+      {pagination && (
+        <TableFooter>
+          <TableRow className="hover:bg-transparent">
+            <TableCell colSpan={allColumns.length}>
+              <div className="flex items-center justify-between gap-3">
+                {pagination.summary ? (
+                  <span className="text-muted-foreground text-xs">{pagination.summary}</span>
+                ) : (
+                  <span />
+                )}
+                <div className="flex items-center gap-1.5">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    aria-label={pagination.previousLabel}
+                    disabled={pagination.page <= 1}
+                    onClick={() => pagination.onPageChange(pagination.page - 1)}
+                  >
+                    <ChevronLeft className="size-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    aria-label={pagination.nextLabel}
+                    disabled={pagination.page >= pagination.totalPages}
+                    onClick={() => pagination.onPageChange(pagination.page + 1)}
+                  >
+                    <ChevronRight className="size-4" />
+                  </Button>
+                </div>
+              </div>
+            </TableCell>
+          </TableRow>
+        </TableFooter>
+      )}
     </Table>
   )
 }
