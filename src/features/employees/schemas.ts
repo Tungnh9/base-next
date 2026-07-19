@@ -21,5 +21,16 @@ export const createEmployeeSchema = z.object({
 
 export const updateEmployeeSchema = createEmployeeSchema.partial()
 
+// getEmployees()/getEmployeeById() are Server Actions — directly callable
+// regardless of which UI called them — so their params need the same
+// validation as any other external input, not just what the UI happens to send.
+export const getEmployeesParamsSchema = z.object({
+  page: z.number().int().min(1).optional(),
+  pageSize: z.number().int().min(1).max(100).optional(),
+  search: z.string().max(200).optional(),
+})
+
+export const employeeIdSchema = z.string().min(1)
+
 export type CreateEmployeeFormValues = z.infer<typeof createEmployeeSchema>
 export type UpdateEmployeeFormValues = z.infer<typeof updateEmployeeSchema>

@@ -109,6 +109,26 @@ describe("employees actions — auth guard", () => {
     expect(result.data?.page).toBe(2)
   })
 
+  // getEmployees is a Server Action — directly callable regardless of what
+  // the UI ever sends — so params need validating like any external input.
+  it("getEmployees returns VALIDATION_ERROR for an out-of-range pageSize and never calls employeeApi", async () => {
+    mockRequireSession.mockResolvedValue(adminSession as never)
+
+    const result = await getEmployees({ pageSize: 1000 })
+
+    expect(result.error?.code).toBe("VALIDATION_ERROR")
+    expect(mockGetAll).not.toHaveBeenCalled()
+  })
+
+  it("getEmployees returns VALIDATION_ERROR for a negative page", async () => {
+    mockRequireSession.mockResolvedValue(adminSession as never)
+
+    const result = await getEmployees({ page: -1 })
+
+    expect(result.error?.code).toBe("VALIDATION_ERROR")
+    expect(mockGetAll).not.toHaveBeenCalled()
+  })
+
   it("getEmployeeById delegates to employeeApi.getById for an admin session", async () => {
     mockRequireSession.mockResolvedValue(adminSession as never)
     const employee = { id: "1", ...validInput, joinedAt: "now" }
@@ -118,6 +138,15 @@ describe("employees actions — auth guard", () => {
 
     expect(mockGetById).toHaveBeenCalledWith("1")
     expect(result).toEqual({ data: employee, error: null })
+  })
+
+  it("getEmployeeById returns VALIDATION_ERROR for an empty id and never calls employeeApi", async () => {
+    mockRequireSession.mockResolvedValue(adminSession as never)
+
+    const result = await getEmployeeById("")
+
+    expect(result.error?.code).toBe("VALIDATION_ERROR")
+    expect(mockGetById).not.toHaveBeenCalled()
   })
 
   it("createEmployee returns VALIDATION_ERROR for invalid input when the session is admin", async () => {
@@ -168,5 +197,23 @@ describe("employees actions — auth guard", () => {
     await deleteEmployee("42")
 
     expect(mockDelete).toHaveBeenCalledWith("42")
+  })
+
+  it("deleteEmployee returns VALIDATION_ERROR for an empty id and never calls employeeApi", async () => {
+    mockRequireSession.mockResolvedValue(adminSession as never)
+
+    const result = await deleteEmployee("")
+
+    expect(result.error?.code).toBe("VALIDATION_ERROR")
+    expect(mockDelete).not.toHaveBeenCalled()
+  })
+
+  it("updateEmployee returns VALIDATION_ERROR for an empty id even with valid input", async () => {
+    mockRequireSession.mockResolvedValue(adminSession as never)
+
+    const result = await updateEmployee("", { name: "New Name" })
+
+    expect(result.error?.code).toBe("VALIDATION_ERROR")
+    expect(mockUpdate).not.toHaveBeenCalled()
   })
 })
