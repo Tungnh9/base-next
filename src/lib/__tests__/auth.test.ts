@@ -19,7 +19,7 @@ vi.mock("next/headers", () => ({
 }))
 
 import { redirect } from "next/navigation"
-import { signToken, requireRole, requireSession, unauthorizedError } from "../auth"
+import { signToken, requireRole, requireSession, unauthorizedError, forbiddenError } from "../auth"
 
 describe("requireRole", () => {
   beforeEach(() => {
@@ -65,6 +65,16 @@ describe("unauthorizedError", () => {
     expect(unauthorizedError()).toMatchObject({
       code: "UNAUTHORIZED",
       status: 401,
+      message: expect.any(String),
+    })
+  })
+})
+
+describe("forbiddenError", () => {
+  it("returns a 403 ApiError shape, distinct from unauthorizedError's 401", () => {
+    expect(forbiddenError()).toMatchObject({
+      code: "FORBIDDEN",
+      status: 403,
       message: expect.any(String),
     })
   })
