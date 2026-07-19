@@ -423,6 +423,77 @@
     "searchPlaceholder": "Search by name, email...",
     "backToList": "Back to list"
   },
+  "employees": {
+    "title": "Employees",
+    "description": "Manage your employee directory",
+    "addNew": "Add Employee",
+    "view": "View details",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteTitle": "Delete employee",
+    "confirmDelete": "Are you sure you want to delete employee <b>{name}</b>?",
+    "confirmDeleteMany": "Are you sure you want to delete {count} selected employees?",
+    "deleteSelected": "Delete selected ({count})",
+    "selectAll": "Select all",
+    "selectRow": "Select {name}",
+    "toast": {
+      "createSuccess": "Employee added",
+      "updateSuccess": "Updated successfully",
+      "deleteSuccess": "Employee deleted",
+      "deleteManySuccess": "{count} employees deleted",
+      "deleteManyPartialFail": "Failed to delete {failed}/{total} employees"
+    },
+    "columns": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "department": "Department",
+      "position": "Position",
+      "status": "Status",
+      "joinedAt": "Joined At"
+    },
+    "department": {
+      "engineering": "Engineering",
+      "sales": "Sales",
+      "marketing": "Marketing",
+      "hr": "Human Resources",
+      "finance": "Finance",
+      "support": "Support"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "on-leave": "On Leave"
+    },
+    "form": {
+      "title": "Add Employee",
+      "titleEdit": "Edit Employee",
+      "name": "Full Name",
+      "namePlaceholder": "John Doe",
+      "email": "Email",
+      "emailPlaceholder": "example@email.com",
+      "phone": "Phone",
+      "phonePlaceholder": "+1 234 567 890",
+      "department": "Department",
+      "position": "Position",
+      "positionPlaceholder": "Frontend Engineer",
+      "status": "Status",
+      "submit": "Save",
+      "cancel": "Cancel",
+      "discardTitle": "Discard changes?",
+      "discardDescription": "You have unsaved changes. If you discard, these changes will be lost.",
+      "discardCancel": "Continue editing",
+      "discardConfirm": "Discard changes"
+    },
+    "empty": "No employees yet",
+    "searchPlaceholder": "Search by name, email...",
+    "backToList": "Back to list",
+    "pagination": {
+      "previous": "Previous page",
+      "next": "Next page",
+      "summary": "Showing {from}-{to} of {total}"
+    }
+  },
   "misc": {
     "maintenance": {
       "title": "Under Maintenance!",

@@ -423,6 +423,77 @@
     "searchPlaceholder": "Tìm theo tên, email...",
     "backToList": "Quay lại danh sách"
   },
+  "employees": {
+    "title": "Nhân viên",
+    "description": "Quản lý danh sách nhân viên",
+    "addNew": "Thêm nhân viên",
+    "view": "Xem chi tiết",
+    "edit": "Chỉnh sửa",
+    "delete": "Xóa",
+    "deleteTitle": "Xóa nhân viên",
+    "confirmDelete": "Bạn có chắc muốn xóa nhân viên <b>{name}</b> này?",
+    "confirmDeleteMany": "Bạn có chắc muốn xóa {count} nhân viên đã chọn?",
+    "deleteSelected": "Xóa đã chọn ({count})",
+    "selectAll": "Chọn tất cả",
+    "selectRow": "Chọn {name}",
+    "toast": {
+      "createSuccess": "Đã thêm nhân viên",
+      "updateSuccess": "Cập nhật thành công",
+      "deleteSuccess": "Đã xóa nhân viên",
+      "deleteManySuccess": "Đã xóa {count} nhân viên",
+      "deleteManyPartialFail": "Xóa thất bại {failed}/{total} nhân viên"
+    },
+    "columns": {
+      "name": "Họ tên",
+      "email": "Email",
+      "phone": "Số điện thoại",
+      "department": "Phòng ban",
+      "position": "Vị trí",
+      "status": "Trạng thái",
+      "joinedAt": "Ngày vào làm"
+    },
+    "department": {
+      "engineering": "Kỹ thuật",
+      "sales": "Kinh doanh",
+      "marketing": "Marketing",
+      "hr": "Nhân sự",
+      "finance": "Tài chính",
+      "support": "Hỗ trợ"
+    },
+    "status": {
+      "active": "Đang làm việc",
+      "inactive": "Ngừng làm việc",
+      "on-leave": "Đang nghỉ phép"
+    },
+    "form": {
+      "title": "Thêm nhân viên",
+      "titleEdit": "Chỉnh sửa nhân viên",
+      "name": "Họ tên",
+      "namePlaceholder": "Nguyễn Văn A",
+      "email": "Email",
+      "emailPlaceholder": "example@email.com",
+      "phone": "Số điện thoại",
+      "phonePlaceholder": "0901234567",
+      "department": "Phòng ban",
+      "position": "Vị trí",
+      "positionPlaceholder": "Frontend Engineer",
+      "status": "Trạng thái",
+      "submit": "Lưu",
+      "cancel": "Hủy",
+      "discardTitle": "Hủy thay đổi?",
+      "discardDescription": "Bạn có thay đổi chưa lưu. Nếu hủy, các thay đổi này sẽ mất.",
+      "discardCancel": "Tiếp tục chỉnh sửa",
+      "discardConfirm": "Hủy thay đổi"
+    },
+    "empty": "Chưa có nhân viên nào",
+    "searchPlaceholder": "Tìm theo tên, email...",
+    "backToList": "Quay lại danh sách",
+    "pagination": {
+      "previous": "Trang trước",
+      "next": "Trang sau",
+      "summary": "Hiển thị {from}-{to} trong {total}"
+    }
+  },
   "misc": {
     "maintenance": {
       "title": "Đang bảo trì!",

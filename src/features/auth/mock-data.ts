@@ -19,6 +19,9 @@ const MOCK_USER: User = {
 // deterministically while mocking — any other email/password just succeeds.
 const MOCK_2FA_EMAIL = "2fa@example.com"
 const MOCK_FAIL_EMAIL = "wrong@example.com"
+// The only way to reach an admin-gated route (e.g. /employees) while mocking —
+// every other email logs in as role "user".
+const MOCK_ADMIN_EMAIL = "admin@example.com"
 const MOCK_2FA_CODE = "230320"
 const MOCK_FORGOT_PASSWORD_CODE = "120820"
 const MOCK_RESET_TOKEN = "demo-reset-token"
@@ -44,6 +47,13 @@ export const authMockApi = {
         user: { ...MOCK_USER, email },
         requiresTwoFactor: true,
         twoFactorPhone: "+84900000000",
+      })
+    }
+    if (email === MOCK_ADMIN_EMAIL) {
+      return mockApi<AuthResponse>({
+        token: "mock-access-token",
+        user: { ...MOCK_USER, email, role: "admin" },
+        requiresTwoFactor: false,
       })
     }
     return mockApi<AuthResponse>({

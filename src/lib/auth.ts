@@ -113,3 +113,15 @@ export function unauthorizedError(): ApiError {
     status: 401,
   }
 }
+
+// Shared 403 payload — distinct from unauthorizedError()'s 401: this is for
+// Server Actions where the caller IS authenticated but lacks the required
+// role (requireRole() redirects, which is wrong for actions returning
+// {data,error} — same reasoning as requireSession() above).
+export function forbiddenError(): ApiError {
+  return {
+    message: "Bạn không có quyền thực hiện thao tác này",
+    code: "FORBIDDEN",
+    status: 403,
+  }
+}
