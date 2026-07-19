@@ -82,17 +82,27 @@ function DataTable<TData>({
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
 
+  // Read via a ref (not a dependency) so this only re-fires when the
+  // selection itself changes — depending on `data` directly would re-fire on
+  // every render whenever a caller passes a non-memoized array (e.g. an
+  // inline `isLoading ? [] : rows` ternary), an infinite loop since
+  // onSelectionChange([]) triggers a parent state update every time.
+  const dataRef = React.useRef(data)
+  React.useEffect(() => {
+    dataRef.current = data
+  })
+
   React.useEffect(() => {
     if (!onSelectionChange) return
     const selected = Object.keys(rowSelection)
       .filter((k) => rowSelection[k])
-      .map((k) => data[Number(k)])
+      .map((k) => dataRef.current[Number(k)])
       .filter(Boolean)
     onSelectionChange(selected)
     // onSelectionChange intentionally excluded — including it would let a new
     // inline callback identity from the caller re-fire this on every render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rowSelection, data])
+  }, [rowSelection])
 
   // Prepend selection column when selectable — memoized so its object/array
   // identity stays stable across renders (a fresh columns array every render
