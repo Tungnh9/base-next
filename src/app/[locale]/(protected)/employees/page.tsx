@@ -1,6 +1,6 @@
-import Image from "next/image"
 import { getTranslations } from "next-intl/server"
 import { requireRole } from "@/lib/auth"
+import { EmployeeList } from "@/features/employees"
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
@@ -11,20 +11,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function EmployeesPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
   await requireRole(locale, ["admin"])
-  const t = await getTranslations("misc.comingSoon")
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-2 p-6 text-center">
-      <h2 className="text-foreground text-lg font-semibold">{t("title")}</h2>
-      <p className="text-muted-foreground max-w-md text-sm">{t("subtitle")}</p>
-      <Image
-        src="/images/notify/launching-soon.png"
-        alt=""
-        aria-hidden
-        width={180}
-        height={342}
-        className="mt-4"
-      />
+    <div className="flex flex-1 flex-col p-6">
+      <EmployeeList />
     </div>
   )
 }

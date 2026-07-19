@@ -44,7 +44,9 @@ base-next/
     │           ├── layout.tsx    # Server check session → redirect /login nếu chưa login
     │           ├── dashboard/page.tsx
     │           ├── customers/page.tsx   # Delegates to features/customers → CustomerList
-    │           └── employees/page.tsx   # requireRole(locale, ["admin"]) — non-admin → /not-authorized
+    │           │   └── [id]/page.tsx    # Delegates to features/customers → CustomerDetail
+    │           └── employees/page.tsx   # requireRole(locale, ["admin"]) → features/employees → EmployeeList
+    │               └── [id]/page.tsx    # requireRole(locale, ["admin"]) → features/employees → EmployeeDetail
     │
     ├── components/
     │   ├── ui/                   # shadcn/ui primitives
@@ -105,10 +107,25 @@ base-next/
     │       ├── hooks/
     │       │   └── use-customers.ts  # useCustomers() — tick-based refresh pattern
     │       ├── components/
-    │       │   ├── customer-list.tsx  # Table với search, skeleton, CRUD actions
-    │       │   └── customer-form.tsx  # Dialog form tạo/sửa (RHF + zodResolver)
-    │       └── __tests__/
-    │           └── schemas.test.ts    # 8 test cases cho Zod schemas
+    │       │   ├── customer-list.tsx    # Table (tay) với search, skeleton, CRUD actions
+    │       │   ├── customer-form.tsx    # Dialog form tạo/sửa (RHF + zodResolver)
+    │       │   └── customer-detail.tsx  # Trang chi tiết /customers/[id]
+    │       └── __tests__/        # schemas/actions/hooks/components — feature-sliced như src
+    │   └── employees/             # Module nhân viên (admin-only) — CRUD mẫu thứ 2, dùng DataTable thật
+    │       ├── index.ts          # Barrel exports
+    │       ├── types.ts          # Employee, EmployeeStatus, EmployeeDepartment, GetEmployeesParams
+    │       ├── schemas.ts        # createEmployeeSchema, updateEmployeeSchema (Zod)
+    │       ├── api.ts            # employeeApi: switch mock/real qua USE_MOCK_API
+    │       ├── actions.ts        # Server Actions — mỗi action gọi requireAdmin() (session + role "admin")
+    │       ├── mock-data.ts      # employeeMockApi: 24 fixture, getAll() phân trang/lọc thật (không phải
+    │       │                     #   load hết rồi filter phía client như customers)
+    │       ├── hooks/
+    │       │   └── use-employees.ts  # useEmployees() — page/pageSize/search, refetch sau create/delete
+    │       └── components/
+    │           ├── employee-list.tsx    # Dùng @/components/ui/data-table (DataTable) — sort + select +
+    │           │                        #   pagination, không tự viết <table> như customer-list.tsx
+    │           ├── employee-form.tsx    # Dialog form tạo/sửa
+    │           └── employee-detail.tsx  # Trang chi tiết /employees/[id]
     │
     ├── lib/                      # Tiện ích thuần — không phụ thuộc vào React
     │   ├── env.ts                # Zod validate biến môi trường lúc build

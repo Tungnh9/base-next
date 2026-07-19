@@ -81,7 +81,7 @@ Logic hiển thị đã gắn vào 3 trang này:
 
 - `/maintenance` — bật bằng biến môi trường `MAINTENANCE_MODE=true`; `proxy.ts` redirect toàn bộ traffic sang trang này (trừ chính nó).
 - `/not-authorized` — trả về khi `requireRole()` (`src/lib/auth.ts`) phát hiện session không đủ quyền. Ví dụ: route `/employees` yêu cầu role `admin`.
-- `/coming-soon` — nội dung (`misc.comingSoon`) được tái sử dụng ở trang `/employees` cho user có quyền nhưng feature chưa build xong.
+- `/coming-soon` — nội dung (`misc.comingSoon`) dùng cho feature/route chưa build xong; dùng `ComingSoonForm` (email capture) làm ví dụ.
 
 ## Quy ước Button
 
