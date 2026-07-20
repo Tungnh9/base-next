@@ -47,6 +47,11 @@ export function LanguageSwitcher({ currentLocale }: { currentLocale: Locale }) {
     segments[1] = locale
     const qs = searchParams.toString()
     router.push(segments.join("/") + (qs ? "?" + qs : ""))
+    // The locale comes from a header (proxy.ts) read by the root layout — an
+    // ancestor segment outside the [locale] param that changed, so the App
+    // Router's Client Cache reuses its old render on a plain push(). refresh()
+    // clears that cache and re-runs the root layout's Server Components.
+    router.refresh()
   }
 
   return (
