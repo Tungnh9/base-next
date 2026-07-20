@@ -13,7 +13,7 @@ export async function Header() {
   const locale = rawLocale as Locale
 
   return (
-    <div className="bg-background sticky top-4 z-50">
+    <div className="bg-background">
       <header className="bg-card flex h-[62px] items-center gap-4 rounded-[6px] px-6 py-3 shadow-[0px_2px_4px_0px_rgba(165,163,174,0.3)]">
         <SearchBox />
 
