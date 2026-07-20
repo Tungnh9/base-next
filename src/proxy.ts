@@ -7,6 +7,14 @@ const locales = ["en", "vi"] as const
 type Locale = (typeof locales)[number]
 const defaultLocale: Locale = "vi"
 
+// next-intl reads this to resolve the request's locale — must match the
+// HEADER_LOCALE_NAME constant baked into next-intl itself. This app uses a
+// custom auth proxy instead of next-intl's own middleware, so nothing else
+// sets this header (next-intl's per-request `setRequestLocale` cache doesn't
+// reliably propagate across separate next-intl calls in this Next.js
+// version, so this header is the one resolution path that actually works).
+const LOCALE_HEADER = "X-NEXT-INTL-LOCALE"
+
 // Path segments (without locale prefix) that don't require auth
 const PUBLIC_PATHS = [
   "/login",
@@ -63,9 +71,12 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL(`/${locale}/maintenance`, request.url))
   }
 
+  const requestHeaders = new Headers(request.headers)
+  requestHeaders.set(LOCALE_HEADER, locale)
+
   // Public paths — check after stripping locale prefix
   if (PUBLIC_PATHS.some((p) => normalizedPath === p || normalizedPath.startsWith(p + "/"))) {
-    return NextResponse.next()
+    return NextResponse.next({ request: { headers: requestHeaders } })
   }
 
   const sessionCookieName = process.env.SESSION_COOKIE_NAME ?? "session"
@@ -85,7 +96,7 @@ export async function proxy(request: NextRequest) {
 
   try {
     await jwtVerify(token, secret)
-    return NextResponse.next()
+    return NextResponse.next({ request: { headers: requestHeaders } })
   } catch {
     const loginUrl = new URL(`/${locale}/login`, request.url)
     loginUrl.searchParams.set("callbackUrl", pathname)
