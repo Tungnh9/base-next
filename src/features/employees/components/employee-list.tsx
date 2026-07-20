@@ -24,10 +24,6 @@ import { EmployeeForm } from "./employee-form"
 import type { Employee, EmployeeStatus } from "../types"
 import type { CreateEmployeeFormValues } from "../schemas"
 
-// Stable reference for the loading-state placeholder — a fresh `[]` literal
-// every render would give DataTable a new `data` array identity each time.
-const EMPTY_EMPLOYEES: Employee[] = []
-
 const STATUS_BADGE_VARIANT: Record<EmployeeStatus, "success" | "danger" | "warning"> = {
   active: "success",
   inactive: "danger",
@@ -220,15 +216,17 @@ export function EmployeeList() {
       <DataTable
         key={tableKey}
         columns={columns}
-        data={isLoading ? EMPTY_EMPLOYEES : employees}
+        data={employees}
+        isLoading={isLoading}
         selectable
         onSelectionChange={setSelectedRows}
         selectAllLabel={t("selectAll")}
         getRowSelectLabel={(employee) => t("selectRow", { name: employee.name })}
-        emptyMessage={isLoading ? tCommon("loading") : t("empty")}
+        emptyMessage={t("empty")}
         pagination={{
           page,
           totalPages,
+          pageSize,
           onPageChange: setPage,
           previousLabel: t("pagination.previous"),
           nextLabel: t("pagination.next"),

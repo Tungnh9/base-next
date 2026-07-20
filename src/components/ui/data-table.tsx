@@ -23,15 +23,23 @@ import {
 } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type { ColumnDef as DataTableColumnDef }
 
+// Approximate default-density row height (TableCell's py-3 padding + text-sm
+// line-height + border) — used to reserve space so a shorter last page
+// doesn't visibly collapse the table. Adjust if the default density changes.
+const DEFAULT_ROW_HEIGHT_REM = 2.75
+
 export interface DataTablePaginationProps {
   /** 1-based current page — matches PaginatedResponse.page, not TanStack's 0-based index */
   page: number
   totalPages: number
+  /** Rows per full page — used to size loading skeletons and to reserve height on shorter pages */
+  pageSize: number
   onPageChange: (page: number) => void
   previousLabel: string
   nextLabel: string
@@ -54,6 +62,8 @@ interface DataTableProps<TData> {
   bordered?: boolean
   /** Message shown when data is empty */
   emptyMessage?: string
+  /** Shows skeleton placeholder rows instead of `data`/`emptyMessage` */
+  isLoading?: boolean
   /** Server-side pagination controls — omit for an unpaginated table */
   pagination?: DataTablePaginationProps
   /** Aria-label for the header "select all" checkbox (only used when selectable) */
@@ -74,6 +84,7 @@ function DataTable<TData>({
   hoverable = true,
   bordered = true,
   emptyMessage = "No results.",
+  isLoading = false,
   pagination,
   selectAllLabel = "Select all",
   getRowSelectLabel = () => "Select row",
@@ -188,8 +199,24 @@ function DataTable<TData>({
         ))}
       </TableHeader>
 
-      <TableBody>
-        {table.getRowModel().rows.length > 0 ? (
+      <TableBody
+        style={
+          pagination && !isLoading && table.getRowModel().rows.length < pagination.pageSize
+            ? { minHeight: `${DEFAULT_ROW_HEIGHT_REM * pagination.pageSize}rem` }
+            : undefined
+        }
+      >
+        {isLoading ? (
+          Array.from({ length: pagination?.pageSize ?? 5 }).map((_, i) => (
+            <TableRow key={`skeleton-${i}`} className="hover:bg-transparent">
+              {allColumns.map((_col, j) => (
+                <TableCell key={j}>
+                  <Skeleton className="h-4 w-full" />
+                </TableCell>
+              ))}
+            </TableRow>
+          ))
+        ) : table.getRowModel().rows.length > 0 ? (
           table.getRowModel().rows.map((row) => (
             <TableRow key={row.id} data-selected={row.getIsSelected()}>
               {row.getVisibleCells().map((cell) => (

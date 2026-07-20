@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "overlayscrollbars/overlayscrollbars.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -623,4 +624,22 @@
   border: none;
   border-top: 2px solid var(--border);
   margin: 1em 0;
+}
+
+/* ─── OverlayScrollbars — app-shell scroll pane theme ─────────────────────── */
+/* Self-contained theme (not extending os-theme-light/dark) so there's no
+   cascade-order dependency on import order. Colors are wired to --foreground,
+   which next-themes already flips via the .dark class on <html> — so this
+   automatically follows the app's theme toggle with no separate :root/.dark
+   blocks needed, the same way every other color token in this file does. */
+.os-theme-app {
+  --os-size: 10px;
+  --os-padding-perpendicular: 2px;
+  --os-padding-axis: 2px;
+  --os-track-border-radius: 10px;
+  --os-handle-border-radius: 10px;
+  --os-handle-interactive-area-offset: 4px;
+  --os-handle-bg: color-mix(in srgb, var(--foreground) 35%, transparent);
+  --os-handle-bg-hover: color-mix(in srgb, var(--foreground) 50%, transparent);
+  --os-handle-bg-active: color-mix(in srgb, var(--foreground) 65%, transparent);
 }
