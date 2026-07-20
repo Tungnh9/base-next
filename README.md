@@ -4,20 +4,21 @@ Next.js 16 base template — scalable, production-ready, dùng được cho mọ
 
 ## Stack
 
-|               |                                       |
-| ------------- | ------------------------------------- |
-| Framework     | Next.js 16 (App Router, Turbopack)    |
-| Language      | TypeScript 5 (strict)                 |
-| Styling       | Tailwind CSS v4 + shadcn/ui           |
-| State         | Zustand                               |
-| i18n          | next-intl (vi mặc định, en)           |
-| Auth          | JWT via `jose` + cookie httpOnly      |
-| Forms         | react-hook-form + Zod                 |
-| HTTP Client   | axios (via `ApiClient` class)         |
-| Tables        | TanStack Table v8                     |
-| Icons         | lucide-react                          |
-| Notifications | Sonner                                |
-| Rich Text     | TipTap v3 (ProseMirror, @tiptap/core) |
+|               |                                                  |
+| ------------- | ------------------------------------------------ |
+| Framework     | Next.js 16 (App Router, Turbopack)               |
+| Language      | TypeScript 5 (strict)                            |
+| Styling       | Tailwind CSS v4 + shadcn/ui                      |
+| State         | Zustand                                          |
+| i18n          | next-intl (vi mặc định, en)                      |
+| Auth          | JWT via `jose` + cookie httpOnly                 |
+| Forms         | react-hook-form + Zod                            |
+| HTTP Client   | axios (via `ApiClient` class)                    |
+| Tables        | TanStack Table v8                                |
+| Icons         | lucide-react                                     |
+| Notifications | Sonner                                           |
+| Rich Text     | TipTap v3 (ProseMirror, @tiptap/core)            |
+| Scrollbars    | overlayscrollbars-react (app shell content pane) |
 
 ---
 
@@ -88,3 +89,10 @@ Logic hiển thị đã gắn vào 3 trang này:
 - Mọi `<button>` đều có `cursor: pointer` (khai báo trong `globals.css @layer base`)
 - Trạng thái `disabled` hiển thị `cursor: not-allowed`
 - Dùng `<Button>` từ `@/components/ui/button` cho tất cả button trong app
+
+## Quy ước Layout — App Shell
+
+`(protected)/layout.tsx` là khung cố định 1 viewport (`h-dvh overflow-hidden`) — Sidebar/Header/Footer đứng yên, **chỉ `<main>` mới cuộn** (bọc trong `ScrollArea`, `@/components/layout/scroll-area.tsx`, dùng `overlayscrollbars-react` để có thanh cuộn overlay thay vì mặc định trình duyệt). Khi thêm page mới trong `(protected)/`:
+
+- Không tự đặt `h-screen`/`min-h-dvh`/`overflow-y-auto` ở root component của page — sẽ tạo scroll lồng nhau (double scrollbar) với `ScrollArea` đã có sẵn.
+- Theme màu thanh cuộn (`.os-theme-app` trong `globals.css`) tự đổi theo light/dark, không cần cấu hình thêm.
