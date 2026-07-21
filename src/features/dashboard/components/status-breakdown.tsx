@@ -1,16 +1,7 @@
 import { type FC } from "react"
 import { ProgressStack, ProgressSegment, type ProgressVariant } from "@/components/ui/progress"
+import { COLOR_VARIANT_CLASSES } from "@/components/ui/color-variants"
 import { cn } from "@/lib/utils"
-
-const DOT_VARIANT_CLASSES: Record<ProgressVariant, string> = {
-  primary: "bg-primary",
-  secondary: "bg-secondary",
-  success: "bg-success",
-  danger: "bg-destructive",
-  warning: "bg-warning",
-  info: "bg-info",
-  dark: "bg-foreground",
-}
 
 export interface StatusBreakdownItem {
   key: string
@@ -45,7 +36,7 @@ export const StatusBreakdown: FC<StatusBreakdownProps> = ({ items, className }) 
             {index > 0 ? <span aria-hidden>·</span> : null}
             <span
               aria-hidden
-              className={cn("size-2 rounded-full", DOT_VARIANT_CLASSES[item.variant])}
+              className={cn("size-2 rounded-full", COLOR_VARIANT_CLASSES[item.variant])}
             />
             {item.count} {item.label}
           </span>

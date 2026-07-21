@@ -5,34 +5,20 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { Progress as ProgressPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
-
-// ─── Shared color variant map ─────────────────────────────────────────────────
-
-const COLOR_VARIANTS = {
-  primary:   "bg-primary",
-  secondary: "bg-secondary",
-  success:   "bg-success",
-  danger:    "bg-destructive",
-  warning:   "bg-warning",
-  info:      "bg-info",
-  dark:      "bg-foreground",
-} as const
+import { COLOR_VARIANT_CLASSES } from "./color-variants"
 
 // ─── Track (root container) ───────────────────────────────────────────────────
 
-const progressTrackVariants = cva(
-  "relative w-full overflow-hidden rounded-full bg-muted",
-  {
-    variants: {
-      size: {
-        sm:      "h-1.5",
-        default: "h-2.5",
-        lg:      "h-4",
-      },
+const progressTrackVariants = cva("relative w-full overflow-hidden rounded-full bg-muted", {
+  variants: {
+    size: {
+      sm: "h-1.5",
+      default: "h-2.5",
+      lg: "h-4",
     },
-    defaultVariants: { size: "default" },
-  }
-)
+  },
+  defaultVariants: { size: "default" },
+})
 
 // ─── Indicator (fill bar) ─────────────────────────────────────────────────────
 
@@ -42,7 +28,7 @@ const progressIndicatorVariants = cva(
   "h-full transition-[width] duration-300 ease-in-out",
   {
     variants: {
-      variant: COLOR_VARIANTS,
+      variant: COLOR_VARIANT_CLASSES,
       skin: {
         default: "",
         striped: "progress-striped",
@@ -153,7 +139,7 @@ function ProgressSegment({
     <div
       data-slot="progress-segment"
       data-variant={variant}
-      data-skin={skin}      // Fix #7: mirror Progress — needed for attribute-based CSS/JS selectors
+      data-skin={skin} // Fix #7: mirror Progress — needed for attribute-based CSS/JS selectors
       className={cn(progressIndicatorVariants({ variant, skin }), className)}
       style={{ width: `${pct}%` }}
       {...props}
@@ -168,6 +154,6 @@ export { progressTrackVariants, progressIndicatorVariants }
 export type { ProgressProps, ProgressStackProps, ProgressSegmentProps }
 
 type ProgressVariant = NonNullable<VariantProps<typeof progressIndicatorVariants>["variant"]>
-type ProgressSkin    = NonNullable<VariantProps<typeof progressIndicatorVariants>["skin"]>
-type ProgressSize    = NonNullable<VariantProps<typeof progressTrackVariants>["size"]>
+type ProgressSkin = NonNullable<VariantProps<typeof progressIndicatorVariants>["skin"]>
+type ProgressSize = NonNullable<VariantProps<typeof progressTrackVariants>["size"]>
 export type { ProgressVariant, ProgressSkin, ProgressSize }

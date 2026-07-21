@@ -22,14 +22,8 @@ import {
 import { ROUTES } from "@/lib/constants"
 import { updateEmployee, deleteEmployee } from "../actions"
 import { EmployeeForm } from "./employee-form"
-import type { Employee, EmployeeStatus } from "../types"
+import { STATUS_VARIANT, type Employee } from "../types"
 import type { CreateEmployeeFormValues } from "../schemas"
-
-const STATUS_BADGE_VARIANT: Record<EmployeeStatus, "success" | "danger" | "warning"> = {
-  active: "success",
-  inactive: "danger",
-  "on-leave": "warning",
-}
 
 interface EmployeeDetailProps {
   employee: Employee
@@ -91,11 +85,7 @@ export function EmployeeDetail({ employee: initialEmployee }: EmployeeDetailProp
             </Avatar>
             <div>
               <h1 className="text-foreground text-xl font-semibold">{employee.name}</h1>
-              <Badge
-                variant={STATUS_BADGE_VARIANT[employee.status]}
-                skin="light"
-                className="mt-1.5"
-              >
+              <Badge variant={STATUS_VARIANT[employee.status]} skin="light" className="mt-1.5">
                 {t(`status.${employee.status}`)}
               </Badge>
             </div>

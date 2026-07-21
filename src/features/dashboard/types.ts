@@ -1,6 +1,9 @@
 import type { CustomerStatus } from "@/features/customers/types"
-import type { EmployeeStatus, EmployeeDepartment } from "@/features/employees/types"
-import type { ProgressVariant } from "@/components/ui/progress"
+import {
+  STATUS_VARIANT,
+  type EmployeeStatus,
+  type EmployeeDepartment,
+} from "@/features/employees/types"
 
 export interface DashboardStats {
   totalCustomers: number
@@ -38,14 +41,11 @@ export const STATUS_LABEL_KEYS: Record<EmployeeStatus, "active" | "inactive" | "
   "on-leave": "onLeave",
 }
 
-// Same superset-keying idea as STATUS_LABEL_KEYS — maps a status value to the
-// semantic ProgressSegment color used in the dashboard's breakdown bars.
-// "inactive" uses "danger" rather than "secondary": in the dark theme,
+// Re-exported for existing importers (e.g. dashboard/page.tsx) — the
+// canonical status→variant map now lives in @/features/employees/types
+// since it's also used directly by employee-list.tsx/employee-detail.tsx.
+// "inactive" maps to "danger" rather than "secondary": in the dark theme,
 // --secondary (#3b4261) resolves to the exact same color as --muted
 // (the ProgressStack track background), making a "secondary" segment
 // invisible against its own track.
-export const STATUS_VARIANT: Record<EmployeeStatus, ProgressVariant> = {
-  active: "success",
-  inactive: "danger",
-  "on-leave": "warning",
-}
+export { STATUS_VARIANT }

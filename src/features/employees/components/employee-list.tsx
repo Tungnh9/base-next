@@ -21,14 +21,8 @@ import { DataTable, type DataTableColumnDef } from "@/components/ui/data-table"
 import { ROUTES } from "@/lib/constants"
 import { useEmployees } from "../hooks/use-employees"
 import { EmployeeForm } from "./employee-form"
-import type { Employee, EmployeeStatus } from "../types"
+import { STATUS_VARIANT, type Employee } from "../types"
 import type { CreateEmployeeFormValues } from "../schemas"
-
-const STATUS_BADGE_VARIANT: Record<EmployeeStatus, "success" | "danger" | "warning"> = {
-  active: "success",
-  inactive: "danger",
-  "on-leave": "warning",
-}
 
 export function EmployeeList() {
   const t = useTranslations("employees")
@@ -125,7 +119,7 @@ export function EmployeeList() {
         accessorKey: "status",
         header: t("columns.status"),
         cell: ({ row }) => (
-          <Badge variant={STATUS_BADGE_VARIANT[row.original.status]} skin="light">
+          <Badge variant={STATUS_VARIANT[row.original.status]} skin="light">
             {t(`status.${row.original.status}`)}
           </Badge>
         ),
