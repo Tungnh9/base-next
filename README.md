@@ -19,6 +19,7 @@ Next.js 16 base template — scalable, production-ready, dùng được cho mọ
 | Notifications | Sonner                                           |
 | Rich Text     | TipTap v3 (ProseMirror, @tiptap/core)            |
 | Scrollbars    | overlayscrollbars-react (app shell content pane) |
+| E2E Testing   | Playwright (`e2e/`, xem `playwright.config.ts`)  |
 
 ---
 
@@ -35,6 +36,7 @@ npm run format                # Prettier --write toàn bộ project
 npm run test                 # Vitest watch mode
 npm run test:run             # Chạy toàn bộ test một lần (CI / pre-commit)
 npm run test:coverage        # Test + coverage report
+npx playwright test          # E2E (login, protected-route, locale-switch) — cần npm run build && npm run start trước, hoặc để playwright.config.ts tự start
 ```
 
 > `.npmrc` đã cấu hình `legacy-peer-deps=true` để xử lý conflict giữa `@emoji-mart/react` và React 19.
@@ -45,8 +47,8 @@ npm run test:coverage        # Test + coverage report
 
 ## Bảo mật
 
-- **Response headers** (`next.config.ts`): CSP, X-Frame-Options, HSTS, X-Content-Type-Options, Referrer-Policy, Permissions-Policy. `connect-src` trong CSP tự thêm origin của `NEXT_PUBLIC_API_BASE_URL`/`API_BASE_URL` — nhớ cập nhật nếu đổi domain backend.
-- **Session cookie & access token**, **rate limiting**: xem [docs/auth.md](docs/auth.md).
+- **Response headers**: `X-Frame-Options`, HSTS, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` khai báo tĩnh trong `next.config.ts`. **CSP** (Content-Security-Policy) sinh **động trong `src/proxy.ts`** — mỗi request có 1 nonce riêng (`script-src`/`style-src` dùng `'nonce-...'` thay vì `'unsafe-inline'`), áp dụng cho mọi return path kể cả redirect. `connect-src` tự thêm origin của `NEXT_PUBLIC_API_BASE_URL`/`API_BASE_URL` — nhớ cập nhật nếu đổi domain backend. Chi tiết + CSRF stance: xem [docs/auth.md](docs/auth.md).
+- **Session cookie & access token**, **session expiry** (không có refresh-token, xem `SessionExpiryToast`), **rate limiting** (`src/lib/rate-limit.ts` — in-memory mặc định, có thể swap sang Upstash Redis REST qua `UPSTASH_REDIS_REST_URL`/`UPSTASH_REDIS_REST_TOKEN` trong `.env.example`, xem `src/lib/rate-limit-store.ts`): xem [docs/auth.md](docs/auth.md).
 - **`proxy.ts`** cũng forward header `X-NEXT-INTL-LOCALE` (thay cho middleware gốc của next-intl mà app không dùng) — xem [docs/i18n.md](docs/i18n.md#cách-locale-được-resolve).
 
 ---
