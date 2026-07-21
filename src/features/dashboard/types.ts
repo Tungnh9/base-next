@@ -40,12 +40,12 @@ export const STATUS_LABEL_KEYS: Record<EmployeeStatus, "active" | "inactive" | "
 
 // Same superset-keying idea as STATUS_LABEL_KEYS — maps a status value to the
 // semantic ProgressSegment color used in the dashboard's breakdown bars.
-// "inactive" uses "info" rather than "secondary": in the dark theme,
+// "inactive" uses "danger" rather than "secondary": in the dark theme,
 // --secondary (#3b4261) resolves to the exact same color as --muted
 // (the ProgressStack track background), making a "secondary" segment
 // invisible against its own track.
 export const STATUS_VARIANT: Record<EmployeeStatus, ProgressVariant> = {
   active: "success",
-  inactive: "info",
+  inactive: "danger",
   "on-leave": "warning",
 }
