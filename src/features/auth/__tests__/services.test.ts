@@ -17,16 +17,15 @@ vi.mock("../api", () => ({
 }))
 
 vi.mock("@/lib/auth", () => ({
-  signToken: vi.fn(),
-  setSessionCookie: vi.fn(),
-  clearSessionCookie: vi.fn(),
+  setSession: vi.fn(),
+  clearSession: vi.fn(),
   getSession: vi.fn(),
   verifyToken: vi.fn(),
 }))
 
 import { authService, AuthError } from "../services"
 import { authApi } from "../api"
-import { signToken, setSessionCookie, clearSessionCookie } from "@/lib/auth"
+import { setSession, clearSession } from "@/lib/auth"
 
 const mockLogin = vi.mocked(authApi.login)
 const mockRegister = vi.mocked(authApi.register)
@@ -34,9 +33,8 @@ const mockForgotPassword = vi.mocked(authApi.forgotPassword)
 const mockResetPassword = vi.mocked(authApi.resetPassword)
 const mockVerifyForgotPasswordCode = vi.mocked(authApi.verifyForgotPasswordCode)
 const mockVerifyTwoStep = vi.mocked(authApi.verifyTwoStep)
-const mockSignToken = vi.mocked(signToken)
-const mockSetSessionCookie = vi.mocked(setSessionCookie)
-const mockClearSessionCookie = vi.mocked(clearSessionCookie)
+const mockSetSession = vi.mocked(setSession)
+const mockClearSession = vi.mocked(clearSession)
 
 // Minimal User fixture
 const mockUser = {
@@ -57,19 +55,14 @@ describe("authService.login", () => {
       data: { token: "backend-access-token", user: mockUser, requiresTwoFactor: false },
       error: null,
     })
-    mockSignToken.mockResolvedValue("signed-session-jwt")
 
     const result = await authService.login({ email: "user@example.com", password: "pass123" })
 
     expect(result.requiresTwoFactor).toBe(false)
-    expect(mockSignToken).toHaveBeenCalledWith(
-      expect.objectContaining({
-        userId: "user-1",
-        email: "user@example.com",
-        accessToken: "backend-access-token",
-      })
+    expect(mockSetSession).toHaveBeenCalledWith(
+      expect.objectContaining({ userId: "user-1", email: "user@example.com" }),
+      "backend-access-token"
     )
-    expect(mockSetSessionCookie).toHaveBeenCalledWith("signed-session-jwt")
   })
 
   it("returns requiresTwoFactor=true and skips session cookie", async () => {
@@ -87,7 +80,7 @@ describe("authService.login", () => {
 
     expect(result.requiresTwoFactor).toBe(true)
     expect(result.twoFactorPhone).toBe("+84912345678")
-    expect(mockSetSessionCookie).not.toHaveBeenCalled()
+    expect(mockSetSession).not.toHaveBeenCalled()
   })
 
   it("throws AuthError when API returns an error", async () => {
@@ -121,7 +114,6 @@ describe("authService.register", () => {
       data: { token: "access-token", user: mockUser },
       error: null,
     })
-    mockSignToken.mockResolvedValue("session-jwt")
 
     await authService.register({
       username: "johndoe",
@@ -129,10 +121,10 @@ describe("authService.register", () => {
       password: "pass123",
     })
 
-    expect(mockSignToken).toHaveBeenCalledWith(
-      expect.objectContaining({ userId: "user-1", email: "user@example.com" })
+    expect(mockSetSession).toHaveBeenCalledWith(
+      expect.objectContaining({ userId: "user-1", email: "user@example.com" }),
+      "access-token"
     )
-    expect(mockSetSessionCookie).toHaveBeenCalledWith("session-jwt")
   })
 
   it("throws AuthError on API error", async () => {
@@ -242,19 +234,14 @@ describe("authService.verifyTwoStep", () => {
       data: { token: "backend-access-token", user: mockUser },
       error: null,
     })
-    mockSignToken.mockResolvedValue("signed-session-jwt")
 
     const user = await authService.verifyTwoStep("230320")
 
     expect(user).toEqual(mockUser)
-    expect(mockSignToken).toHaveBeenCalledWith(
-      expect.objectContaining({
-        userId: "user-1",
-        email: "user@example.com",
-        accessToken: "backend-access-token",
-      })
+    expect(mockSetSession).toHaveBeenCalledWith(
+      expect.objectContaining({ userId: "user-1", email: "user@example.com" }),
+      "backend-access-token"
     )
-    expect(mockSetSessionCookie).toHaveBeenCalledWith("signed-session-jwt")
   })
 
   it("throws AuthError when the code is rejected", async () => {
@@ -264,7 +251,7 @@ describe("authService.verifyTwoStep", () => {
     })
 
     await expect(authService.verifyTwoStep("000000")).rejects.toThrow(AuthError)
-    expect(mockSetSessionCookie).not.toHaveBeenCalled()
+    expect(mockSetSession).not.toHaveBeenCalled()
   })
 })
 
@@ -272,10 +259,10 @@ describe("authService.verifyTwoStep", () => {
 
 describe("authService.logout", () => {
   it("clears session cookie", async () => {
-    mockClearSessionCookie.mockResolvedValue(undefined)
+    mockClearSession.mockResolvedValue(undefined)
 
     await authService.logout()
 
-    expect(mockClearSessionCookie).toHaveBeenCalledOnce()
+    expect(mockClearSession).toHaveBeenCalledOnce()
   })
 })

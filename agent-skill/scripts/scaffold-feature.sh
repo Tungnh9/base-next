@@ -21,7 +21,7 @@ fi
 FEATURE_PASCAL=$(echo "$FEATURE_NAME" | sed -r 's/(^|-)([a-z])/\U\2/g')
 
 FEATURE_DIR="src/features/$FEATURE_NAME"
-ROUTE_DIR="src/app/\[locale\]/(protected)/$FEATURE_NAME"
+ROUTE_DIR="src/app/[locale]/(protected)/$FEATURE_NAME"
 
 echo "Scaffolding feature: $FEATURE_NAME ($FEATURE_PASCAL)..." >&2
 
@@ -120,7 +120,7 @@ import { useTranslations } from "next-intl";
 import { get${FEATURE_PASCAL}List } from "../api";
 
 export async function ${FEATURE_PASCAL}List() {
-  const t = useTranslations("${FEATURE_PASCAL}");
+  const t = useTranslations("${FEATURE_NAME}");
   const { data, error } = await get${FEATURE_PASCAL}List();
 
   if (error) {
@@ -168,7 +168,7 @@ echo "  Created route page.tsx" >&2
 # ─── i18n keys reminder ───────────────────────────────────────────────────────
 echo "" >&2
 echo "  ⚠ Nhớ thêm i18n keys vào messages/vi.json và messages/en.json:" >&2
-echo '  "'$FEATURE_PASCAL'": {' >&2
+echo '  "'$FEATURE_NAME'": {' >&2
 echo '    "title": "...", "empty": "...", "error": { "loadFailed": "..." }' >&2
 echo '  }' >&2
 

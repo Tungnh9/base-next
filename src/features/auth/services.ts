@@ -1,4 +1,4 @@
-import { signToken, setSessionCookie, clearSessionCookie } from "@/lib/auth"
+import { setSession, clearSession } from "@/lib/auth"
 import { ROUTES } from "@/lib/constants"
 import { authApi } from "./api"
 import type { LoginInput, RegisterInput } from "./schemas"
@@ -27,14 +27,10 @@ export const authService = {
       return { requiresTwoFactor: true, twoFactorPhone: data.twoFactorPhone }
     }
 
-    const token = await signToken({
-      userId: data.user.id,
-      email: data.user.email,
-      name: data.user.name,
-      role: data.user.role,
-      accessToken: data.token,
-    })
-    await setSessionCookie(token)
+    await setSession(
+      { userId: data.user.id, email: data.user.email, name: data.user.name, role: data.user.role },
+      data.token
+    )
 
     return { requiresTwoFactor: false, user: data.user }
   },
@@ -45,14 +41,10 @@ export const authService = {
     if (error) throw new AuthError(error.message, "REGISTER_FAILED")
     if (!data?.user) throw new AuthError("Unexpected response from server", "INVALID_RESPONSE")
 
-    const token = await signToken({
-      userId: data.user.id,
-      email: data.user.email,
-      name: data.user.name,
-      role: data.user.role,
-      accessToken: data.token,
-    })
-    await setSessionCookie(token)
+    await setSession(
+      { userId: data.user.id, email: data.user.email, name: data.user.name, role: data.user.role },
+      data.token
+    )
   },
 
   getLoginRedirect(): string {
@@ -90,13 +82,13 @@ export const authService = {
 
   async logout(): Promise<void> {
     // Best-effort: notify backend to invalidate the access token.
-    // Always clear the local cookie regardless of backend response.
+    // Always clear the local cookies regardless of backend response.
     try {
       await authApi.logout()
     } catch {
-      // ignore — local cookie must still be cleared
+      // ignore — local cookies must still be cleared
     }
-    await clearSessionCookie()
+    await clearSession()
   },
 
   async resendVerificationEmail(email: string): Promise<void> {
@@ -110,14 +102,10 @@ export const authService = {
     if (error) throw new AuthError(error.message, "VERIFY_TWO_STEP_FAILED")
     if (!data?.user) throw new AuthError("Unexpected response from server", "INVALID_RESPONSE")
 
-    const token = await signToken({
-      userId: data.user.id,
-      email: data.user.email,
-      name: data.user.name,
-      role: data.user.role,
-      accessToken: data.token,
-    })
-    await setSessionCookie(token)
+    await setSession(
+      { userId: data.user.id, email: data.user.email, name: data.user.name, role: data.user.role },
+      data.token
+    )
 
     return data.user
   },

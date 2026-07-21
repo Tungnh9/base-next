@@ -5,17 +5,19 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { Slider as SliderPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
+import { COLOR_VARIANT_CLASSES } from "./color-variants"
 
-// ─── Shared color variant map ─────────────────────────────────────────────────
-
+// Slider's public variant prop uses "default" (not "secondary") for the
+// neutral color — keep that key name (changing it would be a breaking API
+// change for existing callers) while reusing the shared class strings.
 const COLOR_VARIANTS = {
-  default:   "bg-secondary",
-  primary:   "bg-primary",
-  success:   "bg-success",
-  danger:    "bg-destructive",
-  warning:   "bg-warning",
-  info:      "bg-info",
-  dark:      "bg-foreground",
+  default: COLOR_VARIANT_CLASSES.secondary,
+  primary: COLOR_VARIANT_CLASSES.primary,
+  success: COLOR_VARIANT_CLASSES.success,
+  danger: COLOR_VARIANT_CLASSES.danger,
+  warning: COLOR_VARIANT_CLASSES.warning,
+  info: COLOR_VARIANT_CLASSES.info,
+  dark: COLOR_VARIANT_CLASSES.dark,
 } as const
 
 // ─── Range fill ───────────────────────────────────────────────────────────────
@@ -33,9 +35,9 @@ const sliderThumbVariants = cva(
     variants: {
       variant: COLOR_VARIANTS,
       size: {
-        sm:      "size-2.5",
+        sm: "size-2.5",
         default: "size-3.5",
-        lg:      "size-[18px]",
+        lg: "size-[18px]",
       },
     },
     defaultVariants: { variant: "primary", size: "default" },
@@ -45,9 +47,9 @@ const sliderThumbVariants = cva(
 // ─── Track thickness per size ─────────────────────────────────────────────────
 
 const TRACK_THICKNESS: Record<SliderSize, { h: string; w: string }> = {
-  sm:      { h: "h-0.5", w: "w-0.5" },
-  default: { h: "h-1",   w: "w-1"   },
-  lg:      { h: "h-1.5", w: "w-1.5" },
+  sm: { h: "h-0.5", w: "w-0.5" },
+  default: { h: "h-1", w: "w-1" },
+  lg: { h: "h-1.5", w: "w-1.5" },
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -59,18 +61,18 @@ function valuePct(v: number, min: number, max: number): number {
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type SliderVariant = keyof typeof COLOR_VARIANTS
-type SliderSize    = "sm" | "default" | "lg"
+type SliderSize = "sm" | "default" | "lg"
 
 type SliderProps = Omit<React.ComponentProps<typeof SliderPrimitive.Root>, "orientation"> & {
-  variant?:     SliderVariant
-  size?:        SliderSize
+  variant?: SliderVariant
+  size?: SliderSize
   orientation?: "horizontal" | "vertical"
   /** Show floating value labels above (horizontal) or beside (vertical) each thumb */
-  showLabel?:   boolean
+  showLabel?: boolean
   /** Show tick marks with numeric scale */
-  showTicks?:   boolean
+  showTicks?: boolean
   /** Interval between ticks; defaults to (max - min) / 10 */
-  tickStep?:    number
+  tickStep?: number
   /** Format each thumb label; defaults to String */
   formatLabel?: (v: number) => string
 }
@@ -79,16 +81,16 @@ type SliderProps = Omit<React.ComponentProps<typeof SliderPrimitive.Root>, "orie
 
 function Slider({
   className,
-  variant     = "primary",
-  size        = "default",
+  variant = "primary",
+  size = "default",
   orientation = "horizontal",
-  showLabel   = false,
-  showTicks   = false,
+  showLabel = false,
+  showTicks = false,
   tickStep,
   formatLabel = String,
-  min         = 0,
-  max         = 100,
-  step        = 1,
+  min = 0,
+  max = 100,
+  step = 1,
   value,
   defaultValue,
   onValueChange,
@@ -129,15 +131,11 @@ function Slider({
         isVertical
           ? cn(
               "inline-flex h-full flex-row items-center",
-              showTicks  && "pl-12",
-              showLabel  && "pr-14",
-              (showTicks || showLabel) && "py-3",
+              showTicks && "pl-12",
+              showLabel && "pr-14",
+              (showTicks || showLabel) && "py-3"
             )
-          : cn(
-              "flex w-full flex-col",
-              showLabel  && "pt-7",
-              showTicks  && "pb-6",
-            ),
+          : cn("flex w-full flex-col", showLabel && "pt-7", showTicks && "pb-6"),
         className
       )}
     >
@@ -155,7 +153,7 @@ function Slider({
             return (
               <span
                 key={i}
-                className="absolute flex items-center justify-center rounded bg-foreground text-[10px] font-medium leading-none px-1.5 py-1 whitespace-nowrap"
+                className="bg-foreground absolute flex items-center justify-center rounded px-1.5 py-1 text-[10px] leading-none font-medium whitespace-nowrap"
                 style={{
                   color: "var(--background)",
                   ...(isVertical
@@ -181,7 +179,7 @@ function Slider({
         defaultValue={defaultValue ?? [min]}
         onValueChange={handleValueChange}
         className={cn(
-          "relative flex touch-none select-none items-center",
+          "relative flex touch-none items-center select-none",
           isVertical ? "h-full flex-col" : "w-full"
         )}
         {...props}
@@ -189,7 +187,7 @@ function Slider({
         <SliderPrimitive.Track
           data-slot="slider-track"
           className={cn(
-            "relative grow overflow-hidden rounded-full bg-muted",
+            "bg-muted relative grow overflow-hidden rounded-full",
             isVertical ? tt.w : tt.h
           )}
         >
@@ -225,24 +223,20 @@ function Slider({
                 className={cn(
                   "absolute flex items-center gap-0.5",
                   isVertical
-                    ? "flex-row -translate-y-1/2"
-                    : "flex-col items-center -translate-x-1/2"
+                    ? "-translate-y-1/2 flex-row"
+                    : "-translate-x-1/2 flex-col items-center"
                 )}
-                style={
-                  isVertical
-                    ? { bottom: `${p}%`, right: 0 }
-                    : { left: `${p}%`, top: 0 }
-                }
+                style={isVertical ? { bottom: `${p}%`, right: 0 } : { left: `${p}%`, top: 0 }}
               >
                 {isVertical ? (
                   <>
-                    <span className="text-[10px] text-muted-foreground leading-none">{v}</span>
-                    <span className="block shrink-0 rounded-full bg-muted-foreground/40 h-px w-2" />
+                    <span className="text-muted-foreground text-[10px] leading-none">{v}</span>
+                    <span className="bg-muted-foreground/40 block h-px w-2 shrink-0 rounded-full" />
                   </>
                 ) : (
                   <>
-                    <span className="block shrink-0 rounded-full bg-muted-foreground/40 w-px h-1.5" />
-                    <span className="text-[10px] text-muted-foreground leading-none">{v}</span>
+                    <span className="bg-muted-foreground/40 block h-1.5 w-px shrink-0 rounded-full" />
+                    <span className="text-muted-foreground text-[10px] leading-none">{v}</span>
                   </>
                 )}
               </span>

@@ -1,5 +1,6 @@
 export { CustomerList } from "./components/customer-list"
 export { CustomerForm } from "./components/customer-form"
+export { CustomerDetail } from "./components/customer-detail"
 export { useCustomers } from "./hooks/use-customers"
 export * from "./types"
 export * from "./schemas"

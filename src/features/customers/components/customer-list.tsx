@@ -1,8 +1,9 @@
 "use client"
 
 import { useState, type MouseEvent } from "react"
-import { useTranslations } from "next-intl"
-import { Plus, Pencil, Trash2 } from "lucide-react"
+import Link from "next/link"
+import { useTranslations, useLocale } from "next-intl"
+import { Plus, Eye, Pencil, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
@@ -18,6 +19,7 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog"
+import { ROUTES } from "@/lib/constants"
 import { useCustomers } from "../hooks/use-customers"
 import { CustomerForm } from "./customer-form"
 import type { Customer } from "../types"
@@ -26,6 +28,7 @@ import type { CreateCustomerFormValues } from "../schemas"
 export function CustomerList() {
   const t = useTranslations("customers")
   const tCommon = useTranslations("common")
+  const locale = useLocale()
   const { customers, isLoading, handleCreate, handleUpdate, handleDelete, handleDeleteMany } =
     useCustomers()
 
@@ -178,7 +181,14 @@ export function CustomerList() {
                       aria-label={t("selectRow", { name: customer.name })}
                     />
                   </td>
-                  <td className="px-4 py-3 font-medium">{customer.name}</td>
+                  <td className="px-4 py-3 font-medium">
+                    <Link
+                      href={`/${locale}${ROUTES.customers}/${customer.id}`}
+                      className="hover:text-primary hover:underline"
+                    >
+                      {customer.name}
+                    </Link>
+                  </td>
                   <td className="text-muted-foreground px-4 py-3">{customer.email}</td>
                   <td className="text-muted-foreground px-4 py-3">{customer.phone}</td>
                   <td className="text-muted-foreground px-4 py-3">{customer.company}</td>
@@ -195,6 +205,11 @@ export function CustomerList() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-1">
+                      <Button variant="ghost" size="icon" aria-label={t("view")} asChild>
+                        <Link href={`/${locale}${ROUTES.customers}/${customer.id}`}>
+                          <Eye className="size-4" />
+                        </Link>
+                      </Button>
                       <Button
                         variant="ghost"
                         size="icon"

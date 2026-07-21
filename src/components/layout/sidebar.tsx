@@ -44,8 +44,12 @@ export function Sidebar({ role }: SidebarProps) {
       )}
       <aside
         className={cn(
-          "bg-sidebar sticky top-0 flex h-dvh shrink-0 flex-col shadow-[0px_2px_4px_0px_rgba(165,163,174,0.3)] transition-[width] duration-200 ease-in-out",
-          "fixed inset-y-0 left-0 z-50 lg:relative lg:z-auto",
+          // The (protected) layout shell is now a fixed h-dvh/overflow-hidden
+          // container with its own scrolling content pane (ScrollArea) — it
+          // never scrolls itself, so the sidebar just needs to fill it (h-full)
+          // with no sticky/fixed positioning at desktop widths at all.
+          "bg-sidebar flex h-full shrink-0 flex-col shadow-[0px_2px_4px_0px_rgba(165,163,174,0.3)] transition-[width] duration-200 ease-in-out",
+          "z-50 max-lg:fixed max-lg:inset-y-0 max-lg:left-0",
           sidebarOpen ? "flex" : "hidden lg:flex",
           sidebarCollapsed ? "w-[84px]" : "w-[260px]"
         )}

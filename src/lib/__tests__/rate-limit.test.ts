@@ -13,76 +13,76 @@ describe("rate-limit", () => {
     vi.useRealTimers()
   })
 
-  it("allows attempts up to the configured max", () => {
+  it("allows attempts up to the configured max", async () => {
     const key = "allows-up-to-max@example.com"
 
-    expect(checkRateLimit(key, CONFIG).allowed).toBe(true)
-    recordFailedAttempt(key, CONFIG)
-    expect(checkRateLimit(key, CONFIG).allowed).toBe(true)
-    recordFailedAttempt(key, CONFIG)
-    expect(checkRateLimit(key, CONFIG).allowed).toBe(true)
-    recordFailedAttempt(key, CONFIG)
+    expect((await checkRateLimit(key, CONFIG)).allowed).toBe(true)
+    await recordFailedAttempt(key, CONFIG)
+    expect((await checkRateLimit(key, CONFIG)).allowed).toBe(true)
+    await recordFailedAttempt(key, CONFIG)
+    expect((await checkRateLimit(key, CONFIG)).allowed).toBe(true)
+    await recordFailedAttempt(key, CONFIG)
   })
 
-  it("denies the (max+1)th attempt within the window", () => {
+  it("denies the (max+1)th attempt within the window", async () => {
     const key = "denies-over-max@example.com"
 
-    for (let i = 0; i < CONFIG.max; i++) recordFailedAttempt(key, CONFIG)
+    for (let i = 0; i < CONFIG.max; i++) await recordFailedAttempt(key, CONFIG)
 
-    const result = checkRateLimit(key, CONFIG)
+    const result = await checkRateLimit(key, CONFIG)
     expect(result.allowed).toBe(false)
     expect(result.remaining).toBe(0)
     expect(result.retryAfterMs).toBeGreaterThan(0)
   })
 
-  it("retryAfterMs shrinks as time advances toward the window reset", () => {
+  it("retryAfterMs shrinks as time advances toward the window reset", async () => {
     const key = "retry-after-shrinks@example.com"
-    for (let i = 0; i < CONFIG.max; i++) recordFailedAttempt(key, CONFIG)
+    for (let i = 0; i < CONFIG.max; i++) await recordFailedAttempt(key, CONFIG)
 
-    const first = checkRateLimit(key, CONFIG).retryAfterMs
+    const first = (await checkRateLimit(key, CONFIG)).retryAfterMs
     vi.advanceTimersByTime(30_000)
-    const second = checkRateLimit(key, CONFIG).retryAfterMs
+    const second = (await checkRateLimit(key, CONFIG)).retryAfterMs
 
     expect(second).toBeLessThan(first)
   })
 
-  it("re-allows a denied key once the window elapses", () => {
+  it("re-allows a denied key once the window elapses", async () => {
     const key = "reallows-after-window@example.com"
-    for (let i = 0; i < CONFIG.max; i++) recordFailedAttempt(key, CONFIG)
-    expect(checkRateLimit(key, CONFIG).allowed).toBe(false)
+    for (let i = 0; i < CONFIG.max; i++) await recordFailedAttempt(key, CONFIG)
+    expect((await checkRateLimit(key, CONFIG)).allowed).toBe(false)
 
     vi.advanceTimersByTime(CONFIG.windowMs + 1)
 
-    expect(checkRateLimit(key, CONFIG).allowed).toBe(true)
+    expect((await checkRateLimit(key, CONFIG)).allowed).toBe(true)
   })
 
-  it("resetRateLimit immediately re-allows a key that was at its limit", () => {
+  it("resetRateLimit immediately re-allows a key that was at its limit", async () => {
     const key = "reset-reallows@example.com"
-    for (let i = 0; i < CONFIG.max; i++) recordFailedAttempt(key, CONFIG)
-    expect(checkRateLimit(key, CONFIG).allowed).toBe(false)
+    for (let i = 0; i < CONFIG.max; i++) await recordFailedAttempt(key, CONFIG)
+    expect((await checkRateLimit(key, CONFIG)).allowed).toBe(false)
 
-    resetRateLimit(key)
+    await resetRateLimit(key)
 
-    const result = checkRateLimit(key, CONFIG)
+    const result = await checkRateLimit(key, CONFIG)
     expect(result.allowed).toBe(true)
     expect(result.remaining).toBe(CONFIG.max)
   })
 
-  it("recordFailedAttempt on an unknown key starts a fresh bucket with count 1", () => {
+  it("recordFailedAttempt on an unknown key starts a fresh bucket with count 1", async () => {
     const key = "fresh-bucket@example.com"
-    recordFailedAttempt(key, CONFIG)
+    await recordFailedAttempt(key, CONFIG)
 
-    const result = checkRateLimit(key, CONFIG)
+    const result = await checkRateLimit(key, CONFIG)
     expect(result.allowed).toBe(true)
     expect(result.remaining).toBe(CONFIG.max - 1)
   })
 
-  it("tracks separate keys independently", () => {
+  it("tracks separate keys independently", async () => {
     const keyA = "independent-a@example.com"
     const keyB = "independent-b@example.com"
-    for (let i = 0; i < CONFIG.max; i++) recordFailedAttempt(keyA, CONFIG)
+    for (let i = 0; i < CONFIG.max; i++) await recordFailedAttempt(keyA, CONFIG)
 
-    expect(checkRateLimit(keyA, CONFIG).allowed).toBe(false)
-    expect(checkRateLimit(keyB, CONFIG).allowed).toBe(true)
+    expect((await checkRateLimit(keyA, CONFIG)).allowed).toBe(false)
+    expect((await checkRateLimit(keyB, CONFIG)).allowed).toBe(true)
   })
 })

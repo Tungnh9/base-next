@@ -3,6 +3,7 @@
 import { useEffect } from "react"
 import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
+import { logger } from "@/lib/logger"
 
 interface ErrorProps {
   error: Error & { digest?: string }
@@ -13,7 +14,7 @@ export default function Error({ error, reset }: ErrorProps) {
   const t = useTranslations("common")
 
   useEffect(() => {
-    console.error(error)
+    logger.error("Unhandled render error", error)
   }, [error])
 
   return (

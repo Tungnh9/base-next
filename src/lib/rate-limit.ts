@@ -1,8 +1,11 @@
-// In-memory fixed-window rate limiter — no external store, appropriate for
-// this template's single-instance/demo stage. Resets on server restart and
-// does not synchronize across multiple instances/replicas. When a real
-// backend/multi-instance deployment exists, swap the internals for a shared
-// store (e.g. Upstash Redis) while keeping these same function signatures.
+// Fixed-window rate limiter. The backing store is pluggable — see
+// src/lib/rate-limit-store.ts — defaulting to an in-memory Map (appropriate
+// for this template's single-instance/demo stage; resets on server restart
+// and does not synchronize across multiple instances/replicas) with an
+// optional Upstash Redis REST store for shared, multi-instance deployments.
+
+import { headers } from "next/headers"
+import { getRateLimitStore } from "./rate-limit-store"
 
 export interface RateLimitConfig {
   windowMs: number
@@ -15,25 +18,13 @@ export interface RateLimitResult {
   retryAfterMs: number
 }
 
-interface Bucket {
-  count: number
-  resetAt: number
-}
-
-const buckets = new Map<string, Bucket>()
-
-// Opportunistic cleanup so the Map can't grow unbounded from one-off
-// identifiers — bounded by "distinct identifiers active within the last window".
-function sweep(now: number): void {
-  for (const [key, bucket] of buckets) {
-    if (now >= bucket.resetAt) buckets.delete(key)
-  }
-}
-
-export function checkRateLimit(key: string, config: RateLimitConfig): RateLimitResult {
+export async function checkRateLimit(
+  key: string,
+  config: RateLimitConfig
+): Promise<RateLimitResult> {
   const now = Date.now()
-  const bucket = buckets.get(key)
-  if (!bucket || now >= bucket.resetAt) {
+  const bucket = await getRateLimitStore().get(key, now)
+  if (!bucket) {
     return { allowed: true, remaining: config.max, retryAfterMs: 0 }
   }
   if (bucket.count >= config.max) {
@@ -42,17 +33,22 @@ export function checkRateLimit(key: string, config: RateLimitConfig): RateLimitR
   return { allowed: true, remaining: config.max - bucket.count, retryAfterMs: 0 }
 }
 
-export function recordFailedAttempt(key: string, config: RateLimitConfig): void {
+export async function recordFailedAttempt(key: string, config: RateLimitConfig): Promise<void> {
   const now = Date.now()
-  sweep(now)
-  const bucket = buckets.get(key)
-  if (!bucket || now >= bucket.resetAt) {
-    buckets.set(key, { count: 1, resetAt: now + config.windowMs })
-    return
-  }
-  bucket.count += 1
+  await getRateLimitStore().increment(key, config.windowMs, now)
 }
 
-export function resetRateLimit(key: string): void {
-  buckets.delete(key)
+export async function resetRateLimit(key: string): Promise<void> {
+  await getRateLimitStore().delete(key)
+}
+
+// Best-effort client identifier for actions with no other natural rate-limit
+// key (e.g. 2FA code verification, which only receives the OTP itself).
+// Trusts x-forwarded-for/x-real-ip as set by the platform's edge proxy —
+// fine for throttling abuse, not meant as a strong client identity.
+export async function getClientIp(): Promise<string> {
+  const h = await headers()
+  const forwardedFor = h.get("x-forwarded-for")
+  if (forwardedFor) return forwardedFor.split(",")[0].trim()
+  return h.get("x-real-ip") ?? "unknown"
 }

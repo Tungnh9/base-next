@@ -62,14 +62,12 @@ async function execute<T>(
 }
 
 // Server-side calls (Server Actions, Route Handlers)
-// Reads session JWT from cookie, extracts the backend accessToken stored within
+// Reads the backend access token from its own cookie (kept separate from the
+// session-identity JWT — see src/lib/auth.ts for why).
 export async function serverApi<T>(path: string, init?: RequestInit): Promise<ApiResponse<T>> {
-  const { cookies } = await import("next/headers")
-  const { verifyToken } = await import("@/lib/auth")
-  const cookieStore = await cookies()
-  const sessionJwt = cookieStore.get(env.SESSION_COOKIE_NAME)?.value
-  const session = sessionJwt ? await verifyToken(sessionJwt) : null
-  return execute<T>(serverHttpClient, path, init, session?.accessToken)
+  const { getAccessToken } = await import("@/lib/auth")
+  const accessToken = await getAccessToken()
+  return execute<T>(serverHttpClient, path, init, accessToken)
 }
 
 // Client-side calls (React components)

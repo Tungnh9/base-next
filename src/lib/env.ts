@@ -1,4 +1,8 @@
 import { z } from "zod"
+// Relative, not "@/lib/logger" — next.config.ts imports this file for
+// build-time validation, and next-config-ts's transpile step doesn't
+// reliably resolve tsconfig path aliases (same class of issue as proxy.ts).
+import { logger } from "./logger"
 
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
@@ -26,12 +30,24 @@ const envSchema = z.object({
     .string()
     .optional()
     .transform((v) => v === "true"),
+
+  // Optional shared rate-limit store (see src/lib/rate-limit-store.ts). When
+  // both are set, rate limiting uses Upstash Redis over its REST API instead
+  // of the in-memory fallback. Empty-string is treated as unset — the
+  // natural state after copying .env.example and leaving these blank, which
+  // a bare z.string().url().optional() would otherwise reject and break the
+  // build for.
+  UPSTASH_REDIS_REST_URL: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z.string().url().optional()
+  ),
+  UPSTASH_REDIS_REST_TOKEN: z.preprocess((v) => (v === "" ? undefined : v), z.string().optional()),
 })
 
 const parsed = envSchema.safeParse(process.env)
 
 if (!parsed.success) {
-  console.error("❌ Invalid environment variables:", parsed.error.flatten().fieldErrors)
+  logger.error("Invalid environment variables", parsed.error.flatten().fieldErrors)
   throw new Error("Invalid environment configuration. See above for details.")
 }
 

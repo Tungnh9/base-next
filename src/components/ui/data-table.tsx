@@ -10,21 +10,42 @@ import {
   type SortingState,
   type RowSelectionState,
 } from "@tanstack/react-table"
-import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react"
+import { ChevronUp, ChevronDown, ChevronsUpDown, ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
   Table,
   TableHeader,
   TableBody,
+  TableFooter,
   TableRow,
   TableHead,
   TableCell,
 } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type { ColumnDef as DataTableColumnDef }
+
+// Approximate default-density row height (TableCell's py-3 padding + text-sm
+// line-height + border) — used to reserve space so a shorter last page
+// doesn't visibly collapse the table. Adjust if the default density changes.
+const DEFAULT_ROW_HEIGHT_REM = 2.75
+
+export interface DataTablePaginationProps {
+  /** 1-based current page — matches PaginatedResponse.page, not TanStack's 0-based index */
+  page: number
+  totalPages: number
+  /** Rows per full page — used to size loading skeletons and to reserve height on shorter pages */
+  pageSize: number
+  onPageChange: (page: number) => void
+  previousLabel: string
+  nextLabel: string
+  /** Pre-formatted by the caller (e.g. via next-intl) — DataTable renders it as-is */
+  summary?: string
+}
 
 interface DataTableProps<TData> {
   columns: ColumnDef<TData>[]
@@ -41,6 +62,14 @@ interface DataTableProps<TData> {
   bordered?: boolean
   /** Message shown when data is empty */
   emptyMessage?: string
+  /** Shows skeleton placeholder rows instead of `data`/`emptyMessage` */
+  isLoading?: boolean
+  /** Server-side pagination controls — omit for an unpaginated table */
+  pagination?: DataTablePaginationProps
+  /** Aria-label for the header "select all" checkbox (only used when selectable) */
+  selectAllLabel?: string
+  /** Aria-label for each row's checkbox, given its data (only used when selectable) */
+  getRowSelectLabel?: (row: TData) => string
   className?: string
 }
 
@@ -55,38 +84,69 @@ function DataTable<TData>({
   hoverable = true,
   bordered = true,
   emptyMessage = "No results.",
+  isLoading = false,
+  pagination,
+  selectAllLabel = "Select all",
+  getRowSelectLabel = () => "Select row",
   className,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
 
-  // Prepend selection column when selectable
-  const selectionColumn: ColumnDef<TData> = {
-    id: "__select__",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected()
-            ? true
-            : table.getIsSomePageRowsSelected()
-              ? "indeterminate"
-              : false
-        }
-        onCheckedChange={(v) => table.toggleAllPageRowsSelected(!!v)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(v) => row.toggleSelected(!!v)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-  }
+  // Read via a ref (not a dependency) so this only re-fires when the
+  // selection itself changes — depending on `data` directly would re-fire on
+  // every render whenever a caller passes a non-memoized array (e.g. an
+  // inline `isLoading ? [] : rows` ternary), an infinite loop since
+  // onSelectionChange([]) triggers a parent state update every time.
+  const dataRef = React.useRef(data)
+  React.useEffect(() => {
+    dataRef.current = data
+  })
 
-  const allColumns: ColumnDef<TData>[] = selectable ? [selectionColumn, ...columns] : columns
+  React.useEffect(() => {
+    if (!onSelectionChange) return
+    const selected = Object.keys(rowSelection)
+      .filter((k) => rowSelection[k])
+      .map((k) => dataRef.current[Number(k)])
+      .filter(Boolean)
+    onSelectionChange(selected)
+    // onSelectionChange intentionally excluded — including it would let a new
+    // inline callback identity from the caller re-fire this on every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rowSelection])
+
+  // Prepend selection column when selectable — memoized so its object/array
+  // identity stays stable across renders (a fresh columns array every render
+  // was defeating @tanstack/react-table's row-model memoization).
+  const allColumns = React.useMemo<ColumnDef<TData>[]>(() => {
+    if (!selectable) return columns
+    const selectionColumn: ColumnDef<TData> = {
+      id: "__select__",
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected()
+              ? true
+              : table.getIsSomePageRowsSelected()
+                ? "indeterminate"
+                : false
+          }
+          onCheckedChange={(v) => table.toggleAllPageRowsSelected(!!v)}
+          aria-label={selectAllLabel}
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(v) => row.toggleSelected(!!v)}
+          aria-label={getRowSelectLabel(row.original)}
+        />
+      ),
+      enableSorting: false,
+    }
+    return [selectionColumn, ...columns]
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- selectAllLabel/getRowSelectLabel intentionally excluded: recreating the whole column set just because a label string changed identity would defeat the memoization this fixes
+  }, [selectable, columns])
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
@@ -94,17 +154,7 @@ function DataTable<TData>({
     columns: allColumns,
     state: { sorting, rowSelection },
     onSortingChange: setSorting,
-    onRowSelectionChange: (updater) => {
-      const next = typeof updater === "function" ? updater(rowSelection) : updater
-      setRowSelection(next)
-      if (onSelectionChange) {
-        const selected = Object.keys(next)
-          .filter((k) => next[k])
-          .map((k) => data[Number(k)])
-          .filter(Boolean)
-        onSelectionChange(selected)
-      }
-    },
+    onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     enableRowSelection: selectable,
@@ -149,19 +199,30 @@ function DataTable<TData>({
         ))}
       </TableHeader>
 
-      <TableBody>
-        {table.getRowModel().rows.length > 0 ? (
+      <TableBody
+        style={
+          pagination && !isLoading && table.getRowModel().rows.length < pagination.pageSize
+            ? { minHeight: `${DEFAULT_ROW_HEIGHT_REM * pagination.pageSize}rem` }
+            : undefined
+        }
+      >
+        {isLoading ? (
+          Array.from({ length: pagination?.pageSize ?? 5 }).map((_, i) => (
+            <TableRow key={`skeleton-${i}`} className="hover:bg-transparent">
+              {allColumns.map((_col, j) => (
+                <TableCell key={j}>
+                  <Skeleton className="h-4 w-full" />
+                </TableCell>
+              ))}
+            </TableRow>
+          ))
+        ) : table.getRowModel().rows.length > 0 ? (
           table.getRowModel().rows.map((row) => (
-            <TableRow
-              key={row.id}
-              data-selected={row.getIsSelected()}
-              onClick={() => selectable && row.toggleSelected()}
-            >
+            <TableRow key={row.id} data-selected={row.getIsSelected()}>
               {row.getVisibleCells().map((cell) => (
                 <TableCell
                   key={cell.id}
                   className={cn(cell.column.id === "__select__" && "w-10 pr-3")}
-                  onClick={cell.column.id === "__select__" ? (e) => e.stopPropagation() : undefined}
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </TableCell>
@@ -179,6 +240,44 @@ function DataTable<TData>({
           </TableRow>
         )}
       </TableBody>
+
+      {pagination && (
+        <TableFooter>
+          <TableRow className="hover:bg-transparent">
+            <TableCell colSpan={allColumns.length}>
+              <div className="flex items-center justify-between gap-3">
+                {pagination.summary ? (
+                  <span className="text-muted-foreground text-xs">{pagination.summary}</span>
+                ) : (
+                  <span />
+                )}
+                <div className="flex items-center gap-1.5">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    aria-label={pagination.previousLabel}
+                    disabled={pagination.page <= 1}
+                    onClick={() => pagination.onPageChange(pagination.page - 1)}
+                  >
+                    <ChevronLeft className="size-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    aria-label={pagination.nextLabel}
+                    disabled={pagination.page >= pagination.totalPages}
+                    onClick={() => pagination.onPageChange(pagination.page + 1)}
+                  >
+                    <ChevronRight className="size-4" />
+                  </Button>
+                </div>
+              </div>
+            </TableCell>
+          </TableRow>
+        </TableFooter>
+      )}
     </Table>
   )
 }

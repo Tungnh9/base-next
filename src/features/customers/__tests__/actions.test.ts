@@ -117,6 +117,17 @@ describe("customers actions — auth guard", () => {
     expect(result).toEqual({ data: [], error: null })
   })
 
+  it("getCustomerById delegates to customerApi.getById when a session exists", async () => {
+    mockRequireSession.mockResolvedValue(mockSession as never)
+    const customer = { id: "1", ...validInput, createdAt: "now" }
+    mockGetById.mockResolvedValue({ data: customer, error: null })
+
+    const result = await getCustomerById("1")
+
+    expect(mockGetById).toHaveBeenCalledWith("1")
+    expect(result).toEqual({ data: customer, error: null })
+  })
+
   it("createCustomer still returns VALIDATION_ERROR for invalid input when a session exists", async () => {
     mockRequireSession.mockResolvedValue(mockSession as never)
 
@@ -146,5 +157,27 @@ describe("customers actions — auth guard", () => {
     await deleteCustomer("42")
 
     expect(mockDelete).toHaveBeenCalledWith("42")
+  })
+
+  it("updateCustomer delegates to customerApi.update with parsed data when a session exists and input is valid", async () => {
+    mockRequireSession.mockResolvedValue(mockSession as never)
+    mockUpdate.mockResolvedValue({
+      data: { id: "1", ...validInput, createdAt: "now" },
+      error: null,
+    })
+
+    const result = await updateCustomer("1", { name: "New Name" })
+
+    expect(mockUpdate).toHaveBeenCalledWith("1", { name: "New Name" })
+    expect(result.error).toBeNull()
+  })
+
+  it("updateCustomer returns VALIDATION_ERROR for invalid input when a session exists", async () => {
+    mockRequireSession.mockResolvedValue(mockSession as never)
+
+    const result = await updateCustomer("1", { email: "not-an-email" } as never)
+
+    expect(result.error?.code).toBe("VALIDATION_ERROR")
+    expect(mockUpdate).not.toHaveBeenCalled()
   })
 })

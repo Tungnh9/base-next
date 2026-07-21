@@ -1,10 +1,20 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useTranslations } from "next-intl"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -27,13 +37,14 @@ interface CustomerFormProps {
 
 export function CustomerForm({ open, onOpenChange, customer, onSubmit }: CustomerFormProps) {
   const t = useTranslations("customers")
+  const [showDiscardConfirm, setShowDiscardConfirm] = useState(false)
 
   const {
     register,
     handleSubmit,
     reset,
     control,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isDirty },
   } = useForm<CreateCustomerFormValues>({
     resolver: zodResolver(createCustomerSchema),
     defaultValues: { status: "active" },
@@ -60,8 +71,20 @@ export function CustomerForm({ open, onOpenChange, customer, onSubmit }: Custome
     if (ok) onOpenChange(false)
   }
 
+  // Radix calls onOpenChange for every close path — Cancel button, Esc,
+  // overlay click, and the built-in X button — so intercepting here (rather
+  // than only the Cancel button's onClick) is the only way to catch all of
+  // them when there are unsaved changes.
+  function handleOpenChange(nextOpen: boolean) {
+    if (!nextOpen && isDirty) {
+      setShowDiscardConfirm(true)
+      return
+    }
+    onOpenChange(nextOpen)
+  }
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader className="border-border border-b py-4">
           <DialogTitle>{customer ? t("form.titleEdit") : t("form.title")}</DialogTitle>
@@ -118,7 +141,7 @@ export function CustomerForm({ open, onOpenChange, customer, onSubmit }: Custome
             {errors.company && <p className="text-destructive text-xs">{errors.company.message}</p>}
           </div>
           <div className="flex justify-end gap-2 pt-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
               {t("form.cancel")}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
@@ -127,6 +150,26 @@ export function CustomerForm({ open, onOpenChange, customer, onSubmit }: Custome
           </div>
         </form>
       </DialogContent>
+
+      <AlertDialog open={showDiscardConfirm} onOpenChange={setShowDiscardConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("form.discardTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("form.discardDescription")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("form.discardCancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setShowDiscardConfirm(false)
+                onOpenChange(false)
+              }}
+            >
+              {t("form.discardConfirm")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   )
 }

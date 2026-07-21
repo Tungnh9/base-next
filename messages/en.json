@@ -27,6 +27,7 @@
     "logoutSuccess": "Logged out successfully",
     "loginFailed": "Login failed, please try again",
     "tooManyAttempts": "Too many failed login attempts, please try again in 10 minutes",
+    "tooManyRequests": "Too many requests, please try again shortly",
     "tryAgainIn": "Try again in {time}",
     "registerFailed": "Registration failed, please try again",
     "registerSuccess": "Registration successful",
@@ -99,6 +100,11 @@
     "forgotPasswordVerifySubtitle": "Enter the 6-digit code sent to your email address",
     "codeVerifiedSuccess": "Verified successfully! Please set a new password."
   },
+  "sessionExpiry": {
+    "title": "Your session is about to expire",
+    "description": "Your session will expire in a few minutes. Please save any work in progress.",
+    "logoutNow": "Log out now"
+  },
   "validation": {
     "emailInvalid": "Invalid email address",
     "passwordMin": "Password must be at least 6 characters",
@@ -122,7 +128,8 @@
     "notFoundDescription": "Oops! 😞 The requested URL was not found on this server.",
     "backToHome": "Back to Home",
     "serverError": "Server error",
-    "unauthorized": "You are not authorized to access this page"
+    "unauthorized": "You are not authorized to access this page",
+    "criticalError": "Something went wrong"
   },
   "carousel": {
     "prevSlide": "Previous slide",
@@ -371,6 +378,7 @@
     "title": "Customers",
     "description": "Manage your customer list",
     "addNew": "Add Customer",
+    "view": "View details",
     "edit": "Edit",
     "delete": "Delete",
     "deleteTitle": "Delete customer",
@@ -382,7 +390,8 @@
     "toast": {
       "deleteSuccess": "Customer deleted",
       "deleteManySuccess": "{count} customers deleted",
-      "deleteManyPartialFail": "Failed to delete {failed}/{total} customers"
+      "deleteManyPartialFail": "Failed to delete {failed}/{total} customers",
+      "updateSuccess": "Updated successfully"
     },
     "columns": {
       "name": "Name",
@@ -409,10 +418,103 @@
       "companyPlaceholder": "Company name",
       "status": "Status",
       "submit": "Save",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "discardTitle": "Discard changes?",
+      "discardDescription": "You have unsaved changes. If you discard, these changes will be lost.",
+      "discardCancel": "Continue editing",
+      "discardConfirm": "Discard changes"
     },
     "empty": "No customers yet",
-    "searchPlaceholder": "Search by name, email..."
+    "searchPlaceholder": "Search by name, email...",
+    "backToList": "Back to list"
+  },
+  "employees": {
+    "title": "Employees",
+    "description": "Manage your employee directory",
+    "addNew": "Add Employee",
+    "view": "View details",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteTitle": "Delete employee",
+    "confirmDelete": "Are you sure you want to delete employee <b>{name}</b>?",
+    "confirmDeleteMany": "Are you sure you want to delete {count} selected employees?",
+    "deleteSelected": "Delete selected ({count})",
+    "selectAll": "Select all",
+    "selectRow": "Select {name}",
+    "toast": {
+      "createSuccess": "Employee added",
+      "updateSuccess": "Updated successfully",
+      "deleteSuccess": "Employee deleted",
+      "deleteManySuccess": "{count} employees deleted",
+      "deleteManyPartialFail": "Failed to delete {failed}/{total} employees"
+    },
+    "columns": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "department": "Department",
+      "position": "Position",
+      "status": "Status",
+      "joinedAt": "Joined At"
+    },
+    "department": {
+      "engineering": "Engineering",
+      "sales": "Sales",
+      "marketing": "Marketing",
+      "hr": "Human Resources",
+      "finance": "Finance",
+      "support": "Support"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "on-leave": "On Leave"
+    },
+    "form": {
+      "title": "Add Employee",
+      "titleEdit": "Edit Employee",
+      "name": "Full Name",
+      "namePlaceholder": "John Doe",
+      "email": "Email",
+      "emailPlaceholder": "example@email.com",
+      "phone": "Phone",
+      "phonePlaceholder": "+1 234 567 890",
+      "department": "Department",
+      "position": "Position",
+      "positionPlaceholder": "Frontend Engineer",
+      "status": "Status",
+      "submit": "Save",
+      "cancel": "Cancel",
+      "discardTitle": "Discard changes?",
+      "discardDescription": "You have unsaved changes. If you discard, these changes will be lost.",
+      "discardCancel": "Continue editing",
+      "discardConfirm": "Discard changes"
+    },
+    "empty": "No employees yet",
+    "searchPlaceholder": "Search by name, email...",
+    "backToList": "Back to list",
+    "pagination": {
+      "previous": "Previous page",
+      "next": "Next page",
+      "summary": "Showing {from}-{to} of {total}"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "totalCustomers": "Total Customers",
+    "totalEmployees": "Total Employees",
+    "byDepartment": "By department",
+    "active": "Active",
+    "inactive": "Inactive",
+    "onLeave": "On leave",
+    "department": {
+      "engineering": "Engineering",
+      "sales": "Sales",
+      "marketing": "Marketing",
+      "hr": "HR",
+      "finance": "Finance",
+      "support": "Support"
+    }
   },
   "misc": {
     "maintenance": {

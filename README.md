@@ -4,20 +4,22 @@ Next.js 16 base template — scalable, production-ready, dùng được cho mọ
 
 ## Stack
 
-|               |                                       |
-| ------------- | ------------------------------------- |
-| Framework     | Next.js 16 (App Router, Turbopack)    |
-| Language      | TypeScript 5 (strict)                 |
-| Styling       | Tailwind CSS v4 + shadcn/ui           |
-| State         | Zustand                               |
-| i18n          | next-intl (vi mặc định, en)           |
-| Auth          | JWT via `jose` + cookie httpOnly      |
-| Forms         | react-hook-form + Zod                 |
-| HTTP Client   | axios (via `ApiClient` class)         |
-| Tables        | TanStack Table v8                     |
-| Icons         | lucide-react                          |
-| Notifications | Sonner                                |
-| Rich Text     | TipTap v3 (ProseMirror, @tiptap/core) |
+|               |                                                  |
+| ------------- | ------------------------------------------------ |
+| Framework     | Next.js 16 (App Router, Turbopack)               |
+| Language      | TypeScript 5 (strict)                            |
+| Styling       | Tailwind CSS v4 + shadcn/ui                      |
+| State         | Zustand                                          |
+| i18n          | next-intl (vi mặc định, en)                      |
+| Auth          | JWT via `jose` + cookie httpOnly                 |
+| Forms         | react-hook-form + Zod                            |
+| HTTP Client   | axios (via `ApiClient` class)                    |
+| Tables        | TanStack Table v8                                |
+| Icons         | lucide-react                                     |
+| Notifications | Sonner                                           |
+| Rich Text     | TipTap v3 (ProseMirror, @tiptap/core)            |
+| Scrollbars    | overlayscrollbars-react (app shell content pane) |
+| E2E Testing   | Playwright (`e2e/`, xem `playwright.config.ts`)  |
 
 ---
 
@@ -27,14 +29,27 @@ Next.js 16 base template — scalable, production-ready, dùng được cho mọ
 cp .env.example .env.local   # điền JWT_SECRET và API_BASE_URL
 npm install                  # legacy-peer-deps tự động qua .npmrc
 npm run dev                  # http://localhost:3000 → redirect /vi
+npm run build                # Production build (CI + pre-push hook chạy bước này)
+npm run start                # Chạy bản đã build (sau npm run build)
+npm run lint                 # ESLint — 0 error trước khi commit
+npm run format                # Prettier --write toàn bộ project
 npm run test                 # Vitest watch mode
 npm run test:run             # Chạy toàn bộ test một lần (CI / pre-commit)
 npm run test:coverage        # Test + coverage report
+npx playwright test          # E2E (login, protected-route, locale-switch) — cần npm run build && npm run start trước, hoặc để playwright.config.ts tự start
 ```
 
 > `.npmrc` đã cấu hình `legacy-peer-deps=true` để xử lý conflict giữa `@emoji-mart/react` và React 19.
 
-> **Node.js:** yêu cầu >= 20.9.0 (khai báo trong `package.json` → `engines`, Vercel/CI cũng đọc field này để chọn đúng runtime). Dùng `nvm use 22` nếu đang chạy Node 18.
+> **Node.js:** yêu cầu >= 20.19.0 (khai báo trong `package.json` → `engines`, Vercel/CI cũng đọc field này để chọn đúng runtime — floor này do `vite`/`vitest` yêu cầu, không phải Next.js). Dùng `nvm use 22` nếu đang chạy Node 18.
+
+---
+
+## Bảo mật
+
+- **Response headers**: `X-Frame-Options`, HSTS, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` khai báo tĩnh trong `next.config.ts`. **CSP** (Content-Security-Policy) sinh **động trong `src/proxy.ts`** — mỗi request có 1 nonce riêng (`script-src`/`style-src` dùng `'nonce-...'` thay vì `'unsafe-inline'`), áp dụng cho mọi return path kể cả redirect. `connect-src` tự thêm origin của `NEXT_PUBLIC_API_BASE_URL`/`API_BASE_URL` — nhớ cập nhật nếu đổi domain backend. Chi tiết + CSRF stance: xem [docs/auth.md](docs/auth.md).
+- **Session cookie & access token**, **session expiry** (không có refresh-token, xem `SessionExpiryToast`), **rate limiting** (`src/lib/rate-limit.ts` — in-memory mặc định, có thể swap sang Upstash Redis REST qua `UPSTASH_REDIS_REST_URL`/`UPSTASH_REDIS_REST_TOKEN` trong `.env.example`, xem `src/lib/rate-limit-store.ts`): xem [docs/auth.md](docs/auth.md).
+- **`proxy.ts`** cũng forward header `X-NEXT-INTL-LOCALE` (thay cho middleware gốc của next-intl mà app không dùng) — xem [docs/i18n.md](docs/i18n.md#cách-locale-được-resolve).
 
 ---
 
@@ -70,10 +85,17 @@ Logic hiển thị đã gắn vào 3 trang này:
 
 - `/maintenance` — bật bằng biến môi trường `MAINTENANCE_MODE=true`; `proxy.ts` redirect toàn bộ traffic sang trang này (trừ chính nó).
 - `/not-authorized` — trả về khi `requireRole()` (`src/lib/auth.ts`) phát hiện session không đủ quyền. Ví dụ: route `/employees` yêu cầu role `admin`.
-- `/coming-soon` — nội dung (`misc.comingSoon`) được tái sử dụng ở trang `/employees` cho user có quyền nhưng feature chưa build xong.
+- `/coming-soon` — nội dung (`misc.comingSoon`) dùng cho feature/route chưa build xong; dùng `ComingSoonForm` (email capture) làm ví dụ.
 
 ## Quy ước Button
 
 - Mọi `<button>` đều có `cursor: pointer` (khai báo trong `globals.css @layer base`)
 - Trạng thái `disabled` hiển thị `cursor: not-allowed`
 - Dùng `<Button>` từ `@/components/ui/button` cho tất cả button trong app
+
+## Quy ước Layout — App Shell
+
+`(protected)/layout.tsx` là khung cố định 1 viewport (`h-dvh overflow-hidden`) — Sidebar/Header/Footer đứng yên, **chỉ `<main>` mới cuộn** (bọc trong `ScrollArea`, `@/components/layout/scroll-area.tsx`, dùng `overlayscrollbars-react` để có thanh cuộn overlay thay vì mặc định trình duyệt). Khi thêm page mới trong `(protected)/`:
+
+- Không tự đặt `h-screen`/`min-h-dvh`/`overflow-y-auto` ở root component của page — sẽ tạo scroll lồng nhau (double scrollbar) với `ScrollArea` đã có sẵn.
+- Theme màu thanh cuộn (`.os-theme-app` trong `globals.css`) tự đổi theo light/dark, không cần cấu hình thêm.
