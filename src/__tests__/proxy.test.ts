@@ -80,3 +80,87 @@ describe("proxy — locale header", () => {
     expect(res.headers.get("x-middleware-request-x-next-intl-locale")).toBe("vi")
   })
 })
+
+describe("proxy — nonce-based CSP", () => {
+  const originalMaintenanceMode = process.env.MAINTENANCE_MODE
+
+  afterEach(() => {
+    process.env.MAINTENANCE_MODE = originalMaintenanceMode
+  })
+
+  function extractNonce(csp: string | null): string {
+    const match = csp?.match(/'nonce-([^']+)'/)
+    if (!match) throw new Error(`no nonce found in CSP: ${csp}`)
+    return match[1]
+  }
+
+  it("sets a Content-Security-Policy with a nonce on a public-path pass-through", async () => {
+    const res = await proxy(makeRequest("/vi/login"))
+    const csp = res.headers.get("content-security-policy")
+
+    expect(csp).toContain("script-src 'self' 'nonce-")
+    expect(csp).toContain("'strict-dynamic'")
+  })
+
+  it("forwards the same nonce on both the request headers and the response CSP", async () => {
+    const res = await proxy(makeRequest("/vi/login"))
+
+    const requestNonce = res.headers.get("x-middleware-request-x-nonce")
+    const responseCspNonce = extractNonce(res.headers.get("content-security-policy"))
+
+    expect(requestNonce).toBe(responseCspNonce)
+  })
+
+  it("also forwards the CSP header itself on the request (for Next.js SSR auto-nonce)", async () => {
+    const res = await proxy(makeRequest("/vi/login"))
+
+    expect(res.headers.get("x-middleware-request-content-security-policy")).toContain("nonce-")
+  })
+
+  it("sets a CSP header on the maintenance redirect", async () => {
+    process.env.MAINTENANCE_MODE = "true"
+
+    const res = await proxy(makeRequest("/vi/dashboard"))
+
+    expect(res.headers.get("location")).toContain("/vi/maintenance")
+    expect(res.headers.get("content-security-policy")).toContain("nonce-")
+  })
+
+  it("sets a CSP header on the no-token login redirect", async () => {
+    const res = await proxy(makeRequest("/vi/dashboard"))
+
+    expect(res.headers.get("location")).toContain("/vi/login")
+    expect(res.headers.get("content-security-policy")).toContain("nonce-")
+  })
+
+  it("sets a CSP header on the invalid-token login redirect", async () => {
+    const res = await proxy(makeRequest("/vi/dashboard", { session: "not-a-valid-jwt" }))
+
+    expect(res.headers.get("location")).toContain("/vi/login")
+    expect(res.headers.get("content-security-policy")).toContain("nonce-")
+  })
+
+  it("sets a CSP header on the authenticated pass-through", async () => {
+    const token = await signSessionToken()
+    const res = await proxy(makeRequest("/vi/dashboard", { session: token }))
+
+    expect(res.headers.get("location")).toBeNull()
+    expect(res.headers.get("content-security-policy")).toContain("nonce-")
+  })
+
+  it("generates a fresh nonce on every call", async () => {
+    const resA = await proxy(makeRequest("/vi/login"))
+    const resB = await proxy(makeRequest("/vi/login"))
+
+    const nonceA = extractNonce(resA.headers.get("content-security-policy"))
+    const nonceB = extractNonce(resB.headers.get("content-security-policy"))
+
+    expect(nonceA).not.toBe(nonceB)
+  })
+
+  it("sets a CSP header on the static-asset skip path too", async () => {
+    const res = await proxy(makeRequest("/_next/static/chunk.js"))
+
+    expect(res.headers.get("content-security-policy")).toContain("nonce-")
+  })
+})
