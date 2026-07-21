@@ -114,6 +114,14 @@ Session identity (`userId`/`email`/`role`) và backend access token nằm ở **
 
 `setSession(payload, accessToken)`/`clearSession()` luôn set/xoá cả 2 cookie cùng lúc.
 
+## CSRF stance
+
+Mitigation hiện tại: `sameSite: "lax"` trên **cả 2** cookie (`session` và `access_token`, xem `cookieOptions()` trong `src/lib/auth.ts`). Với `SameSite=Lax`, trình duyệt không đính kèm cookie khi một site khác gửi cross-site POST/PUT/DELETE (form submit, fetch, v.v.) — chỉ navigation GET cấp cao nhất mới mang cookie đi. Vì mọi state-changing action trong app này đều là POST/PUT/DELETE (Server Actions/route handlers), không có state-changing GET endpoint nào, `sameSite: "lax"` là đủ để chặn CSRF cổ điển mà không cần thêm CSRF token riêng.
+
+**Giới hạn đã biết:** `sameSite: "lax"` không bảo vệ được trước CSRF-qua-XSS — nếu attacker chèn được script chạy trên chính origin của app (XSS), script đó chạy same-site nên cookie vẫn được gửi kèm bình thường, `sameSite` không giúp gì ở đây. Đây chính là lý do CSP nonce-based (xem `src/proxy.ts`) vẫn quan trọng: nó là lớp phòng thủ chặn inline script không có nonce hợp lệ chạy được ngay từ đầu, thu hẹp bề mặt tấn công XSS mà CSRF-qua-XSS phụ thuộc vào.
+
+Liên quan (không phải CSRF, nhưng đáng theo dõi trong cùng khu vực rủi ro XSS): `src/components/editor/rich-text-viewer.tsx` dùng `dangerouslySetInnerHTML` để render HTML do TipTap sinh ra — an toàn hay không phụ thuộc vào việc TipTap tự sanitize output của nó, đây là sink đáng để mắt tới nếu sau này nhận HTML từ nguồn không tin cậy hơn.
+
 ## Rate limiting
 
 `src/lib/rate-limit.ts` — in-memory, theo cửa sổ cố định (không dùng được khi deploy nhiều instance/serverless, xem comment trong file). Mỗi action tự chọn key có prefix riêng (`login:`, `register:`, `forgot-password:`, `verify-code:`, `resend-verify:`, `2fa:`, `2fa-resend:`) để tránh 2 action khác nhau dùng chung 1 bucket rate-limit của cùng 1 email/IP.
