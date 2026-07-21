@@ -494,6 +494,24 @@
       "summary": "Showing {from}-{to} of {total}"
     }
   },
+  "dashboard": {
+    "title": "Dashboard",
+    "totalCustomers": "Total Customers",
+    "totalEmployees": "Total Employees",
+    "byStatus": "By status",
+    "byDepartment": "By department",
+    "active": "Active",
+    "inactive": "Inactive",
+    "onLeave": "On leave",
+    "department": {
+      "engineering": "Engineering",
+      "sales": "Sales",
+      "marketing": "Marketing",
+      "hr": "HR",
+      "finance": "Finance",
+      "support": "Support"
+    }
+  },
   "misc": {
     "maintenance": {
       "title": "Under Maintenance!",

@@ -494,6 +494,24 @@
       "summary": "Hiển thị {from}-{to} trong {total}"
     }
   },
+  "dashboard": {
+    "title": "Bảng điều khiển",
+    "totalCustomers": "Tổng số khách hàng",
+    "totalEmployees": "Tổng số nhân viên",
+    "byStatus": "Theo trạng thái",
+    "byDepartment": "Theo phòng ban",
+    "active": "Đang hoạt động",
+    "inactive": "Ngừng hoạt động",
+    "onLeave": "Đang nghỉ phép",
+    "department": {
+      "engineering": "Kỹ thuật",
+      "sales": "Kinh doanh",
+      "marketing": "Marketing",
+      "hr": "Nhân sự",
+      "finance": "Tài chính",
+      "support": "Hỗ trợ"
+    }
+  },
   "misc": {
     "maintenance": {
       "title": "Đang bảo trì!",
