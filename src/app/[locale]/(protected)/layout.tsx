@@ -6,6 +6,7 @@ import { Header } from "@/components/layout/header"
 import { Sidebar } from "@/components/layout/sidebar"
 import { Footer } from "@/components/layout/footer"
 import { ScrollArea } from "@/components/layout/scroll-area"
+import { SessionExpiryToast } from "@/features/auth/components/session-expiry-toast"
 
 interface ProtectedLayoutProps {
   children: ReactNode
@@ -30,6 +31,7 @@ export default async function ProtectedLayout({ children, params }: ProtectedLay
       <Sidebar role={session.role} />
       <div className="flex min-w-0 flex-1 flex-col gap-[26px] pt-4">
         <Header />
+        <SessionExpiryToast exp={session.exp} />
         <main className="min-h-0 flex-1">
           <ScrollArea className="h-full">{children}</ScrollArea>
         </main>

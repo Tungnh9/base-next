@@ -69,7 +69,7 @@ export async function loginAction(
   if (!parsed.success) return { error: "invalidCredentials" }
 
   const identifier = `login:${parsed.data.email.trim().toLowerCase()}`
-  const rateLimitStatus = checkRateLimit(identifier, LOGIN_RATE_LIMIT)
+  const rateLimitStatus = await checkRateLimit(identifier, LOGIN_RATE_LIMIT)
   if (!rateLimitStatus.allowed) {
     return { error: "tooManyAttempts", retryAfterMs: rateLimitStatus.retryAfterMs }
   }
@@ -78,13 +78,13 @@ export async function loginAction(
   try {
     result = await authService.login(parsed.data)
   } catch {
-    recordFailedAttempt(identifier, LOGIN_RATE_LIMIT)
+    await recordFailedAttempt(identifier, LOGIN_RATE_LIMIT)
     return { error: "loginFailed" }
   }
 
   // Correct credentials — reset the counter whether this resolves immediately
   // or continues into 2FA, since both mean the password was right.
-  resetRateLimit(identifier)
+  await resetRateLimit(identifier)
 
   if (result.requiresTwoFactor) {
     return { requiresTwoFactor: true, twoFactorPhone: result.twoFactorPhone }
@@ -107,11 +107,11 @@ export async function registerAction(
   if (!parsed.success) return { error: "registerFailed" }
 
   const identifier = `register:${parsed.data.email.trim().toLowerCase()}`
-  const rateLimitStatus = checkRateLimit(identifier, REGISTER_RATE_LIMIT)
+  const rateLimitStatus = await checkRateLimit(identifier, REGISTER_RATE_LIMIT)
   if (!rateLimitStatus.allowed) {
     return { error: "tooManyRequests", retryAfterMs: rateLimitStatus.retryAfterMs }
   }
-  recordFailedAttempt(identifier, REGISTER_RATE_LIMIT)
+  await recordFailedAttempt(identifier, REGISTER_RATE_LIMIT)
 
   try {
     await authService.register(parsed.data)
@@ -134,11 +134,11 @@ export async function forgotPasswordAction(
   if (!parsed.success) return { error: "forgotPasswordFailed" }
 
   const identifier = `forgot-password:${parsed.data.email.trim().toLowerCase()}`
-  const rateLimitStatus = checkRateLimit(identifier, FORGOT_PASSWORD_RATE_LIMIT)
+  const rateLimitStatus = await checkRateLimit(identifier, FORGOT_PASSWORD_RATE_LIMIT)
   if (!rateLimitStatus.allowed) {
     return { error: "tooManyRequests", retryAfterMs: rateLimitStatus.retryAfterMs }
   }
-  recordFailedAttempt(identifier, FORGOT_PASSWORD_RATE_LIMIT)
+  await recordFailedAttempt(identifier, FORGOT_PASSWORD_RATE_LIMIT)
 
   try {
     await authService.forgotPassword(parsed.data.email)
@@ -158,7 +158,7 @@ export async function verifyForgotPasswordCodeAction(
   if (!email || !parsedCode.success) return { error: "invalidVerificationCode" }
 
   const identifier = `verify-code:${email.trim().toLowerCase()}`
-  const rateLimitStatus = checkRateLimit(identifier, VERIFY_CODE_RATE_LIMIT)
+  const rateLimitStatus = await checkRateLimit(identifier, VERIFY_CODE_RATE_LIMIT)
   if (!rateLimitStatus.allowed) {
     return { error: "tooManyRequests", retryAfterMs: rateLimitStatus.retryAfterMs }
   }
@@ -167,11 +167,11 @@ export async function verifyForgotPasswordCodeAction(
   try {
     resetToken = await authService.verifyForgotPasswordCode({ email, code: parsedCode.data })
   } catch {
-    recordFailedAttempt(identifier, VERIFY_CODE_RATE_LIMIT)
+    await recordFailedAttempt(identifier, VERIFY_CODE_RATE_LIMIT)
     return { error: "invalidVerificationCode" }
   }
 
-  resetRateLimit(identifier)
+  await resetRateLimit(identifier)
   return { success: true, resetToken }
 }
 
@@ -203,7 +203,7 @@ export async function resetPasswordAction(
   // valid token. Targets the "login:" bucket specifically — every
   // rate-limited action here has its own prefixed key so clearing one
   // can't accidentally reset another action's counter for the same email.
-  resetRateLimit(`login:${verifiedEmail.trim().toLowerCase()}`)
+  await resetRateLimit(`login:${verifiedEmail.trim().toLowerCase()}`)
 
   // Client-side navigation (not redirect()) so the caller can show a success
   // toast before leaving the page — same pattern as loginAction.
@@ -234,7 +234,7 @@ export async function twoStepVerificationAction(
   // No email/user identifier is available at this step (see authMockApi.verifyTwoStep) —
   // fall back to client IP as the brute-force guard key.
   const identifier = `2fa:${await getClientIp()}`
-  const rateLimitStatus = checkRateLimit(identifier, TWO_STEP_RATE_LIMIT)
+  const rateLimitStatus = await checkRateLimit(identifier, TWO_STEP_RATE_LIMIT)
   if (!rateLimitStatus.allowed) {
     return { error: "tooManyRequests", retryAfterMs: rateLimitStatus.retryAfterMs }
   }
@@ -243,11 +243,11 @@ export async function twoStepVerificationAction(
   try {
     user = await authService.verifyTwoStep(code)
   } catch {
-    recordFailedAttempt(identifier, TWO_STEP_RATE_LIMIT)
+    await recordFailedAttempt(identifier, TWO_STEP_RATE_LIMIT)
     return { error: "invalidVerificationCode" }
   }
 
-  resetRateLimit(identifier)
+  await resetRateLimit(identifier)
   // Client-side navigation (not redirect()) so the caller can persist `user`
   // to localStorage first — same pattern as loginAction.
   return { success: true, user }
@@ -261,11 +261,11 @@ export async function resendVerificationEmailAction(
   if (!email) return { error: "resendFailed" }
 
   const identifier = `resend-verify:${email.trim().toLowerCase()}`
-  const rateLimitStatus = checkRateLimit(identifier, RESEND_EMAIL_RATE_LIMIT)
+  const rateLimitStatus = await checkRateLimit(identifier, RESEND_EMAIL_RATE_LIMIT)
   if (!rateLimitStatus.allowed) {
     return { error: "tooManyRequests", retryAfterMs: rateLimitStatus.retryAfterMs }
   }
-  recordFailedAttempt(identifier, RESEND_EMAIL_RATE_LIMIT)
+  await recordFailedAttempt(identifier, RESEND_EMAIL_RATE_LIMIT)
 
   try {
     await authService.resendVerificationEmail(email)
@@ -281,11 +281,11 @@ export async function resendTwoStepCodeAction(
   _formData: FormData
 ): Promise<ActionState> {
   const identifier = `2fa-resend:${await getClientIp()}`
-  const rateLimitStatus = checkRateLimit(identifier, RESEND_TWO_STEP_RATE_LIMIT)
+  const rateLimitStatus = await checkRateLimit(identifier, RESEND_TWO_STEP_RATE_LIMIT)
   if (!rateLimitStatus.allowed) {
     return { error: "tooManyRequests", retryAfterMs: rateLimitStatus.retryAfterMs }
   }
-  recordFailedAttempt(identifier, RESEND_TWO_STEP_RATE_LIMIT)
+  await recordFailedAttempt(identifier, RESEND_TWO_STEP_RATE_LIMIT)
 
   try {
     await authService.resendTwoStepCode()
