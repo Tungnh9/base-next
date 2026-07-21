@@ -13,7 +13,7 @@ concurrency:
 env:
   NEXT_PUBLIC_APP_URL: http://localhost:3000
   NEXT_PUBLIC_APP_NAME: base-next
-  JWT_SECRET: ci-placeholder-jwt-secret-at-least-32-characters-long
+  JWT_SECRET: ci-placeholder-jwt-secret-at-least-32-characters-long # gitleaks:allow
   SESSION_COOKIE_NAME: session
   API_BASE_URL: http://localhost:4000
   NEXT_PUBLIC_API_BASE_URL: http://localhost:4000
