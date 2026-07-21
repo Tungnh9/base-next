@@ -1,5 +1,6 @@
 import type { CustomerStatus } from "@/features/customers/types"
 import type { EmployeeStatus, EmployeeDepartment } from "@/features/employees/types"
+import type { ProgressVariant } from "@/components/ui/progress"
 
 export interface DashboardStats {
   totalCustomers: number
@@ -35,4 +36,12 @@ export const STATUS_LABEL_KEYS: Record<EmployeeStatus, "active" | "inactive" | "
   active: "active",
   inactive: "inactive",
   "on-leave": "onLeave",
+}
+
+// Same superset-keying idea as STATUS_LABEL_KEYS — maps a status value to the
+// semantic ProgressSegment color used in the dashboard's breakdown bars.
+export const STATUS_VARIANT: Record<EmployeeStatus, ProgressVariant> = {
+  active: "success",
+  inactive: "secondary",
+  "on-leave": "warning",
 }

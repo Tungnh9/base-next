@@ -30,29 +30,26 @@ const stats: DashboardStats = {
 }
 
 describe("DashboardCharts", () => {
-  it("renders a chart for customers by status and one for employees by department", async () => {
+  it("renders a single chart for employees by department", async () => {
     render(<DashboardCharts stats={stats} />)
 
     const charts = await screen.findAllByTestId("echarts-mock")
-    expect(charts).toHaveLength(2)
+    expect(charts).toHaveLength(1)
   })
 
   it("passes the department counts into the bar chart option", async () => {
     render(<DashboardCharts stats={stats} />)
 
-    const charts = await screen.findAllByTestId("echarts-mock")
-    const departmentChartText = charts.map((c) => c.textContent ?? "").join("")
+    const chart = await screen.findByTestId("echarts-mock")
 
-    expect(departmentChartText).toContain("8")
-    expect(departmentChartText).toContain("support")
+    expect(chart.textContent).toContain("8")
+    expect(chart.textContent).toContain("support")
   })
 
-  it("renders section titles", () => {
+  it("renders the section title", () => {
     render(<DashboardCharts stats={stats} />)
 
-    expect(screen.getByText("totalCustomers")).toBeInTheDocument()
     expect(screen.getByText("totalEmployees")).toBeInTheDocument()
-    expect(screen.getByText("byStatus")).toBeInTheDocument()
     expect(screen.getByText("byDepartment")).toBeInTheDocument()
   })
 })

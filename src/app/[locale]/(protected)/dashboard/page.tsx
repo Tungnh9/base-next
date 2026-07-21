@@ -1,7 +1,8 @@
 import { getTranslations } from "next-intl/server"
 import { getDashboardStats } from "@/features/dashboard/api"
-import { STATUS_LABEL_KEYS } from "@/features/dashboard/types"
+import { STATUS_LABEL_KEYS, STATUS_VARIANT } from "@/features/dashboard/types"
 import { StatCard } from "@/features/dashboard/components/stat-card"
+import { StatusBreakdown } from "@/features/dashboard/components/status-breakdown"
 import { DashboardCharts } from "@/features/dashboard/components/dashboard-charts"
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
@@ -24,21 +25,28 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
           title={t("totalCustomers")}
           value={stats.totalCustomers}
           description={
-            <>
-              {stats.customersByStatus.active} {t(STATUS_LABEL_KEYS.active)} ·{" "}
-              {stats.customersByStatus.inactive} {t(STATUS_LABEL_KEYS.inactive)}
-            </>
+            <StatusBreakdown
+              items={(["active", "inactive"] as const).map((status) => ({
+                key: status,
+                label: t(STATUS_LABEL_KEYS[status]),
+                count: stats.customersByStatus[status],
+                variant: STATUS_VARIANT[status],
+              }))}
+            />
           }
         />
         <StatCard
           title={t("totalEmployees")}
           value={stats.totalEmployees}
           description={
-            <>
-              {stats.employeesByStatus.active} {t(STATUS_LABEL_KEYS.active)} ·{" "}
-              {stats.employeesByStatus.inactive} {t(STATUS_LABEL_KEYS.inactive)} ·{" "}
-              {stats.employeesByStatus["on-leave"]} {t(STATUS_LABEL_KEYS["on-leave"])}
-            </>
+            <StatusBreakdown
+              items={(["active", "inactive", "on-leave"] as const).map((status) => ({
+                key: status,
+                label: t(STATUS_LABEL_KEYS[status]),
+                count: stats.employeesByStatus[status],
+                variant: STATUS_VARIANT[status],
+              }))}
+            />
           }
         />
       </div>
