@@ -2,7 +2,7 @@ import "@testing-library/jest-dom"
 import { vi } from "vitest"
 
 // Env vars required by @/lib/env — set before any module import
-process.env.JWT_SECRET = "test-jwt-secret-that-is-at-least-32-characters-long" // gitleaks:allow
+process.env.JWT_SECRET = "test-jwt-secret-that-is-at-least-32-characters-long"
 process.env.API_BASE_URL = "http://localhost:4000"
 process.env.NODE_ENV = "test"
 
