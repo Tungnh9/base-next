@@ -83,9 +83,11 @@ describe("proxy — locale header", () => {
 
 describe("proxy — nonce-based CSP", () => {
   const originalMaintenanceMode = process.env.MAINTENANCE_MODE
+  const originalNodeEnv = process.env.NODE_ENV
 
   afterEach(() => {
     process.env.MAINTENANCE_MODE = originalMaintenanceMode
+    process.env.NODE_ENV = originalNodeEnv
   })
 
   function extractNonce(csp: string | null): string {
@@ -162,5 +164,36 @@ describe("proxy — nonce-based CSP", () => {
     const res = await proxy(makeRequest("/_next/static/chunk.js"))
 
     expect(res.headers.get("content-security-policy")).toContain("nonce-")
+  })
+
+  it("drops 'unsafe-inline'/'unsafe-eval' from script-src and style-src in production", async () => {
+    // Previously only verified by reading the code — a regression that
+    // leaked 'unsafe-inline'/'unsafe-eval' into the prod branch would have
+    // passed CI undetected since every other test here runs with
+    // NODE_ENV=test (the isDev branch).
+    process.env.NODE_ENV = "production"
+
+    const res = await proxy(makeRequest("/vi/login"))
+    const csp = res.headers.get("content-security-policy") ?? ""
+    const scriptSrc = csp.split(";").find((d) => d.trim().startsWith("script-src"))
+    const styleSrc = csp.split(";").find((d) => d.trim().startsWith("style-src"))
+
+    expect(scriptSrc).not.toContain("unsafe-inline")
+    expect(scriptSrc).not.toContain("unsafe-eval")
+    expect(scriptSrc).toContain("'strict-dynamic'")
+    expect(styleSrc).not.toContain("unsafe-inline")
+    expect(styleSrc).toContain("nonce-")
+  })
+
+  it("keeps 'unsafe-eval' in script-src and 'unsafe-inline' in style-src outside production (dev only)", async () => {
+    process.env.NODE_ENV = "development"
+
+    const res = await proxy(makeRequest("/vi/login"))
+    const csp = res.headers.get("content-security-policy") ?? ""
+    const scriptSrc = csp.split(";").find((d) => d.trim().startsWith("script-src"))
+    const styleSrc = csp.split(";").find((d) => d.trim().startsWith("style-src"))
+
+    expect(scriptSrc).toContain("unsafe-eval")
+    expect(styleSrc).toContain("unsafe-inline")
   })
 })
