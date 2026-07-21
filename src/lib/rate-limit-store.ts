@@ -95,6 +95,16 @@ export class UpstashRestRateLimitStore implements RateLimitStore {
       throw new Error("Upstash REST pipeline returned an unexpected response shape")
     }
 
+    // A per-command error still comes back inside a 200 response (e.g.
+    // WRONGTYPE) — entry.result would silently be undefined for that
+    // command, which Number(undefined) turns into NaN. NaN >= max is always
+    // false, so an unchecked error here would make rate limiting fail open
+    // instead of erroring. Fail loud instead.
+    const failed = body.find((entry) => entry.error)
+    if (failed) {
+      throw new Error(`Upstash REST pipeline command failed: ${failed.error}`)
+    }
+
     return body.map((entry) => entry.result)
   }
 

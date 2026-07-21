@@ -109,6 +109,32 @@ describe("UpstashRestRateLimitStore", () => {
 
     await expect(store.get("some-key", 1_000)).rejects.toThrow()
   })
+
+  it("throws instead of silently coercing to NaN when a pipeline command errors inside a 200 response", async () => {
+    // Upstash returns HTTP 200 with a per-command { error } for things like
+    // WRONGTYPE — unchecked, entry.result would be undefined here and
+    // Number(undefined) === NaN, which would make rate limiting fail open
+    // (NaN >= max is always false). This must throw, not return a bucket.
+    const { UpstashRestRateLimitStore } = await import("../rate-limit-store")
+    const store = new UpstashRestRateLimitStore("https://upstash.example.com", "test-token")
+    fetchMock.mockResolvedValueOnce(
+      jsonResponse([{ error: "WRONGTYPE Operation against a key holding the wrong kind of value" }])
+    )
+
+    await expect(store.delete("bad-key")).rejects.toThrow(/WRONGTYPE/)
+  })
+
+  it("throws on a partial pipeline failure (one command ok, one erroring) during increment()", async () => {
+    const { UpstashRestRateLimitStore } = await import("../rate-limit-store")
+    const store = new UpstashRestRateLimitStore("https://upstash.example.com", "test-token")
+    fetchMock.mockResolvedValueOnce(
+      jsonResponse([{ result: 1 }, { error: "ERR some pexpire failure" }])
+    )
+
+    await expect(store.increment("login:user@example.com", 60_000, 1_000)).rejects.toThrow(
+      /ERR some pexpire failure/
+    )
+  })
 })
 
 describe("getRateLimitStore", () => {
