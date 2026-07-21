@@ -1,6 +1,11 @@
 import { getTranslations } from "next-intl/server"
 import { getDashboardStats } from "@/features/dashboard/api"
-import { STATUS_LABEL_KEYS, STATUS_VARIANT } from "@/features/dashboard/types"
+import {
+  CUSTOMER_STATUSES,
+  EMPLOYEE_STATUSES,
+  STATUS_LABEL_KEYS,
+  STATUS_VARIANT,
+} from "@/features/dashboard/types"
 import { StatCard } from "@/features/dashboard/components/stat-card"
 import { StatusBreakdown } from "@/features/dashboard/components/status-breakdown"
 import { DashboardCharts } from "@/features/dashboard/components/dashboard-charts"
@@ -26,7 +31,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
           value={stats.totalCustomers}
           description={
             <StatusBreakdown
-              items={(["active", "inactive"] as const).map((status) => ({
+              items={CUSTOMER_STATUSES.map((status) => ({
                 key: status,
                 label: t(STATUS_LABEL_KEYS[status]),
                 count: stats.customersByStatus[status],
@@ -40,7 +45,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
           value={stats.totalEmployees}
           description={
             <StatusBreakdown
-              items={(["active", "inactive", "on-leave"] as const).map((status) => ({
+              items={EMPLOYEE_STATUSES.map((status) => ({
                 key: status,
                 label: t(STATUS_LABEL_KEYS[status]),
                 count: stats.employeesByStatus[status],
