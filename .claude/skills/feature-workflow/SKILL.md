@@ -1,6 +1,8 @@
 ---
 name: feature-workflow
 description: Quy trình bắt buộc khi thêm feature, page, hoặc module mới vào dự án base-next — viết spec trước khi code, tạo cấu trúc thư mục src/features/[name]/ chuẩn, và implement theo vertical slices với commit checkpoint sau mỗi bước. Dùng khi user yêu cầu "thêm feature X", "thêm page mới", hoặc "tạo module mới". Không bao gồm chi tiết viết component (xem component-convention), gọi API (xem api-convention), hay thêm chuỗi i18n (xem i18n-workflow).
+metadata:
+  version: "1.0.0"
 ---
 
 # Thêm Feature Mới
@@ -93,3 +95,8 @@ Slice 5: Verify end-to-end
   → npm run build && npm run lint
   → Commit: "feat([name]): complete feature implementation"
 ```
+
+## Tài liệu tham khảo thêm
+
+- `agent-skill/examples/feature-example.md` — ví dụ end-to-end cho việc thêm feature "Product" theo tinh thần spec → cấu trúc → implement ở trên (thứ tự slice cụ thể có thể khác đôi chút). Đọc khi cần xem một feature hoàn chỉnh làm mẫu.
+- `agent-skill/templates/new-feature.md` — template copy-paste sẵn cho types.ts/schemas.ts/api.ts/actions.ts/page.tsx khi bắt đầu feature mới thủ công (không dùng script scaffold ở Phase 2). Phần component vẫn cần tự viết theo component-convention.

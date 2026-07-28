@@ -1,6 +1,8 @@
 ---
 name: clone-checklist
 description: Checklist khi clone base-next để tạo dự án mới — setup env/JWT, đổi style (màu/font/logo), xóa feature demo, và verify build/lint/login/i18n trước khi bàn giao. Dùng khi user nói "clone dự án này", "tạo dự án mới từ base-next", hoặc "chuẩn bị base cho client mới". Không dùng cho việc thêm feature vào dự án đã clone xong (xem feature-workflow).
+metadata:
+  version: "1.0.0"
 ---
 
 # Clone Base Sang Dự Án Mới

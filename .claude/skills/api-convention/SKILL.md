@@ -1,6 +1,8 @@
 ---
 name: api-convention
 description: Convention gọi API trong base-next — cách viết Server Action dùng serverApi (server-side) và client fetching dùng clientApi (client-side), pattern destructure { data, error } chuẩn. Dùng khi user cần "fetch data", "gọi API", "viết Server Action", hoặc "tạo mutation". Không bao gồm validate schema cho auth (xem auth-convention) hay cấu trúc file api.ts/actions.ts tổng thể của feature (xem feature-workflow).
+metadata:
+  version: "1.0.0"
 ---
 
 # Gọi API

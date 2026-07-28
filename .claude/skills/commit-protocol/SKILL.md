@@ -1,13 +1,15 @@
 ---
 name: commit-protocol
-description: 'Quy trình commit & push trong base-next — pre-commit checklist (lint/build/secret-scan), format commit message <type>(<scope>): <mô tả>, branch naming, và trình tự bắt buộc Review → Pre-commit → Commit → Push. Dùng khi user sắp commit, sắp push, hoặc hỏi "commit message nên viết sao". Quy tắc riêng của dự án: merge vào main ngoài hotfix/* luôn phải hỏi trước — chi tiết đầy đủ về git-flow xem agent-skill/references/git-flow.md.'
+description: 'Quy trình commit & push trong base-next — pre-commit checklist (lint/build/secret-scan), format commit message dạng type(scope): mô tả ngắn (ví dụ feat(auth): thêm đăng nhập Google), branch naming, và trình tự bắt buộc Review → Pre-commit → Commit → Push. Dùng khi user sắp commit, sắp push, hoặc hỏi "commit message nên viết sao". Quy tắc riêng của dự án: merge vào main ngoài hotfix/* luôn phải hỏi trước — chi tiết đầy đủ về git-flow xem .claude/skills/commit-protocol/references/git-flow.md.'
+metadata:
+  version: "1.0.0"
 ---
 
 # Commit & Version Control
 
 **Dùng khi:** Sắp commit bất kỳ thay đổi nào.
 
-> Sơ đồ nhánh đầy đủ (main/develop/feature/hotfix), quy tắc chọn base PR, và các bài học thực tế khi merge — xem `agent-skill/references/git-flow.md`. Đặc biệt lưu ý: merge vào `main` ngoài `hotfix/*` luôn phải hỏi lại user trước.
+> Sơ đồ nhánh đầy đủ (main/develop/feature/hotfix), quy tắc chọn base PR, và các bài học thực tế khi merge — xem `.claude/skills/commit-protocol/references/git-flow.md`. Đặc biệt lưu ý: merge vào `main` ngoài `hotfix/*` luôn phải hỏi lại user trước.
 
 ## Pre-commit checklist (KHÔNG SKIP)
 
@@ -19,7 +21,7 @@ description: 'Quy trình commit & push trong base-next — pre-commit checklist 
 [ ] git diff --staged → review lại một lần cuối
 ```
 
-**Script tự động:** `bash agent-skill/scripts/pre-commit-check.sh`
+**Script tự động:** `bash .claude/skills/commit-protocol/scripts/pre-commit-check.sh`
 Chạy lint + build + secret scan + i18n check, output JSON.
 
 > `npm run build` và README sync check được enforce bởi Husky **pre-push** hook.

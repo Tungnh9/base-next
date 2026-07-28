@@ -1,6 +1,8 @@
 ---
 name: review-gates
-description: 5 quality gate bắt buộc trước khi merge code trong base-next — Gate 1 Build & Lint, Gate 2 Kiến trúc, Gate 3 Convention, Gate 4 Security, Gate 5 i18n, mỗi gate là một checklist cụ thể theo convention của dự án này. Dùng khi cần tự-review code trước merge hoặc khi được yêu cầu review theo checklist chuẩn của base-next. Checklist NỘI DUNG cụ thể (đường dẫn file, quy ước đặt tên, pattern serverApi/clientApi...) — bổ sung cho, không thay thế, review chất lượng tổng quát dạng code-review/security-review.
+description: 5 quality gate bắt buộc trước khi merge code trong base-next — Gate 1 Build & Lint, Gate 2 Kiến trúc, Gate 3 Convention, Gate 4 Security, Gate 5 i18n, mỗi gate là một checklist cụ thể theo convention của dự án này. Dùng khi user nói "review code trước khi merge", "check giúp tôi trước khi tạo PR", "sẵn sàng merge chưa", hoặc "review theo checklist chuẩn của base-next". Checklist NỘI DUNG cụ thể (đường dẫn file, quy ước đặt tên, pattern serverApi/clientApi...) — bổ sung cho, không thay thế, review chất lượng tổng quát dạng code-review/security-review.
+metadata:
+  version: "1.0.0"
 ---
 
 # Quality Gates Trước Khi Merge
@@ -51,3 +53,7 @@ npm run lint    # Phải pass — 0 error
 [ ] Không có key thiếu ở một ngôn ngữ
 [ ] Namespace trong useTranslations() khớp với key trong JSON
 ```
+
+## Tài liệu tham khảo thêm
+
+- `agent-skill/references/security-checklist.md` — checklist bảo mật chi tiết hơn Gate 4 ở trên (secret scanning, validate input, JWT/session). Đọc khi cần kiểm tra kỹ phần security trước khi merge.

@@ -12,4 +12,4 @@ Nếu tôi chưa cung cấp đủ thông tin, hãy hỏi tôi:
 - Font (hoặc giữ nguyên)
 - Backend API URL (hoặc chưa có)
 
-Áp dụng skill `clone-checklist`, đọc `agent-skill/references/clone-checklist.md` để thực hiện từng bước chi tiết. Báo cáo khi hoàn thành mỗi bước chính.
+Áp dụng skill `clone-checklist`, đọc `.claude/skills/clone-checklist/references/clone-checklist.md` để thực hiện từng bước chi tiết. Báo cáo khi hoàn thành mỗi bước chính.

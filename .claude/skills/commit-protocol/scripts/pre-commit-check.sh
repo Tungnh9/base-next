@@ -1,7 +1,7 @@
 #!/bin/bash
 # pre-commit-check.sh
 # Chạy toàn bộ quality gates trước khi commit
-# Usage: bash agent-skill/scripts/pre-commit-check.sh
+# Usage: bash .claude/skills/commit-protocol/scripts/pre-commit-check.sh
 #
 # Output: JSON với status và danh sách lỗi (nếu có)
 # Exit code: 0 = pass, 1 = fail

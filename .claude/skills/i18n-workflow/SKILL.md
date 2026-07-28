@@ -1,6 +1,8 @@
 ---
 name: i18n-workflow
 description: Quy trình next-intl bắt buộc trong base-next — không hardcode string hiển thị, luôn thêm key vào messages/vi.json TRƯỚC rồi mới messages/en.json, cách thêm locale mới (phải hỏi trước), và script verify đồng bộ agent-skill/scripts/check-i18n.sh. Dùng khi user yêu cầu "thêm string mới", "dịch UI", "thêm ngôn ngữ", hoặc khi phát hiện text hiển thị bị hardcode.
+metadata:
+  version: "1.0.0"
 ---
 
 # Internationalization

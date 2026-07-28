@@ -1,6 +1,8 @@
 ---
 name: component-convention
 description: Convention viết React component trong base-next — named export, template chuẩn dùng next-intl/cn/shadcn, bảng quy tắc Đúng/Sai cho string/className/icon/state/type. Dùng khi user yêu cầu "tạo component UI", "viết component cho feature X", hoặc cần biết dùng shadcn/ui component có sẵn trước khi tạo mới. Không bao gồm cấu trúc thư mục feature tổng thể (xem feature-workflow) hay cách gọi API trong component (xem api-convention).
+metadata:
+  version: "1.0.0"
 ---
 
 # Viết Component
@@ -66,3 +68,7 @@ import { Toast } from "@/components/ui/toast" // dùng sonner
 // Thêm component mới từ shadcn — hỏi trước
 // npx shadcn@latest add [component-name]
 ```
+
+## Tài liệu tham khảo thêm
+
+- `agent-skill/references/component-patterns.md` — pattern cụ thể cho Server vs Client Component, Zustand store, form với react-hook-form + Zod, toast notification (Sonner), và conditional rendering. Đọc khi cần ví dụ chi tiết hơn ngoài template chuẩn ở trên.

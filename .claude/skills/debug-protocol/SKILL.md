@@ -1,6 +1,8 @@
 ---
 name: debug-protocol
-description: Quy trình debug có hệ thống 5 bước (REPRODUCE → LOCALIZE → REDUCE → FIX ROOT CAUSE → GUARD) dành riêng cho base-next, gồm các lỗi Next.js 16 đặc thù (proxy.ts thay middleware, Server/Client Component conflict, MISSING_MESSAGE i18n, auth redirect loop) và quy tắc dừng lại sau 2 lần thử fail. Dùng khi build lỗi, test fail, hoặc behavior sai trong dự án base-next. Chứa các pattern lỗi ĐẶC THÙ của stack base-next — bổ sung cho, không thay thế, debugging tổng quát.
+description: Quy trình debug có hệ thống 5 bước (REPRODUCE → LOCALIZE → REDUCE → FIX ROOT CAUSE → GUARD) dành riêng cho base-next, gồm các lỗi Next.js 16 đặc thù (proxy.ts thay middleware, Server/Client Component conflict, MISSING_MESSAGE i18n, auth redirect loop) và quy tắc dừng lại sau 2 lần thử fail. Dùng khi user nói "build bị lỗi", "test fail", "sao cái này chạy sai vậy", hoặc "giúp tôi debug cái này", hoặc khi có behavior sai trong dự án base-next. Chứa các pattern lỗi ĐẶC THÙ của stack base-next — bổ sung cho, không thay thế, debugging tổng quát.
+metadata:
+  version: "1.0.0"
 ---
 
 # Debug Có Hệ Thống
