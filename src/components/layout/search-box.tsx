@@ -15,6 +15,7 @@ export function SearchBox() {
   const { locale } = useParams<{ locale: string }>()
 
   const filtered = NAV_ITEMS.filter((r) => {
+    if (r.disabled) return false
     const label = t(r.label as never)
     return label.toLowerCase().includes(query.toLowerCase())
   })

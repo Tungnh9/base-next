@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react"
+import { render, screen, within } from "@testing-library/react"
 import { describe, it, expect, vi } from "vitest"
 
 vi.mock("next/navigation", () => ({
@@ -35,5 +35,24 @@ describe("Sidebar", () => {
     expect(className).toContain("max-lg:left-0")
     expect(className).not.toMatch(/(^|\s)sticky(\s|$)/)
     expect(className).not.toMatch(/(^|\s)fixed(\s|$)/)
+  })
+
+  it("renders a disabled nav item without a navigable link, showing the coming-soon indicator", () => {
+    render(<Sidebar />)
+
+    const label = screen.getByText("nav.salesOpportunities")
+    const row = label.closest("div")
+    expect(row).not.toBeNull()
+    expect(row).toHaveAttribute("aria-disabled", "true")
+
+    expect(screen.queryByRole("link", { name: /nav.salesOpportunities/i })).not.toBeInTheDocument()
+    expect(within(row!).getByText("nav.comingSoonBadge")).toBeInTheDocument()
+  })
+
+  it("still renders an enabled item (Dashboard) as a real clickable Link", () => {
+    render(<Sidebar />)
+
+    const link = screen.getByRole("link", { name: /nav.dashboard/i })
+    expect(link).toHaveAttribute("href", "/vi/dashboard")
   })
 })
