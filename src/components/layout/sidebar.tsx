@@ -8,6 +8,8 @@ import { useTranslations } from "next-intl"
 import { useUiStore } from "@/stores"
 import { cn } from "@/lib/utils"
 import { Separator } from "@/components/ui/separator"
+import { Badge } from "@/components/ui/badge"
+import { ScrollArea } from "@/components/layout/scroll-area"
 import { NAV } from "@/config/nav"
 
 interface SidebarProps {
@@ -99,61 +101,90 @@ export function Sidebar({ role }: SidebarProps) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto py-2">
-          {NAV.map((section, i) => {
-            const items = section.items.filter(
-              (item) => !item.requiredRole || item.requiredRole === role
-            )
-            if (items.length === 0) return null
+        <ScrollArea className="flex-1">
+          <nav className="py-2">
+            {NAV.map((section, i) => {
+              const items = section.items.filter(
+                (item) => !item.requiredRole || item.requiredRole === role
+              )
+              if (items.length === 0) return null
 
-            return (
-              <div key={i} className="mt-2">
-                {section.title &&
-                  (sidebarCollapsed ? (
-                    <Separator className="mx-auto my-3 w-6" />
-                  ) : (
-                    <p className="text-muted-foreground px-[30px] pt-5 pb-1.5 text-[11px] uppercase">
-                      {t(section.title as never)}
-                    </p>
-                  ))}
-                <ul className="flex flex-col gap-1 px-3.5">
-                  {items.map((item) => {
-                    const href = `/${locale}${item.href}`
-                    const isActive = pathname === href || pathname.startsWith(href + "/")
-                    const label = t(item.label as never)
-                    return (
-                      <li key={item.href}>
-                        <Link
-                          href={href}
-                          title={sidebarCollapsed ? label : undefined}
-                          className={cn(
-                            "flex items-center gap-2 rounded-[6px] py-[9px] text-[15px] transition-colors",
-                            sidebarCollapsed ? "justify-center px-[10px]" : "px-4",
-                            isActive
-                              ? "text-sidebar-primary-foreground bg-[linear-gradient(29deg,var(--color-sidebar-primary)_22%,color-mix(in_srgb,var(--color-sidebar-primary)_70%,transparent)_76%)] shadow-[0px_2px_6px_0px_color-mix(in_srgb,var(--color-sidebar-primary)_48%,transparent)]"
-                              : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                          )}
-                        >
-                          <item.icon className="size-[22px] shrink-0" />
-                          {!sidebarCollapsed && (
-                            <>
-                              <span className="flex-1 truncate">{label}</span>
-                              {item.badge !== undefined && (
-                                <span className="bg-sidebar-primary/16 text-sidebar-primary flex size-[22px] items-center justify-center rounded-full text-[13px] font-semibold">
-                                  {item.badge}
-                                </span>
+              return (
+                <div key={i} className="mt-2">
+                  {section.title &&
+                    (sidebarCollapsed ? (
+                      <Separator className="mx-auto my-3 w-6" />
+                    ) : (
+                      <p className="text-muted-foreground px-[30px] pt-5 pb-1.5 text-[11px] uppercase">
+                        {t(section.title as never)}
+                      </p>
+                    ))}
+                  <ul className="flex flex-col gap-1 px-3.5">
+                    {items.map((item) => {
+                      const label = t(item.label as never)
+
+                      if (item.disabled) {
+                        const comingSoonLabel = t("nav.comingSoonBadge")
+                        return (
+                          <li key={item.href}>
+                            <div
+                              aria-disabled="true"
+                              title={sidebarCollapsed ? `${label} — ${comingSoonLabel}` : undefined}
+                              className={cn(
+                                "text-sidebar-foreground flex cursor-not-allowed items-center gap-2 rounded-[6px] py-[9px] text-[15px] opacity-65",
+                                sidebarCollapsed ? "justify-center px-[10px]" : "px-4"
                               )}
-                            </>
-                          )}
-                        </Link>
-                      </li>
-                    )
-                  })}
-                </ul>
-              </div>
-            )
-          })}
-        </nav>
+                            >
+                              <item.icon className="size-[22px] shrink-0" />
+                              {!sidebarCollapsed && (
+                                <>
+                                  <span className="flex-1 truncate">{label}</span>
+                                  <Badge variant="secondary" skin="light" className="shrink-0">
+                                    {comingSoonLabel}
+                                  </Badge>
+                                </>
+                              )}
+                            </div>
+                          </li>
+                        )
+                      }
+
+                      const href = `/${locale}${item.href}`
+                      const isActive = pathname === href || pathname.startsWith(href + "/")
+                      return (
+                        <li key={item.href}>
+                          <Link
+                            href={href}
+                            title={sidebarCollapsed ? label : undefined}
+                            className={cn(
+                              "flex items-center gap-2 rounded-[6px] py-[9px] text-[15px] transition-colors",
+                              sidebarCollapsed ? "justify-center px-[10px]" : "px-4",
+                              isActive
+                                ? "text-sidebar-primary-foreground bg-[linear-gradient(29deg,var(--color-sidebar-primary)_22%,color-mix(in_srgb,var(--color-sidebar-primary)_70%,transparent)_76%)] shadow-[0px_2px_6px_0px_color-mix(in_srgb,var(--color-sidebar-primary)_48%,transparent)]"
+                                : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                            )}
+                          >
+                            <item.icon className="size-[22px] shrink-0" />
+                            {!sidebarCollapsed && (
+                              <>
+                                <span className="flex-1 truncate">{label}</span>
+                                {item.badge !== undefined && (
+                                  <span className="bg-sidebar-primary/16 text-sidebar-primary flex size-[22px] items-center justify-center rounded-full text-[13px] font-semibold">
+                                    {item.badge}
+                                  </span>
+                                )}
+                              </>
+                            )}
+                          </Link>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                </div>
+              )
+            })}
+          </nav>
+        </ScrollArea>
       </aside>
     </>
   )
