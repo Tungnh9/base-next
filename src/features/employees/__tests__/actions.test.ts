@@ -31,6 +31,7 @@ import {
   createEmployee,
   updateEmployee,
   deleteEmployee,
+  getEmployeeOptions,
 } from "../actions"
 import { employeeApi } from "../api"
 import { requireSession } from "@/lib/auth"
@@ -215,5 +216,73 @@ describe("employees actions — auth guard", () => {
 
     expect(result.error?.code).toBe("VALIDATION_ERROR")
     expect(mockUpdate).not.toHaveBeenCalled()
+  })
+})
+
+// getEmployeeOptions backs the customer form's NVKD/QLHĐ pickers, reachable
+// by every logged-in user — unlike every other action in this file it must
+// NOT require admin. These tests pin that down so a future "tidy-up" onto
+// requireAdmin() gets caught immediately.
+describe("getEmployeeOptions", () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it("returns UNAUTHORIZED without a session", async () => {
+    mockRequireSession.mockResolvedValue(null)
+
+    const result = await getEmployeeOptions()
+
+    expect(result.error?.code).toBe("UNAUTHORIZED")
+    expect(mockGetAll).not.toHaveBeenCalled()
+  })
+
+  it("returns options for a non-admin session", async () => {
+    mockRequireSession.mockResolvedValue(userSession as never)
+    mockGetAll.mockResolvedValue({
+      data: {
+        data: [{ id: "1", ...validInput, joinedAt: "now" }],
+        total: 1,
+        page: 1,
+        pageSize: 1000,
+        totalPages: 1,
+      },
+      error: null,
+    })
+
+    const result = await getEmployeeOptions()
+
+    expect(result.error).toBeNull()
+    expect(result.data).toEqual([{ id: "1", name: validInput.name, department: "engineering" }])
+  })
+
+  it("only returns id/name/department — never email, phone, or status", async () => {
+    mockRequireSession.mockResolvedValue(userSession as never)
+    mockGetAll.mockResolvedValue({
+      data: {
+        data: [{ id: "1", ...validInput, joinedAt: "now" }],
+        total: 1,
+        page: 1,
+        pageSize: 1000,
+        totalPages: 1,
+      },
+      error: null,
+    })
+
+    const result = await getEmployeeOptions()
+
+    expect(result.data?.[0]).not.toHaveProperty("email")
+    expect(result.data?.[0]).not.toHaveProperty("phone")
+    expect(result.data?.[0]).not.toHaveProperty("status")
+  })
+
+  it("calls employeeApi.getAll with a large pageSize to fetch every employee in one page", async () => {
+    mockRequireSession.mockResolvedValue(userSession as never)
+    mockGetAll.mockResolvedValue({
+      data: { data: [], total: 0, page: 1, pageSize: 1000, totalPages: 1 },
+      error: null,
+    })
+
+    await getEmployeeOptions()
+
+    expect(mockGetAll).toHaveBeenCalledWith({ pageSize: 1000 })
   })
 })

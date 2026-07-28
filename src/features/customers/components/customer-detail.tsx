@@ -8,7 +8,7 @@ import { toast } from "sonner"
 import { ArrowLeft, Pencil, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import {
   AlertDialog,
   AlertDialogContent,
@@ -20,13 +20,38 @@ import {
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog"
 import { ROUTES } from "@/lib/constants"
+import { cn } from "@/lib/utils"
+import { useEmployeeOptions } from "@/features/employees"
 import { updateCustomer, deleteCustomer } from "../actions"
 import { CustomerForm } from "./customer-form"
-import type { Customer } from "../types"
+import { STATUS_VARIANT, type Customer } from "../types"
 import type { CreateCustomerFormValues } from "../schemas"
 
 interface CustomerDetailProps {
   customer: Customer
+}
+
+function dash(value?: string) {
+  return value && value.trim() ? value : "—"
+}
+
+function DetailItem({
+  label,
+  value,
+  multiline,
+}: {
+  label: string
+  value?: string
+  multiline?: boolean
+}) {
+  return (
+    <div>
+      <dt className="text-muted-foreground text-xs">{label}</dt>
+      <dd className={cn("mt-1 text-sm break-words", multiline && "whitespace-pre-line")}>
+        {dash(value)}
+      </dd>
+    </div>
+  )
 }
 
 export function CustomerDetail({ customer: initialCustomer }: CustomerDetailProps) {
@@ -34,11 +59,26 @@ export function CustomerDetail({ customer: initialCustomer }: CustomerDetailProp
   const tCommon = useTranslations("common")
   const locale = useLocale()
   const router = useRouter()
+  // Module-scope cache in the hook means this costs no extra network
+  // round-trip if CustomerForm (rendered below for the edit dialog) already
+  // fetched the same options on this page.
+  const { options: employeeOptions, isLoading: employeeOptionsLoading } = useEmployeeOptions()
 
   const [customer, setCustomer] = useState(initialCustomer)
   const [formOpen, setFormOpen] = useState(false)
   const [pendingDelete, setPendingDelete] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+
+  // A stored id whose employee has since been deleted still needs to render
+  // as something informative, not a blank dash. While options are still
+  // loading (mockApi has a deliberate delay), a valid id has no match yet —
+  // render "—" instead of prematurely mislabeling it "unknown".
+  function resolveEmployeeName(id?: string) {
+    if (!id) return undefined
+    if (employeeOptionsLoading) return undefined
+    const match = employeeOptions.find((option) => option.id === id)
+    return match ? match.name : t("form.assigneeUnknown", { id })
+  }
 
   async function onFormSubmit(values: CreateCustomerFormValues) {
     const { data, error } = await updateCustomer(customer.id, values)
@@ -81,15 +121,15 @@ export function CustomerDetail({ customer: initialCustomer }: CustomerDetailProp
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-4">
             <Avatar size={64}>
+              {/* avatarUrl is always undefined in mock mode (no object storage
+                  exists to produce one) — this branch is ready for a real
+                  backend without any further wiring. */}
+              {customer.avatarUrl && <AvatarImage src={customer.avatarUrl} alt={customer.name} />}
               <AvatarFallback>{customer.name.charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
             <div>
               <h1 className="text-foreground text-xl font-semibold">{customer.name}</h1>
-              <Badge
-                variant={customer.status === "active" ? "success" : "danger"}
-                skin="light"
-                className="mt-1.5"
-              >
+              <Badge variant={STATUS_VARIANT[customer.status]} skin="light" className="mt-1.5">
                 {t(`status.${customer.status}`)}
               </Badge>
             </div>
@@ -110,26 +150,96 @@ export function CustomerDetail({ customer: initialCustomer }: CustomerDetailProp
           </div>
         </div>
 
-        <dl className="mt-6 grid grid-cols-2 gap-x-6 gap-y-4">
-          <div>
-            <dt className="text-muted-foreground text-xs">{t("columns.email")}</dt>
-            <dd className="mt-1 text-sm">{customer.email}</dd>
-          </div>
-          <div>
-            <dt className="text-muted-foreground text-xs">{t("columns.phone")}</dt>
-            <dd className="mt-1 text-sm">{customer.phone}</dd>
-          </div>
-          <div>
-            <dt className="text-muted-foreground text-xs">{t("columns.company")}</dt>
-            <dd className="mt-1 text-sm">{customer.company}</dd>
-          </div>
-          <div>
-            <dt className="text-muted-foreground text-xs">{t("columns.createdAt")}</dt>
-            <dd className="mt-1 text-sm">
-              {new Date(customer.createdAt).toLocaleDateString("vi-VN")}
-            </dd>
-          </div>
-        </dl>
+        <div className="mt-6 flex flex-col gap-6">
+          <section className="flex flex-col gap-3">
+            <h2 className="text-foreground text-sm font-semibold">{t("form.sectionGeneral")}</h2>
+            <dl className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
+              <DetailItem label={t("columns.code")} value={customer.code} />
+              <DetailItem label={t("form.shortName")} value={customer.shortName} />
+              <DetailItem label={t("columns.email")} value={customer.email} />
+              <DetailItem label={t("columns.phone")} value={customer.phone} />
+              <DetailItem label={t("columns.company")} value={customer.company} />
+              <DetailItem
+                label={t("columns.classification")}
+                value={t(`classification.${customer.classification}`)}
+              />
+              <DetailItem
+                label={t("columns.industry")}
+                value={t(`industry.${customer.industry}`)}
+              />
+              <DetailItem label={t("form.taxCode")} value={customer.taxCode} />
+              <DetailItem label={t("form.website")} value={customer.website} />
+              <DetailItem label={t("form.address")} value={customer.address} />
+              <DetailItem
+                label={t("form.country")}
+                value={customer.country ? t(`country.${customer.country}`) : undefined}
+              />
+              <DetailItem
+                label={t("form.province")}
+                value={customer.province ? t(`province.${customer.province}`) : undefined}
+              />
+              <DetailItem
+                label={t("form.salesRep")}
+                value={resolveEmployeeName(customer.salesRepId)}
+              />
+              <DetailItem
+                label={t("form.contractManager")}
+                value={resolveEmployeeName(customer.contractManagerId)}
+              />
+              <DetailItem
+                label={t("columns.createdAt")}
+                value={new Date(customer.createdAt).toLocaleDateString("vi-VN")}
+              />
+            </dl>
+          </section>
+
+          <section className="flex flex-col gap-3">
+            <h2 className="text-foreground text-sm font-semibold">{t("form.sectionContacts")}</h2>
+            <dl className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-3">
+              <DetailItem
+                label={t("form.representativeName")}
+                value={customer.representativeName}
+              />
+              <DetailItem label={t("form.contactName")} value={customer.contactName} />
+              <DetailItem label={t("form.mediaContactName")} value={customer.mediaContactName} />
+              <DetailItem
+                label={t("form.representativePosition")}
+                value={customer.representativePosition}
+              />
+              <DetailItem label={t("form.contactPosition")} value={customer.contactPosition} />
+              <DetailItem
+                label={t("form.mediaContactPosition")}
+                value={customer.mediaContactPosition}
+              />
+              <DetailItem
+                label={t("form.representativeMobile")}
+                value={customer.representativeMobile}
+              />
+              <DetailItem label={t("form.contactMobile")} value={customer.contactMobile} />
+              <DetailItem
+                label={t("form.mediaContactMobile")}
+                value={customer.mediaContactMobile}
+              />
+              <DetailItem
+                label={t("form.representativeEmail")}
+                value={customer.representativeEmail}
+              />
+              <DetailItem label={t("form.contactEmail")} value={customer.contactEmail} />
+              <DetailItem label={t("form.mediaContactEmail")} value={customer.mediaContactEmail} />
+            </dl>
+          </section>
+
+          <section className="flex flex-col gap-3">
+            <h2 className="text-foreground text-sm font-semibold">{t("form.sectionMedia")}</h2>
+            <dl className="grid grid-cols-1 gap-x-6 gap-y-4">
+              <DetailItem label={t("form.avatar")} value={customer.avatarFileName} />
+            </dl>
+            <dl className="grid grid-cols-1 gap-x-6 gap-y-4 lg:grid-cols-2">
+              <DetailItem label={t("form.notes")} value={customer.notes} multiline />
+              <DetailItem label={t("form.review")} value={customer.review} multiline />
+            </dl>
+          </section>
+        </div>
       </div>
 
       <CustomerForm

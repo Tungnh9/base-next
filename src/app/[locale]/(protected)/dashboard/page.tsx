@@ -4,7 +4,8 @@ import {
   CUSTOMER_STATUSES,
   EMPLOYEE_STATUSES,
   STATUS_LABEL_KEYS,
-  STATUS_VARIANT,
+  CUSTOMER_STATUS_VARIANT,
+  EMPLOYEE_STATUS_VARIANT,
 } from "@/features/dashboard/types"
 import { StatCard } from "@/features/dashboard/components/stat-card"
 import { StatusBreakdown } from "@/features/dashboard/components/status-breakdown"
@@ -18,7 +19,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 
 export default async function DashboardPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
-  const t = await getTranslations({ locale, namespace: "dashboard" })
+  const [t, tCustomers] = await Promise.all([
+    getTranslations({ locale, namespace: "dashboard" }),
+    getTranslations({ locale, namespace: "customers" }),
+  ])
   const stats = await getDashboardStats()
 
   return (
@@ -33,9 +37,9 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
             <StatusBreakdown
               items={CUSTOMER_STATUSES.map((status) => ({
                 key: status,
-                label: t(STATUS_LABEL_KEYS[status]),
+                label: tCustomers(`status.${status}`),
                 count: stats.customersByStatus[status],
-                variant: STATUS_VARIANT[status],
+                variant: CUSTOMER_STATUS_VARIANT[status],
               }))}
             />
           }
@@ -49,7 +53,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
                 key: status,
                 label: t(STATUS_LABEL_KEYS[status]),
                 count: stats.employeesByStatus[status],
-                variant: STATUS_VARIANT[status],
+                variant: EMPLOYEE_STATUS_VARIANT[status],
               }))}
             />
           }

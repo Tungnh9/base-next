@@ -9,9 +9,10 @@ import {
   type DashboardStats,
 } from "./types"
 
-// Large enough to cover the whole employees mock dataset (24 rows) in a
-// single page — see the comment on getDashboardStats for why fetch-all is
-// acceptable here.
+// Large enough to cover the whole customers/employees mock datasets (24 rows
+// each) in a single page — see the comment on getDashboardStats for why
+// fetch-all is acceptable here.
+const CUSTOMER_PAGE_SIZE = 1000
 const EMPLOYEE_PAGE_SIZE = 1000
 
 function zeroRecord<K extends string>(keys: readonly K[]): Record<K, number> {
@@ -51,11 +52,11 @@ export function aggregateStats(customers: Customer[], employees: Employee[]): Da
 // of shipping every row to the server just to compute counts.
 export async function getDashboardStats(): Promise<DashboardStats> {
   const [customersRes, employeesRes] = await Promise.all([
-    customerApi.getAll(),
+    customerApi.getAll({ pageSize: CUSTOMER_PAGE_SIZE }),
     employeeApi.getAll({ pageSize: EMPLOYEE_PAGE_SIZE }),
   ])
 
-  const customers = customersRes.data ?? []
+  const customers = customersRes.data?.data ?? []
   const employees = employeesRes.data?.data ?? []
 
   return aggregateStats(customers, employees)

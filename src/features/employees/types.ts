@@ -33,6 +33,16 @@ export interface EmployeeFilters {
 
 export interface GetEmployeesParams extends PaginationParams, EmployeeFilters {}
 
+// Minimal projection for assignee pickers in other features (e.g. the
+// customer form's NVKD/QLHĐ Selects). Deliberately excludes email/phone/
+// status: those pickers are reachable by non-admin users, who have no
+// business receiving the full Employee record.
+export interface EmployeeOption {
+  id: string
+  name: string
+  department: EmployeeDepartment
+}
+
 // Canonical status → Badge/ProgressSegment variant mapping. Single source of
 // truth shared by employee-list.tsx, employee-detail.tsx, and (via
 // re-export) the dashboard feature's status-breakdown bars — previously

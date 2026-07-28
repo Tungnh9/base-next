@@ -8,7 +8,12 @@ import {
   getEmployeesParamsSchema,
   employeeIdSchema,
 } from "./schemas"
-import type { CreateEmployeeInput, UpdateEmployeeInput, GetEmployeesParams } from "./types"
+import type {
+  CreateEmployeeInput,
+  UpdateEmployeeInput,
+  GetEmployeesParams,
+  EmployeeOption,
+} from "./types"
 import type { ApiError } from "@/types"
 
 const VALIDATION_ERROR: ApiError = {
@@ -72,4 +77,32 @@ export async function deleteEmployee(id: string) {
   const parsedId = employeeIdSchema.safeParse(id)
   if (!parsedId.success) return { data: null, error: VALIDATION_ERROR }
   return employeeApi.delete(parsedId.data)
+}
+
+// Assignee-picker data source. Session-gated, NOT admin-gated on purpose:
+// /customers is open to every logged-in user (see config/nav.ts — the
+// customers nav item has no requiredRole), and its form has to populate the
+// NVKD/QLHĐ Selects. To keep that safe, this returns only id/name/department —
+// never the full Employee record that the admin-only getEmployees() returns.
+//
+// Calls employeeApi.getAll directly with a large pageSize rather than going
+// through getEmployees(): that action is admin-gated AND its param schema
+// caps pageSize at 100. Same fetch-one-big-page shortcut as
+// features/dashboard/api.ts — fine at this template's scale, but a real
+// backend should expose GET /employees/options instead of shipping every row.
+const EMPLOYEE_OPTIONS_PAGE_SIZE = 1000
+
+export async function getEmployeeOptions() {
+  const session = await requireSession()
+  if (!session) return { data: null, error: unauthorizedError() }
+
+  const { data, error } = await employeeApi.getAll({ pageSize: EMPLOYEE_OPTIONS_PAGE_SIZE })
+  if (error) return { data: null, error }
+
+  const options: EmployeeOption[] = (data?.data ?? []).map(({ id, name, department }) => ({
+    id,
+    name,
+    department,
+  }))
+  return { data: options, error: null }
 }

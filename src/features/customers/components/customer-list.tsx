@@ -1,14 +1,19 @@
 "use client"
 
-import { useState, type MouseEvent } from "react"
+import { useMemo, useState, type MouseEvent } from "react"
 import Link from "next/link"
 import { useTranslations, useLocale } from "next-intl"
 import { Plus, Eye, Pencil, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import {
   AlertDialog,
   AlertDialogContent,
@@ -19,55 +24,58 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog"
+import { DataTable, type DataTableColumnDef } from "@/components/ui/data-table"
 import { ROUTES } from "@/lib/constants"
 import { useCustomers } from "../hooks/use-customers"
 import { CustomerForm } from "./customer-form"
-import type { Customer } from "../types"
+import { CUSTOMER_CLASSIFICATIONS, CUSTOMER_INDUSTRIES, CUSTOMER_STATUSES } from "../constants"
+import {
+  STATUS_VARIANT,
+  type Customer,
+  type CustomerClassification,
+  type CustomerIndustry,
+  type CustomerStatus,
+} from "../types"
 import type { CreateCustomerFormValues } from "../schemas"
 
 export function CustomerList() {
   const t = useTranslations("customers")
   const tCommon = useTranslations("common")
   const locale = useLocale()
-  const { customers, isLoading, handleCreate, handleUpdate, handleDelete, handleDeleteMany } =
-    useCustomers()
+  const {
+    customers,
+    total,
+    totalPages,
+    page,
+    setPage,
+    pageSize,
+    search,
+    setSearch,
+    classification,
+    setClassification,
+    industry,
+    setIndustry,
+    status,
+    setStatus,
+    isLoading,
+    handleCreate,
+    handleUpdate,
+    handleDelete,
+    handleDeleteMany,
+  } = useCustomers()
 
-  const [search, setSearch] = useState("")
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<Customer | null>(null)
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [selectedRows, setSelectedRows] = useState<Customer[]>([])
   const [pendingDelete, setPendingDelete] = useState<Customer[] | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
-
-  const filtered = customers.filter(
-    (c) =>
-      c.name.toLowerCase().includes(search.toLowerCase()) ||
-      c.email.toLowerCase().includes(search.toLowerCase())
-  )
-
-  const allSelected = filtered.length > 0 && filtered.every((c) => selectedIds.has(c.id))
-  const someSelected = filtered.some((c) => selectedIds.has(c.id))
-
-  function toggleSelectAll() {
-    setSelectedIds(allSelected ? new Set() : new Set(filtered.map((c) => c.id)))
-  }
-
-  function toggleSelectRow(id: string) {
-    setSelectedIds((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
-      return next
-    })
-  }
+  // DataTable's internal rowSelection/sorting state is keyed by row index, not
+  // row id — bumping this key forces a remount (fresh internal state) after
+  // a delete refetches, so a stale index can't silently re-select the wrong row.
+  const [tableKey, setTableKey] = useState(0)
 
   function openCreate() {
     setEditing(null)
-    setFormOpen(true)
-  }
-
-  function openEdit(customer: Customer) {
-    setEditing(customer)
     setFormOpen(true)
   }
 
@@ -88,14 +96,125 @@ export function CustomerList() {
     } else {
       await handleDeleteMany(ids)
     }
-    setSelectedIds((prev) => {
-      const next = new Set(prev)
-      ids.forEach((id) => next.delete(id))
-      return next
-    })
+    setSelectedRows([])
+    setTableKey((k) => k + 1)
     setIsDeleting(false)
     setPendingDelete(null)
   }
+
+  const columns = useMemo<DataTableColumnDef<Customer>[]>(
+    () => [
+      {
+        accessorKey: "code",
+        header: t("columns.code"),
+        cell: ({ row }) => (
+          <span className="text-muted-foreground font-mono text-xs">{row.original.code}</span>
+        ),
+      },
+      {
+        accessorKey: "name",
+        header: t("columns.name"),
+        cell: ({ row }) => (
+          <Link
+            href={`/${locale}${ROUTES.customers}/${row.original.id}`}
+            className="hover:text-primary font-medium hover:underline"
+          >
+            {row.original.name}
+          </Link>
+        ),
+      },
+      {
+        accessorKey: "email",
+        header: t("columns.email"),
+        cell: ({ row }) => <span className="text-muted-foreground">{row.original.email}</span>,
+      },
+      {
+        accessorKey: "phone",
+        header: t("columns.phone"),
+        cell: ({ row }) => <span className="text-muted-foreground">{row.original.phone}</span>,
+      },
+      {
+        accessorKey: "company",
+        header: t("columns.company"),
+        cell: ({ row }) => <span className="text-muted-foreground">{row.original.company}</span>,
+      },
+      {
+        accessorKey: "classification",
+        header: t("columns.classification"),
+        cell: ({ row }) => (
+          <span className="text-muted-foreground">
+            {t(`classification.${row.original.classification}`)}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "industry",
+        header: t("columns.industry"),
+        cell: ({ row }) => (
+          <span className="text-muted-foreground">{t(`industry.${row.original.industry}`)}</span>
+        ),
+      },
+      {
+        accessorKey: "status",
+        header: t("columns.status"),
+        cell: ({ row }) => (
+          <Badge variant={STATUS_VARIANT[row.original.status]} skin="light">
+            {t(`status.${row.original.status}`)}
+          </Badge>
+        ),
+      },
+      {
+        accessorKey: "createdAt",
+        header: t("columns.createdAt"),
+        cell: ({ row }) => (
+          <span className="text-muted-foreground">
+            {new Date(row.original.createdAt).toLocaleDateString("vi-VN")}
+          </span>
+        ),
+      },
+      {
+        id: "actions",
+        header: "",
+        enableSorting: false,
+        cell: ({ row }) => {
+          const customer = row.original
+          return (
+            <div className="flex items-center justify-end gap-1">
+              <Button variant="ghost" size="icon" aria-label={t("view")} asChild>
+                <Link href={`/${locale}${ROUTES.customers}/${customer.id}`}>
+                  <Eye className="size-4" />
+                </Link>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  setEditing(customer)
+                  setFormOpen(true)
+                }}
+                aria-label={t("edit")}
+              >
+                <Pencil className="size-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setPendingDelete([customer])}
+                aria-label={t("delete")}
+                className="text-destructive hover:text-destructive"
+              >
+                <Trash2 className="size-4" />
+              </Button>
+            </div>
+          )
+        },
+      },
+    ],
+    [t, locale]
+  )
+
+  const from = total === 0 ? 0 : (page - 1) * pageSize + 1
+  const to = Math.min(page * pageSize, total)
 
   return (
     <div className="flex flex-col gap-4">
@@ -111,130 +230,99 @@ export function CustomerList() {
         </Button>
       </div>
 
-      {/* Search + bulk action bar */}
-      <div className="flex items-center justify-between gap-3">
-        <Input
-          placeholder={t("searchPlaceholder")}
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="max-w-sm"
-        />
-        {someSelected && (
-          <Button
-            variant="destructive"
-            skin="light"
-            onClick={() => setPendingDelete(filtered.filter((c) => selectedIds.has(c.id)))}
+      {/* Filter bar — 4 fields share the row equally instead of sizing to content */}
+      <div className="flex flex-col gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <Input
+            placeholder={t("searchPlaceholder")}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <Select
+            value={classification ?? "all"}
+            onValueChange={(v) =>
+              setClassification(v === "all" ? undefined : (v as CustomerClassification))
+            }
           >
-            <Trash2 className="mr-1.5 size-4" />
-            {t("deleteSelected", { count: selectedIds.size })}
-          </Button>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder={t("filters.classification")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t("filters.all")}</SelectItem>
+              {CUSTOMER_CLASSIFICATIONS.map((c) => (
+                <SelectItem key={c} value={c}>
+                  {t(`classification.${c}`)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={industry ?? "all"}
+            onValueChange={(v) => setIndustry(v === "all" ? undefined : (v as CustomerIndustry))}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder={t("filters.industry")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t("filters.all")}</SelectItem>
+              {CUSTOMER_INDUSTRIES.map((i) => (
+                <SelectItem key={i} value={i}>
+                  {t(`industry.${i}`)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={status ?? "all"}
+            onValueChange={(v) => setStatus(v === "all" ? undefined : (v as CustomerStatus))}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder={t("filters.status")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t("filters.all")}</SelectItem>
+              {CUSTOMER_STATUSES.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {t(`status.${s}`)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        {selectedRows.length > 0 && (
+          <div className="flex justify-end">
+            <Button
+              variant="destructive"
+              skin="light"
+              onClick={() => setPendingDelete(selectedRows)}
+            >
+              <Trash2 className="mr-1.5 size-4" />
+              {t("deleteSelected", { count: selectedRows.length })}
+            </Button>
+          </div>
         )}
       </div>
 
-      {/* Table */}
-      <div className="border-border bg-card overflow-hidden rounded-xl border">
-        <table className="w-full text-sm">
-          <thead className="bg-muted/50 border-border border-b">
-            <tr>
-              <th className="w-10 px-4 py-3">
-                <Checkbox
-                  checked={allSelected ? true : someSelected ? "indeterminate" : false}
-                  onCheckedChange={toggleSelectAll}
-                  disabled={filtered.length === 0}
-                  aria-label={t("selectAll")}
-                />
-              </th>
-              {(["name", "email", "phone", "company", "status", "createdAt"] as const).map(
-                (col) => (
-                  <th key={col} className="text-muted-foreground px-4 py-3 text-left font-medium">
-                    {t(`columns.${col}`)}
-                  </th>
-                )
-              )}
-              <th className="px-4 py-3" />
-            </tr>
-          </thead>
-          <tbody className="divide-border divide-y">
-            {isLoading ? (
-              Array.from({ length: 5 }).map((_, i) => (
-                <tr key={i}>
-                  {Array.from({ length: 8 }).map((_, j) => (
-                    <td key={j} className="px-4 py-3">
-                      <Skeleton className="h-4 w-full" />
-                    </td>
-                  ))}
-                </tr>
-              ))
-            ) : filtered.length === 0 ? (
-              <tr>
-                <td colSpan={8} className="text-muted-foreground py-12 text-center">
-                  {t("empty")}
-                </td>
-              </tr>
-            ) : (
-              filtered.map((customer) => (
-                <tr key={customer.id} className="hover:bg-muted/30 transition-colors">
-                  <td className="px-4 py-3">
-                    <Checkbox
-                      checked={selectedIds.has(customer.id)}
-                      onCheckedChange={() => toggleSelectRow(customer.id)}
-                      aria-label={t("selectRow", { name: customer.name })}
-                    />
-                  </td>
-                  <td className="px-4 py-3 font-medium">
-                    <Link
-                      href={`/${locale}${ROUTES.customers}/${customer.id}`}
-                      className="hover:text-primary hover:underline"
-                    >
-                      {customer.name}
-                    </Link>
-                  </td>
-                  <td className="text-muted-foreground px-4 py-3">{customer.email}</td>
-                  <td className="text-muted-foreground px-4 py-3">{customer.phone}</td>
-                  <td className="text-muted-foreground px-4 py-3">{customer.company}</td>
-                  <td className="px-4 py-3">
-                    <Badge
-                      variant={customer.status === "active" ? "success" : "danger"}
-                      skin="light"
-                    >
-                      {t(`status.${customer.status}`)}
-                    </Badge>
-                  </td>
-                  <td className="text-muted-foreground px-4 py-3">
-                    {new Date(customer.createdAt).toLocaleDateString("vi-VN")}
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-1">
-                      <Button variant="ghost" size="icon" aria-label={t("view")} asChild>
-                        <Link href={`/${locale}${ROUTES.customers}/${customer.id}`}>
-                          <Eye className="size-4" />
-                        </Link>
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => openEdit(customer)}
-                        aria-label={t("edit")}
-                      >
-                        <Pencil className="size-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setPendingDelete([customer])}
-                        aria-label={t("delete")}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="size-4" />
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+      <DataTable
+        key={tableKey}
+        columns={columns}
+        data={customers}
+        isLoading={isLoading}
+        selectable
+        onSelectionChange={setSelectedRows}
+        selectAllLabel={t("selectAll")}
+        getRowSelectLabel={(customer) => t("selectRow", { name: customer.name })}
+        emptyMessage={t("empty")}
+        pagination={{
+          page,
+          totalPages,
+          pageSize,
+          onPageChange: setPage,
+          previousLabel: t("pagination.previous"),
+          nextLabel: t("pagination.next"),
+          summary: t("pagination.summary", { from, to, total }),
+        }}
+      />
 
       <CustomerForm
         open={formOpen}

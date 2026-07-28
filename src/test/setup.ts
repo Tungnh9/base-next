@@ -13,6 +13,30 @@ global.ResizeObserver = class {
   disconnect() {}
 }
 
+// jsdom has no URL.createObjectURL/revokeObjectURL — needed by the customer
+// avatar picker's local file preview
+global.URL.createObjectURL = vi.fn(() => "blob:mock-object-url")
+global.URL.revokeObjectURL = vi.fn()
+
+// jsdom has no pointer-capture APIs or scrollIntoView — Radix Select calls
+// these when a trigger is clicked/opened via userEvent, needed for any test
+// that opens a Select dropdown and picks an option. Guarded since some test
+// files in this project run in the "node" environment (no DOM at all).
+if (typeof Element !== "undefined") {
+  if (!Element.prototype.hasPointerCapture) {
+    Element.prototype.hasPointerCapture = () => false
+  }
+  if (!Element.prototype.setPointerCapture) {
+    Element.prototype.setPointerCapture = () => {}
+  }
+  if (!Element.prototype.releasePointerCapture) {
+    Element.prototype.releasePointerCapture = () => {}
+  }
+  if (!Element.prototype.scrollIntoView) {
+    Element.prototype.scrollIntoView = () => {}
+  }
+}
+
 // next/navigation — redirect, router, pathname
 vi.mock("next/navigation", () => ({
   redirect: vi.fn(),
