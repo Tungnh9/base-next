@@ -2,13 +2,20 @@
 
 import { requireSession, unauthorizedError } from "@/lib/auth"
 import { customerApi } from "./api"
-import { createCustomerSchema, updateCustomerSchema } from "./schemas"
-import type { CreateCustomerInput, UpdateCustomerInput } from "./types"
+import { createCustomerSchema, updateCustomerSchema, getCustomersParamsSchema } from "./schemas"
+import type { CreateCustomerInput, UpdateCustomerInput, GetCustomersParams } from "./types"
 
-export async function getCustomers() {
+export async function getCustomers(params: GetCustomersParams = {}) {
   const session = await requireSession()
   if (!session) return { data: null, error: unauthorizedError() }
-  return customerApi.getAll()
+
+  const parsed = getCustomersParamsSchema.safeParse(params)
+  if (!parsed.success)
+    return {
+      data: null,
+      error: { message: "Dữ liệu không hợp lệ", code: "VALIDATION_ERROR", status: 400 },
+    }
+  return customerApi.getAll(parsed.data)
 }
 
 export async function getCustomerById(id: string) {

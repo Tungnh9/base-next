@@ -24,27 +24,48 @@ const mockToastSuccess = vi.mocked(toast.success)
 
 const customerA: Customer = {
   id: "1",
+  code: "KH00001",
+  opportunityCount: 0,
   name: "Nguyễn Văn An",
   email: "an@example.com",
   phone: "0901234567",
   company: "ABC",
-  status: "active",
+  classification: "corporation",
+  industry: "finance-banking",
+  status: "collaborating",
   createdAt: "2024-01-01T00:00:00.000Z",
 }
 const customerB: Customer = {
   id: "2",
+  code: "KH00002",
+  opportunityCount: 0,
   name: "Lê Minh Châu",
   email: "chau@example.com",
   phone: "0923456789",
   company: "XYZ",
-  status: "inactive",
+  classification: "technology",
+  industry: "ecommerce",
+  status: "paused",
   createdAt: "2024-02-01T00:00:00.000Z",
+}
+
+function pageOf(data: Customer[], overrides: Partial<{ total: number; totalPages: number }> = {}) {
+  return {
+    data: {
+      data,
+      total: overrides.total ?? data.length,
+      page: 1,
+      pageSize: 10,
+      totalPages: overrides.totalPages ?? 1,
+    },
+    error: null,
+  }
 }
 
 describe("useCustomers", () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockGetCustomers.mockResolvedValue({ data: [customerA, customerB], error: null })
+    mockGetCustomers.mockResolvedValue(pageOf([customerA, customerB]))
   })
 
   it("starts with isLoading=true, then loads customers from getCustomers on mount", async () => {
@@ -56,7 +77,14 @@ describe("useCustomers", () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
     expect(result.current.customers).toEqual([customerA, customerB])
-    expect(mockGetCustomers).toHaveBeenCalledOnce()
+    expect(mockGetCustomers).toHaveBeenCalledWith({
+      page: 1,
+      pageSize: 10,
+      search: "",
+      classification: undefined,
+      industry: undefined,
+      status: undefined,
+    })
   })
 
   it("toasts an error and stops loading when getCustomers resolves with an error", async () => {
@@ -73,7 +101,104 @@ describe("useCustomers", () => {
     expect(mockToastError).toHaveBeenCalledWith("boom")
   })
 
-  it("refresh() sets isLoading and refetches", async () => {
+  it("setPage refetches with the new page number", async () => {
+    const { result } = renderHook(() => useCustomers())
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+    act(() => result.current.setPage(2))
+    await waitFor(() => expect(mockGetCustomers).toHaveBeenCalledTimes(2))
+
+    expect(mockGetCustomers).toHaveBeenLastCalledWith({
+      page: 2,
+      pageSize: 10,
+      search: "",
+      classification: undefined,
+      industry: undefined,
+      status: undefined,
+    })
+  })
+
+  it("setSearch resets back to page 1", async () => {
+    const { result } = renderHook(() => useCustomers())
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+    act(() => result.current.setPage(3))
+    await waitFor(() => expect(result.current.page).toBe(3))
+
+    act(() => result.current.setSearch("an"))
+
+    expect(result.current.page).toBe(1)
+    await waitFor(() =>
+      expect(mockGetCustomers).toHaveBeenLastCalledWith({
+        page: 1,
+        pageSize: 10,
+        search: "an",
+        classification: undefined,
+        industry: undefined,
+        status: undefined,
+      })
+    )
+  })
+
+  it("setClassification resets back to page 1 and refetches with the filter", async () => {
+    const { result } = renderHook(() => useCustomers())
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+    act(() => result.current.setPage(2))
+    await waitFor(() => expect(result.current.page).toBe(2))
+
+    act(() => result.current.setClassification("partner"))
+
+    expect(result.current.page).toBe(1)
+    await waitFor(() =>
+      expect(mockGetCustomers).toHaveBeenLastCalledWith({
+        page: 1,
+        pageSize: 10,
+        search: "",
+        classification: "partner",
+        industry: undefined,
+        status: undefined,
+      })
+    )
+  })
+
+  it("setIndustry resets back to page 1 and refetches with the filter", async () => {
+    const { result } = renderHook(() => useCustomers())
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+    act(() => result.current.setIndustry("telecom-it"))
+
+    await waitFor(() =>
+      expect(mockGetCustomers).toHaveBeenLastCalledWith({
+        page: 1,
+        pageSize: 10,
+        search: "",
+        classification: undefined,
+        industry: "telecom-it",
+        status: undefined,
+      })
+    )
+  })
+
+  it("setStatus resets back to page 1 and refetches with the filter", async () => {
+    const { result } = renderHook(() => useCustomers())
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+    act(() => result.current.setStatus("potential"))
+
+    await waitFor(() =>
+      expect(mockGetCustomers).toHaveBeenLastCalledWith({
+        page: 1,
+        pageSize: 10,
+        search: "",
+        classification: undefined,
+        industry: undefined,
+        status: "potential",
+      })
+    )
+  })
+
+  it("refresh() sets isLoading and refetches with the same page/filters", async () => {
     const { result } = renderHook(() => useCustomers())
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
@@ -84,12 +209,14 @@ describe("useCustomers", () => {
     expect(mockGetCustomers).toHaveBeenCalledTimes(2)
   })
 
-  it("handleCreate appends the new customer and returns true on success", async () => {
+  it("handleCreate refetches and returns true on success", async () => {
     const { result } = renderHook(() => useCustomers())
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
-    const newCustomer: Customer = { ...customerA, id: "3", name: "New Customer" }
-    mockCreateCustomer.mockResolvedValue({ data: newCustomer, error: null })
+    mockCreateCustomer.mockResolvedValue({
+      data: { ...customerA, id: "3", name: "New Customer" },
+      error: null,
+    })
 
     let ok = false
     await act(async () => {
@@ -98,19 +225,24 @@ describe("useCustomers", () => {
         email: "new@example.com",
         phone: "0900000000",
         company: "ABC",
-        status: "active",
+        shortName: "ABC",
+        taxCode: "0123456789",
+        salesRepId: "1",
+        contractManagerId: "2",
+        classification: "corporation",
+        industry: "finance-banking",
+        status: "collaborating",
       })
     })
 
     expect(ok).toBe(true)
-    expect(result.current.customers).toContainEqual(newCustomer)
-    expect(mockToastSuccess).toHaveBeenCalled()
+    expect(mockGetCustomers).toHaveBeenCalledTimes(2) // initial load + refresh after create
+    expect(mockToastSuccess).toHaveBeenCalledWith("createSuccess")
   })
 
-  it("handleCreate toasts the error and returns false without mutating customers on failure", async () => {
+  it("handleCreate toasts the error and returns false without refetching on failure", async () => {
     const { result } = renderHook(() => useCustomers())
     await waitFor(() => expect(result.current.isLoading).toBe(false))
-    const before = result.current.customers
 
     mockCreateCustomer.mockResolvedValue({
       data: null,
@@ -124,16 +256,22 @@ describe("useCustomers", () => {
         email: "",
         phone: "",
         company: "",
-        status: "active",
+        shortName: "",
+        taxCode: "",
+        salesRepId: "",
+        contractManagerId: "",
+        classification: "corporation",
+        industry: "finance-banking",
+        status: "collaborating",
       })
     })
 
     expect(ok).toBe(false)
-    expect(result.current.customers).toEqual(before)
+    expect(mockGetCustomers).toHaveBeenCalledTimes(1) // no refresh on failure
     expect(mockToastError).toHaveBeenCalledWith("invalid")
   })
 
-  it("handleUpdate replaces the matching customer by id and returns true", async () => {
+  it("handleUpdate replaces the matching customer in place without refetching", async () => {
     const { result } = renderHook(() => useCustomers())
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
@@ -147,6 +285,7 @@ describe("useCustomers", () => {
 
     expect(ok).toBe(true)
     expect(result.current.customers.find((c) => c.id === "1")).toEqual(updated)
+    expect(mockGetCustomers).toHaveBeenCalledTimes(1) // in-place update, no refresh
   })
 
   it("handleUpdate returns false and leaves customers unchanged on error", async () => {
@@ -168,7 +307,7 @@ describe("useCustomers", () => {
     expect(result.current.customers).toEqual(before)
   })
 
-  it("handleDelete removes the customer by id and returns true on success", async () => {
+  it("handleDelete refetches and returns true on success", async () => {
     const { result } = renderHook(() => useCustomers())
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
@@ -180,10 +319,11 @@ describe("useCustomers", () => {
     })
 
     expect(ok).toBe(true)
-    expect(result.current.customers.map((c) => c.id)).toEqual(["2"])
+    expect(mockGetCustomers).toHaveBeenCalledTimes(2)
+    expect(mockToastSuccess).toHaveBeenCalledWith("deleteSuccess")
   })
 
-  it("handleDelete returns false and leaves customers unchanged on error", async () => {
+  it("handleDelete returns false and does not refetch on error", async () => {
     const { result } = renderHook(() => useCustomers())
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
@@ -198,10 +338,27 @@ describe("useCustomers", () => {
     })
 
     expect(ok).toBe(false)
-    expect(result.current.customers.map((c) => c.id)).toEqual(["1", "2"])
+    expect(mockGetCustomers).toHaveBeenCalledTimes(1)
   })
 
-  it("handleDeleteMany removes only the successfully-deleted ids when some fail", async () => {
+  it("handleDeleteMany refetches once and toasts success when all deletions succeed", async () => {
+    const { result } = renderHook(() => useCustomers())
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+    mockDeleteCustomer.mockResolvedValue({ data: undefined, error: null })
+
+    let ok = false
+    await act(async () => {
+      ok = await result.current.handleDeleteMany(["1", "2"])
+    })
+
+    expect(ok).toBe(true)
+    expect(mockGetCustomers).toHaveBeenCalledTimes(2)
+    expect(mockToastSuccess).toHaveBeenCalledWith("deleteManySuccess")
+    expect(mockToastError).not.toHaveBeenCalled()
+  })
+
+  it("handleDeleteMany toasts a partial-fail message when some deletions fail", async () => {
     const { result } = renderHook(() => useCustomers())
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
@@ -217,24 +374,6 @@ describe("useCustomers", () => {
     })
 
     expect(ok).toBe(false)
-    expect(result.current.customers.map((c) => c.id)).toEqual(["2"])
     expect(mockToastError).toHaveBeenCalledWith("deleteManyPartialFail")
-  })
-
-  it("handleDeleteMany returns true and toasts success when all deletions succeed", async () => {
-    const { result } = renderHook(() => useCustomers())
-    await waitFor(() => expect(result.current.isLoading).toBe(false))
-
-    mockDeleteCustomer.mockResolvedValue({ data: undefined, error: null })
-
-    let ok = false
-    await act(async () => {
-      ok = await result.current.handleDeleteMany(["1", "2"])
-    })
-
-    expect(ok).toBe(true)
-    expect(result.current.customers).toEqual([])
-    expect(mockToastSuccess).toHaveBeenCalledWith("deleteManySuccess")
-    expect(mockToastError).not.toHaveBeenCalled()
   })
 })

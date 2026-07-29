@@ -44,8 +44,16 @@ const validInput = {
   email: "an@example.com",
   phone: "0901234567",
   company: "ABC",
-  status: "active" as const,
+  classification: "corporation" as const,
+  industry: "finance-banking" as const,
+  status: "collaborating" as const,
+  shortName: "ABC",
+  taxCode: "0123456789",
+  salesRepId: "1",
+  contractManagerId: "2",
 }
+
+const paginatedEmpty = { data: [], total: 0, page: 1, pageSize: 10, totalPages: 1 }
 
 describe("customers actions — auth guard", () => {
   beforeEach(() => vi.clearAllMocks())
@@ -107,14 +115,23 @@ describe("customers actions — auth guard", () => {
     expect(mockDelete).not.toHaveBeenCalled()
   })
 
-  it("getCustomers delegates to customerApi.getAll when a session exists", async () => {
+  it("getCustomers delegates to customerApi.getAll with parsed params when a session exists", async () => {
     mockRequireSession.mockResolvedValue(mockSession as never)
-    mockGetAll.mockResolvedValue({ data: [], error: null })
+    mockGetAll.mockResolvedValue({ data: paginatedEmpty, error: null })
 
-    const result = await getCustomers()
+    const result = await getCustomers({ page: 2, pageSize: 10, search: "an" })
 
-    expect(mockGetAll).toHaveBeenCalledOnce()
-    expect(result).toEqual({ data: [], error: null })
+    expect(mockGetAll).toHaveBeenCalledWith({ page: 2, pageSize: 10, search: "an" })
+    expect(result).toEqual({ data: paginatedEmpty, error: null })
+  })
+
+  it("getCustomers returns VALIDATION_ERROR for an out-of-range page and never calls customerApi", async () => {
+    mockRequireSession.mockResolvedValue(mockSession as never)
+
+    const result = await getCustomers({ page: 0 })
+
+    expect(result.error?.code).toBe("VALIDATION_ERROR")
+    expect(mockGetAll).not.toHaveBeenCalled()
   })
 
   it("getCustomerById delegates to customerApi.getById when a session exists", async () => {

@@ -16,22 +16,40 @@ vi.mock("../../actions", () => ({
   deleteCustomer: vi.fn(),
 }))
 
+// CustomerDetail renders CustomerForm (for the edit dialog) and resolves
+// assignee names via useEmployeeOptions() — without this mock, the real hook
+// would call the getEmployeeOptions Server Action -> cookies(), which throws
+// outside a request context in jsdom.
+vi.mock("@/features/employees", () => ({
+  useEmployeeOptions: vi.fn(() => ({ options: [], isLoading: false })),
+}))
+
 import { CustomerDetail } from "../../components/customer-detail"
 import { updateCustomer, deleteCustomer } from "../../actions"
+import { useEmployeeOptions } from "@/features/employees"
 import { toast } from "sonner"
 import type { Customer } from "../../types"
 
 const mockUpdateCustomer = vi.mocked(updateCustomer)
 const mockDeleteCustomer = vi.mocked(deleteCustomer)
+const mockUseEmployeeOptions = vi.mocked(useEmployeeOptions)
 const mockToastSuccess = vi.mocked(toast.success)
 
 const customer: Customer = {
   id: "1",
+  code: "KH00001",
+  opportunityCount: 0,
   name: "Nguyễn Văn An",
   email: "an@example.com",
   phone: "0901234567",
   company: "ABC",
-  status: "active",
+  classification: "corporation",
+  industry: "finance-banking",
+  status: "collaborating",
+  shortName: "SVG",
+  taxCode: "0123456789",
+  salesRepId: "1",
+  contractManagerId: "2",
   createdAt: "2024-01-15T00:00:00.000Z",
 }
 
@@ -39,6 +57,7 @@ describe("CustomerDetail", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     pushMock.mockClear()
+    mockUseEmployeeOptions.mockReturnValue({ options: [], isLoading: false })
   })
 
   it("renders the customer's info", () => {
@@ -48,6 +67,43 @@ describe("CustomerDetail", () => {
     expect(screen.getByText("an@example.com")).toBeInTheDocument()
     expect(screen.getByText("0901234567")).toBeInTheDocument()
     expect(screen.getByText("ABC")).toBeInTheDocument()
+  })
+
+  it("renders an em dash for absent optional fields", () => {
+    render(<CustomerDetail customer={customer} />)
+
+    expect(screen.getAllByText("—").length).toBeGreaterThan(0)
+  })
+
+  it("resolves the assigned NVKD/QLHĐ names from employee options", () => {
+    mockUseEmployeeOptions.mockReturnValue({
+      options: [
+        { id: "1", name: "Trần Thị B", department: "sales" },
+        { id: "2", name: "Lê Văn C", department: "engineering" },
+      ],
+      isLoading: false,
+    })
+    render(<CustomerDetail customer={{ ...customer, salesRepId: "1", contractManagerId: "2" }} />)
+
+    expect(screen.getByText("Trần Thị B")).toBeInTheDocument()
+    expect(screen.getByText("Lê Văn C")).toBeInTheDocument()
+  })
+
+  it("shows a dash — not the unknown placeholder — for a valid assignee while options are still loading", () => {
+    mockUseEmployeeOptions.mockReturnValue({ options: [], isLoading: true })
+    render(<CustomerDetail customer={{ ...customer, salesRepId: "1" }} />)
+
+    expect(screen.queryByText("form.assigneeUnknown")).not.toBeInTheDocument()
+    expect(screen.getAllByText("—").length).toBeGreaterThan(0)
+  })
+
+  it("shows a placeholder for an assignee id that no longer matches any employee", () => {
+    mockUseEmployeeOptions.mockReturnValue({ options: [], isLoading: false })
+    render(
+      <CustomerDetail customer={{ ...customer, salesRepId: "99", contractManagerId: undefined }} />
+    )
+
+    expect(screen.getByText("form.assigneeUnknown")).toBeInTheDocument()
   })
 
   it("opens the edit form when Edit is clicked and updates in place on success", async () => {
