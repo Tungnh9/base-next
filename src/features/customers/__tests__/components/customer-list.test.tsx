@@ -13,14 +13,17 @@ vi.mock("@/features/employees", () => ({
 
 import { CustomerList } from "../../components/customer-list"
 import { useCustomers } from "../../hooks/use-customers"
+import { useEmployeeOptions } from "@/features/employees"
 import type { Customer } from "../../types"
 
 const mockUseCustomers = vi.mocked(useCustomers)
+const mockUseEmployeeOptions = vi.mocked(useEmployeeOptions)
 
 const customers: Customer[] = [
   {
     id: "1",
     code: "KH00001",
+    opportunityCount: 3,
     name: "Nguyễn Văn An",
     email: "an@example.com",
     phone: "0901234567",
@@ -28,11 +31,13 @@ const customers: Customer[] = [
     classification: "corporation",
     industry: "finance-banking",
     status: "collaborating",
+    contractManagerId: "1",
     createdAt: "2024-01-15T00:00:00.000Z",
   },
   {
     id: "2",
     code: "KH00002",
+    opportunityCount: 0,
     name: "Lê Minh Châu",
     email: "chau@example.com",
     phone: "0923456789",
@@ -85,6 +90,7 @@ describe("CustomerList", () => {
     mockUseCustomers.mockReturnValue(
       baseHookReturn({ handleDelete, handleDeleteMany, setPage, setSearch })
     )
+    mockUseEmployeeOptions.mockReturnValue({ options: [], isLoading: false })
   })
 
   it("renders every customer row", () => {
@@ -94,11 +100,73 @@ describe("CustomerList", () => {
     expect(screen.getByText("Lê Minh Châu")).toBeInTheDocument()
   })
 
-  it("renders the customer code as the first column", () => {
+  it("renders the customer code under the customer's name", () => {
     render(<CustomerList />)
 
     expect(screen.getByText("KH00001")).toBeInTheDocument()
     expect(screen.getByText("KH00002")).toBeInTheDocument()
+  })
+
+  it("renders a sequential STT column starting from 1 on the first page", () => {
+    render(<CustomerList />)
+
+    const rows = screen.getAllByRole("row")
+    // rows[0] is the header row; the STT cell is index 1 (after the select checkbox).
+    expect(within(rows[1]).getAllByRole("cell")[1]).toHaveTextContent("1")
+    expect(within(rows[2]).getAllByRole("cell")[1]).toHaveTextContent("2")
+  })
+
+  it("offsets STT by the current page so numbering stays sequential across pages", () => {
+    mockUseCustomers.mockReturnValue(
+      baseHookReturn({ page: 2, pageSize: 10, total: 12, totalPages: 2, setPage, setSearch })
+    )
+    render(<CustomerList />)
+
+    const rows = screen.getAllByRole("row")
+    expect(within(rows[1]).getAllByRole("cell")[1]).toHaveTextContent("11")
+    expect(within(rows[2]).getAllByRole("cell")[1]).toHaveTextContent("12")
+  })
+
+  it("falls back to the customer's initial when there is no avatar image", () => {
+    render(<CustomerList />)
+
+    const fallbacks = document.querySelectorAll('[data-slot="avatar-fallback"]')
+    expect(fallbacks).toHaveLength(2)
+    expect(fallbacks[0]).toHaveTextContent("N")
+    expect(fallbacks[1]).toHaveTextContent("L")
+  })
+
+  it("renders each customer's opportunity count, centered and bold", () => {
+    render(<CustomerList />)
+
+    const opportunityCell = screen.getByText("3")
+    expect(opportunityCell).toHaveClass("text-center", "font-semibold")
+  })
+
+  it("centers the STT cell's text", () => {
+    render(<CustomerList />)
+
+    const rows = screen.getAllByRole("row")
+    expect(within(rows[1]).getAllByRole("cell")[1].firstChild).toHaveClass("text-center")
+  })
+
+  it("shows a centered header label for the actions column", () => {
+    render(<CustomerList />)
+
+    const header = screen.getByRole("columnheader", { name: "columns.actions" })
+    expect(header).toBeInTheDocument()
+    expect(header.firstChild).toHaveClass("text-center")
+  })
+
+  it("resolves the NVQLHĐ column to the assigned employee's name, and shows a dash when unassigned", () => {
+    mockUseEmployeeOptions.mockReturnValue({
+      options: [{ id: "1", name: "Trần Quản Lý", department: "sales" }],
+      isLoading: false,
+    })
+    render(<CustomerList />)
+
+    expect(screen.getByText("Trần Quản Lý")).toBeInTheDocument()
+    expect(screen.getByText("—")).toBeInTheDocument()
   })
 
   it("renders the classification, industry, and status filter selects, defaulted to 'all'", () => {

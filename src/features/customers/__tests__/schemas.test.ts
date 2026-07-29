@@ -11,18 +11,18 @@ describe("createCustomerSchema", () => {
     classification: "corporation" as const,
     industry: "finance-banking" as const,
     status: "collaborating" as const,
+    shortName: "ABC",
+    taxCode: "0123456789",
+    salesRepId: "1",
+    contractManagerId: "2",
   }
 
   const fullyPopulated = {
     ...valid,
-    shortName: "ABC",
-    taxCode: "0123456789",
     website: "example.com",
     address: "123 Lê Lợi",
     country: "vietnam" as const,
     province: "ha-noi" as const,
-    salesRepId: "1",
-    contractManagerId: "2",
     representativeName: "Trần Thị B",
     representativePosition: "Tổng giám đốc",
     representativeMobile: "0912345678",
@@ -51,8 +51,6 @@ describe("createCustomerSchema", () => {
   it("accepts empty string for every optional text field", () => {
     const result = createCustomerSchema.safeParse({
       ...valid,
-      shortName: "",
-      taxCode: "",
       website: "",
       address: "",
       representativeName: "",
@@ -62,6 +60,15 @@ describe("createCustomerSchema", () => {
       review: "",
     })
     expect(result.success).toBe(true)
+  })
+
+  it("requires shortName, taxCode, salesRepId, and contractManagerId — rejects when missing or empty", () => {
+    expect(createCustomerSchema.safeParse({ ...valid, shortName: "" }).success).toBe(false)
+    expect(createCustomerSchema.safeParse({ ...valid, taxCode: "" }).success).toBe(false)
+    const { salesRepId: _salesRepId, ...withoutSalesRep } = valid
+    expect(createCustomerSchema.safeParse(withoutSalesRep).success).toBe(false)
+    const { contractManagerId: _contractManagerId, ...withoutContractManager } = valid
+    expect(createCustomerSchema.safeParse(withoutContractManager).success).toBe(false)
   })
 
   it("rejects an invalid representativeEmail but accepts an empty one", () => {

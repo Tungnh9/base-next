@@ -420,7 +420,7 @@
     "deleteTitle": "Xóa khách hàng",
     "confirmDelete": "Bạn có chắc muốn xóa khách hàng <b>{name}</b> này?",
     "confirmDeleteMany": "Bạn có chắc muốn xóa {count} khách hàng đã chọn?",
-    "deleteSelected": "Xóa đã chọn ({count})",
+    "deleteSelected": "Đã chọn xóa ({count})",
     "selectAll": "Chọn tất cả",
     "selectRow": "Chọn {name}",
     "toast": {
@@ -431,15 +431,20 @@
       "updateSuccess": "Cập nhật thành công"
     },
     "columns": {
+      "stt": "STT",
       "code": "Mã khách hàng",
-      "name": "Họ tên",
+      "name": "Tên khách hàng",
       "email": "Email",
       "phone": "Số điện thoại",
       "company": "Công ty",
       "classification": "Phân loại",
       "industry": "Lĩnh vực",
       "status": "Trạng thái",
-      "createdAt": "Ngày tạo"
+      "createdAt": "Ngày tạo",
+      "opportunities": "Cơ hội",
+      "collaboratingSince": "Hợp tác từ",
+      "contractManager": "NVQLHĐ",
+      "actions": "Hành động"
     },
     "classification": {
       "corporation": "Tập đoàn",
@@ -507,7 +512,6 @@
       "salesRep": "NVKD phụ trách",
       "contractManager": "QLHĐ phụ trách",
       "assigneePlaceholder": "Chọn nhân viên",
-      "assigneeNone": "Không chọn",
       "assigneeEmpty": "Không có nhân viên",
       "assigneeUnknown": "Nhân viên #{id}",
       "representativeName": "Người đại diện",

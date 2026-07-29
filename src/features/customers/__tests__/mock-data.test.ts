@@ -38,6 +38,14 @@ describe("customerMockApi.getAll — pagination", () => {
     expect(data?.data).toHaveLength(5)
     expect(data?.totalPages).toBe(5)
   })
+
+  it("every fixture has a non-negative opportunityCount", async () => {
+    const { data } = await customerMockApi.getAll({ pageSize: 100 })
+
+    expect(
+      data!.data.every((c) => Number.isInteger(c.opportunityCount) && c.opportunityCount >= 0)
+    ).toBe(true)
+  })
 })
 
 describe("customerMockApi.getAll — filtering", () => {
@@ -68,10 +76,13 @@ describe("customerMockApi.getAll — filtering", () => {
   })
 
   it("matches search against the customer code", async () => {
-    const { data } = await customerMockApi.getAll({ search: "KH00007" })
+    const first = await customerMockApi.getAll({ pageSize: 1 })
+    const code = first.data!.data[0].code
 
-    expect(data?.total).toBe(1)
-    expect(data?.data[0].code).toBe("KH00007")
+    const { data } = await customerMockApi.getAll({ search: code })
+
+    expect(data!.total).toBeGreaterThanOrEqual(1)
+    expect(data!.data.some((c) => c.code === code)).toBe(true)
   })
 
   it("filters by classification", async () => {
@@ -126,6 +137,10 @@ describe("customerMockApi — CRUD", () => {
       email: "test.customer@example.com",
       phone: "0900000000",
       company: "Test Co",
+      shortName: "TestCo",
+      taxCode: "1111111111",
+      salesRepId: "1",
+      contractManagerId: "2",
       classification: "partner",
       industry: "telecom-it",
       status: "potential",
@@ -136,19 +151,86 @@ describe("customerMockApi — CRUD", () => {
     expect(fetched?.email).toBe("test.customer@example.com")
   })
 
-  it("create assigns a KH-prefixed code derived from the id, not from the input", async () => {
+  it("create assigns a code matching the classification+industry+shortName-initial convention", async () => {
     const { data: created } = await customerMockApi.create({
       name: "Another Customer",
       email: "another.customer@example.com",
       phone: "0900000001",
       company: "Another Co",
+      shortName: "Zenith",
+      taxCode: "2222222222",
+      salesRepId: "1",
+      contractManagerId: "2",
+      classification: "partner", // Đại lý -> "3"
+      industry: "ecommerce", // "TMDT"
+      status: "potential",
+    })
+
+    expect(created?.code).toMatch(/^3TMDT-Z\d{5}$/)
+  })
+
+  it("create ignores a code in the input — it is always derived, never taken from the caller", async () => {
+    const { data: created } = await customerMockApi.create({
+      name: "Spoofed Code Customer",
+      email: "spoofed.code@example.com",
+      phone: "0900000003",
+      company: "Spoofed Co",
+      shortName: "Spoofed",
+      taxCode: "3333333333",
+      salesRepId: "1",
+      contractManagerId: "2",
+      // `code` isn't part of CreateCustomerInput, so this cast is the only
+      // way to simulate a hostile/malformed direct call still reaching here.
+      ...({ code: "9ZZ-Z99999" } as object),
       classification: "partner",
       industry: "telecom-it",
       status: "potential",
     })
 
-    expect(created?.code).toMatch(/^KH\d{5}$/)
-    expect(created?.code).toBe(`KH${created!.id.padStart(5, "0")}`)
+    expect(created?.code).not.toBe("9ZZ-Z99999")
+  })
+
+  it("counts sequence numbers independently per classification+industry+initial combination", async () => {
+    const makeInput = (email: string) => ({
+      name: "Sequence Customer",
+      email,
+      phone: "0900000010",
+      company: "Sequence Co",
+      shortName: "Unique",
+      taxCode: "4444444444",
+      salesRepId: "1",
+      contractManagerId: "2",
+      classification: "technology" as const, // Công ty -> "2"
+      industry: "finance-banking" as const, // "TC"
+      status: "potential" as const,
+    })
+
+    const first = await customerMockApi.create(makeInput("sequence1@example.com"))
+    const second = await customerMockApi.create(makeInput("sequence2@example.com"))
+
+    expect(first.data?.code).toMatch(/^2TC-U\d{5}$/)
+    expect(second.data?.code).toMatch(/^2TC-U\d{5}$/)
+    const firstSeq = Number(first.data!.code.slice(-5))
+    const secondSeq = Number(second.data!.code.slice(-5))
+    expect(secondSeq).toBe(firstSeq + 1)
+  })
+
+  it("create starts a new customer at zero opportunities", async () => {
+    const { data: created } = await customerMockApi.create({
+      name: "Zero Opportunity Customer",
+      email: "zero.opportunity@example.com",
+      phone: "0900000002",
+      company: "Zero Co",
+      shortName: "ZeroCo",
+      taxCode: "5555555555",
+      salesRepId: "1",
+      contractManagerId: "2",
+      classification: "partner",
+      industry: "telecom-it",
+      status: "potential",
+    })
+
+    expect(created?.opportunityCount).toBe(0)
   })
 
   it("update returns NOT_FOUND for an unknown id", async () => {

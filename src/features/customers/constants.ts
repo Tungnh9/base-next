@@ -99,12 +99,58 @@ export const VIETNAM_PROVINCES = [
   "yen-bai",
 ] as const
 
-export const CUSTOMER_CODE_PREFIX = "KH"
+// Mã khách hàng convention: {mã phân loại}{mã ngành hàng}-{chữ cái đầu tên
+// rút gọn}{5 số theo thứ tự riêng của từng tổ hợp phân loại+ngành hàng+chữ
+// cái đầu}. E.g. "2VT-C00001": phân loại "Công ty" (2), ngành "Viễn thông"
+// (VT), tên rút gọn bắt đầu bằng "C", khách hàng đầu tiên của tổ hợp này.
+//
+// The app's own 4-value classification (corporation/large-enterprise/
+// partner/technology) doesn't match the convention's 5-value scheme
+// (Trực tiếp=1/Công ty=2/Đại lý=3/Trao đổi=4/Khác=5) one-to-one — mapped by
+// business decision: every "company-shaped" classification collapses to
+// "Công ty" (2); "partner" maps to "Đại lý" (3). Codes 1/4/5 are defined for
+// completeness but unreachable from today's classification values.
+export const CUSTOMER_CLASSIFICATION_CODES: Record<
+  (typeof CUSTOMER_CLASSIFICATIONS)[number],
+  string
+> = {
+  corporation: "2",
+  "large-enterprise": "2",
+  partner: "3",
+  technology: "2",
+}
 
-// "KH" + zero-padded sequence, e.g. 1 -> "KH00001", 24 -> "KH00024". A real
-// backend owns code allocation — mock-data.ts is the only caller today.
-export function generateCustomerCode(sequence: number): string {
-  return `${CUSTOMER_CODE_PREFIX}${String(sequence).padStart(5, "0")}`
+// Ngành hàng viết tắt — Thương mại điện tử dùng nguyên "TMDT" (4 ký tự) thay
+// vì rút gọn 2 ký tự như hai ngành còn lại, theo yêu cầu nghiệp vụ.
+export const CUSTOMER_INDUSTRY_CODES: Record<(typeof CUSTOMER_INDUSTRIES)[number], string> = {
+  "finance-banking": "TC",
+  ecommerce: "TMDT",
+  "telecom-it": "VT",
+}
+
+// Everything the code prefix needs from a customer — deliberately not typed
+// against the full Customer/CreateCustomerInput interfaces (which live in
+// types.ts and would create a circular import back into this file).
+interface CustomerCodePrefixInput {
+  classification: (typeof CUSTOMER_CLASSIFICATIONS)[number]
+  industry: (typeof CUSTOMER_INDUSTRIES)[number]
+  shortName?: string
+  company: string
+}
+
+// The part of the code before the sequence number — same prefix means same
+// per-combination counter. Falls back to the company name's first letter
+// when no shortName is set, since shortName is optional but company is not.
+export function buildCustomerCodePrefix(input: CustomerCodePrefixInput): string {
+  const classificationCode = CUSTOMER_CLASSIFICATION_CODES[input.classification]
+  const industryCode = CUSTOMER_INDUSTRY_CODES[input.industry]
+  const nameSource = input.shortName?.trim() || input.company
+  const initial = nameSource.charAt(0).toUpperCase()
+  return `${classificationCode}${industryCode}-${initial}`
+}
+
+export function formatCustomerCode(prefix: string, sequence: number): string {
+  return `${prefix}${String(sequence).padStart(5, "0")}`
 }
 
 // Sentinel for "not selected" in optional Selects — Radix forbids value="".

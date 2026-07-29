@@ -21,8 +21,8 @@ import {
 } from "@/components/ui/alert-dialog"
 import { ROUTES } from "@/lib/constants"
 import { cn } from "@/lib/utils"
-import { useEmployeeOptions } from "@/features/employees"
 import { updateCustomer, deleteCustomer } from "../actions"
+import { useResolveEmployeeName } from "../hooks/use-resolve-employee-name"
 import { CustomerForm } from "./customer-form"
 import { STATUS_VARIANT, type Customer } from "../types"
 import type { CreateCustomerFormValues } from "../schemas"
@@ -59,26 +59,15 @@ export function CustomerDetail({ customer: initialCustomer }: CustomerDetailProp
   const tCommon = useTranslations("common")
   const locale = useLocale()
   const router = useRouter()
-  // Module-scope cache in the hook means this costs no extra network
-  // round-trip if CustomerForm (rendered below for the edit dialog) already
-  // fetched the same options on this page.
-  const { options: employeeOptions, isLoading: employeeOptionsLoading } = useEmployeeOptions()
+  // Module-scope cache in the underlying useEmployeeOptions() hook means
+  // this costs no extra network round-trip if CustomerForm (rendered below
+  // for the edit dialog) already fetched the same options on this page.
+  const resolveEmployeeName = useResolveEmployeeName()
 
   const [customer, setCustomer] = useState(initialCustomer)
   const [formOpen, setFormOpen] = useState(false)
   const [pendingDelete, setPendingDelete] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
-
-  // A stored id whose employee has since been deleted still needs to render
-  // as something informative, not a blank dash. While options are still
-  // loading (mockApi has a deliberate delay), a valid id has no match yet —
-  // render "—" instead of prematurely mislabeling it "unknown".
-  function resolveEmployeeName(id?: string) {
-    if (!id) return undefined
-    if (employeeOptionsLoading) return undefined
-    const match = employeeOptions.find((option) => option.id === id)
-    return match ? match.name : t("form.assigneeUnknown", { id })
-  }
 
   async function onFormSubmit(values: CreateCustomerFormValues) {
     const { data, error } = await updateCustomer(customer.id, values)

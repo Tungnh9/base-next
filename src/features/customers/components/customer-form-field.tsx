@@ -14,18 +14,34 @@ export function CustomerField({
   id,
   label,
   error,
+  required,
   className,
   children,
 }: {
   id?: string
   label: string
   error?: string
+  /** Shows a red "*" after the label — visual only, doesn't set native `required` (that would trigger the browser's own validation UI on top of Zod's). */
+  required?: boolean
   className?: string
   children: ReactNode
 }) {
   return (
     <div className={cn("grid gap-1.5", className)}>
-      <Label htmlFor={id}>{label}</Label>
+      {/* The "*" sits next to, not inside, the <label> element — it's a
+          sibling span, not label content. Testing Library's getByLabelText
+          (and any real screen reader's label association) matches on the
+          <label>'s own text, so keeping the label's text exactly equal to
+          `label` (no appended "*") is what lets every existing
+          getByLabelText(t("form.xxx")) call keep working unchanged. */}
+      <div className="flex items-center gap-0.5">
+        <Label htmlFor={id}>{label}</Label>
+        {required && (
+          <span className="text-destructive text-sm" aria-hidden="true">
+            *
+          </span>
+        )}
+      </div>
       {children}
       {error && <p className="text-destructive text-xs">{error}</p>}
     </div>
@@ -38,12 +54,24 @@ export function CustomerTextField({
   id,
   label,
   error,
+  required,
   className,
   ...rest
-}: InputProps & { id: string; label: string; error?: string; className?: string }) {
+}: InputProps & {
+  id: string
+  label: string
+  error?: string
+  required?: boolean
+  className?: string
+}) {
   return (
-    <CustomerField id={id} label={label} error={error} className={className}>
-      <Input id={id} aria-invalid={Boolean(error) || undefined} {...rest} />
+    <CustomerField id={id} label={label} error={error} required={required} className={className}>
+      <Input
+        id={id}
+        aria-invalid={Boolean(error) || undefined}
+        aria-required={required || undefined}
+        {...rest}
+      />
     </CustomerField>
   )
 }

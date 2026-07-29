@@ -1,8 +1,15 @@
 import { mockApi, mockApiError } from "@/lib/mock"
-import { CUSTOMER_CLASSIFICATIONS, CUSTOMER_INDUSTRIES, generateCustomerCode } from "./constants"
+import {
+  CUSTOMER_CLASSIFICATIONS,
+  CUSTOMER_INDUSTRIES,
+  buildCustomerCodePrefix,
+  formatCustomerCode,
+} from "./constants"
 import type {
   Customer,
+  CustomerClassification,
   CustomerCountry,
+  CustomerIndustry,
   CustomerStatus,
   VietnamProvince,
   CreateCustomerInput,
@@ -95,13 +102,33 @@ function mobile(i: number, salt: number) {
     .slice(0, 8)}`
 }
 
+// Tracks the next sequence number per distinct code prefix (phân loại +
+// ngành hàng + chữ cái đầu tên rút gọn) — each combination counts
+// independently starting from 1, per the "Mã Khách hàng" convention.
+const codeSequenceByPrefix = new Map<string, number>()
+
+function nextCustomerCode(input: {
+  classification: CustomerClassification
+  industry: CustomerIndustry
+  shortName?: string
+  company: string
+}): string {
+  const prefix = buildCustomerCodePrefix(input)
+  const sequence = (codeSequenceByPrefix.get(prefix) ?? 0) + 1
+  codeSequenceByPrefix.set(prefix, sequence)
+  return formatCustomerCode(prefix, sequence)
+}
+
 // Deterministic (no Math.random/Date.now) so fixtures and any test asserting
 // against them stay stable across runs.
 function buildCustomers(count: number): Customer[] {
   return Array.from({ length: count }, (_, i) => {
     const seq = i + 1
     const classification = CUSTOMER_CLASSIFICATIONS[i % CUSTOMER_CLASSIFICATIONS.length]
+    const industry = CUSTOMER_INDUSTRIES[i % CUSTOMER_INDUSTRIES.length]
     const companyNames = COMPANY_NAMES_BY_CLASSIFICATION[classification]
+    const shortName = `${SHORT_NAMES_BY_CLASSIFICATION[classification]}-${seq}`
+    const company = `${companyNames[i % companyNames.length]} ${seq}`
 
     // Deterministic "sparseness" so the UI's optional-field paths (em-dash
     // placeholders on the detail page, empty Selects in the form) are all
@@ -116,16 +143,19 @@ function buildCustomers(count: number): Customer[] {
 
     return {
       id: String(seq),
-      code: generateCustomerCode(seq),
+      code: nextCustomerCode({ classification, industry, shortName, company }),
+      // Deterministic 0-11 spread — mocks the not-yet-built Sales
+      // Opportunities feature's count for this customer.
+      opportunityCount: (seq * 5) % 12,
       name: fullName(i, 1),
-      shortName: `${SHORT_NAMES_BY_CLASSIFICATION[classification]}-${seq}`,
+      shortName,
       email: `customer${seq}@example.com`,
       phone: `09${String(20_000_000 + i * 41)
         .padStart(8, "0")
         .slice(0, 8)}`,
-      company: `${companyNames[i % companyNames.length]} ${seq}`,
+      company,
       classification,
-      industry: CUSTOMER_INDUSTRIES[i % CUSTOMER_INDUSTRIES.length],
+      industry,
       status: STATUS_CYCLE[i % STATUS_CYCLE.length],
 
       taxCode: hasTaxCode ? String(100_000_000 + seq * 137) : undefined,
@@ -212,13 +242,26 @@ export const customerMockApi = {
   },
 
   create: (input: CreateCustomerInput) => {
-    // Backend-owned in production; the mock reuses the id counter so codes and
-    // ids stay aligned and readable in the demo (id "25" -> "KH00025").
+    // Backend-owned in production; the mock reuses the id counter for `id`.
+    // `code` is unrelated to `id` under this convention — it's derived from
+    // classification/industry/shortName/company instead.
     const sequence = idCounter++
+    const code = nextCustomerCode({
+      classification: input.classification,
+      industry: input.industry,
+      shortName: input.shortName,
+      company: input.company,
+    })
+    // System-owned fields spread AFTER `...input` — CreateCustomerInput has
+    // none of them, but this order guarantees a malformed/direct call still
+    // can't smuggle its own id/code/opportunityCount/createdAt through.
     const next: Customer = {
-      id: String(sequence),
-      code: generateCustomerCode(sequence),
       ...input,
+      id: String(sequence),
+      code,
+      // A new customer starts with zero opportunities — same rationale as
+      // `code`, not something the create form can set.
+      opportunityCount: 0,
       createdAt: new Date().toISOString(),
     }
     customers = [...customers, next]

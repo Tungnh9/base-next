@@ -47,6 +47,10 @@ const validInput = {
   classification: "corporation" as const,
   industry: "finance-banking" as const,
   status: "collaborating" as const,
+  shortName: "ABC",
+  taxCode: "0123456789",
+  salesRepId: "1",
+  contractManagerId: "2",
 }
 
 const paginatedEmpty = { data: [], total: 0, page: 1, pageSize: 10, totalPages: 1 }

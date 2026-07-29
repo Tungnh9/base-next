@@ -7,6 +7,7 @@ import { Plus, Eye, Pencil, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import {
   Select,
   SelectContent,
@@ -27,6 +28,7 @@ import {
 import { DataTable, type DataTableColumnDef } from "@/components/ui/data-table"
 import { ROUTES } from "@/lib/constants"
 import { useCustomers } from "../hooks/use-customers"
+import { useResolveEmployeeName } from "../hooks/use-resolve-employee-name"
 import { CustomerForm } from "./customer-form"
 import { CUSTOMER_CLASSIFICATIONS, CUSTOMER_INDUSTRIES, CUSTOMER_STATUSES } from "../constants"
 import {
@@ -63,6 +65,7 @@ export function CustomerList() {
     handleDelete,
     handleDeleteMany,
   } = useCustomers()
+  const resolveEmployeeName = useResolveEmployeeName()
 
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<Customer | null>(null)
@@ -105,38 +108,38 @@ export function CustomerList() {
   const columns = useMemo<DataTableColumnDef<Customer>[]>(
     () => [
       {
-        accessorKey: "code",
-        header: t("columns.code"),
+        id: "stt",
+        header: t("columns.stt"),
+        enableSorting: false,
         cell: ({ row }) => (
-          <span className="text-muted-foreground font-mono text-xs">{row.original.code}</span>
+          <div className="text-muted-foreground text-center">
+            {(page - 1) * pageSize + row.index + 1}
+          </div>
         ),
       },
       {
         accessorKey: "name",
         header: t("columns.name"),
-        cell: ({ row }) => (
-          <Link
-            href={`/${locale}${ROUTES.customers}/${row.original.id}`}
-            className="hover:text-primary font-medium hover:underline"
-          >
-            {row.original.name}
-          </Link>
-        ),
-      },
-      {
-        accessorKey: "email",
-        header: t("columns.email"),
-        cell: ({ row }) => <span className="text-muted-foreground">{row.original.email}</span>,
-      },
-      {
-        accessorKey: "phone",
-        header: t("columns.phone"),
-        cell: ({ row }) => <span className="text-muted-foreground">{row.original.phone}</span>,
-      },
-      {
-        accessorKey: "company",
-        header: t("columns.company"),
-        cell: ({ row }) => <span className="text-muted-foreground">{row.original.company}</span>,
+        cell: ({ row }) => {
+          const customer = row.original
+          return (
+            <div className="flex items-center gap-3">
+              <Avatar>
+                {customer.avatarUrl && <AvatarImage src={customer.avatarUrl} alt={customer.name} />}
+                <AvatarFallback>{customer.name.charAt(0).toUpperCase()}</AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col">
+                <Link
+                  href={`/${locale}${ROUTES.customers}/${customer.id}`}
+                  className="text-foreground hover:text-primary font-semibold hover:underline"
+                >
+                  {customer.name}
+                </Link>
+                <span className="text-muted-foreground text-xs">{customer.code}</span>
+              </div>
+            </div>
+          )
+        },
       },
       {
         accessorKey: "classification",
@@ -155,6 +158,24 @@ export function CustomerList() {
         ),
       },
       {
+        accessorKey: "createdAt",
+        header: t("columns.collaboratingSince"),
+        cell: ({ row }) => (
+          <span className="text-muted-foreground">
+            {new Date(row.original.createdAt).toLocaleDateString("vi-VN")}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "opportunityCount",
+        header: t("columns.opportunities"),
+        cell: ({ row }) => (
+          <div className="text-muted-foreground text-center font-semibold">
+            {row.original.opportunityCount}
+          </div>
+        ),
+      },
+      {
         accessorKey: "status",
         header: t("columns.status"),
         cell: ({ row }) => (
@@ -164,17 +185,18 @@ export function CustomerList() {
         ),
       },
       {
-        accessorKey: "createdAt",
-        header: t("columns.createdAt"),
+        id: "contractManager",
+        header: t("columns.contractManager"),
+        enableSorting: false,
         cell: ({ row }) => (
           <span className="text-muted-foreground">
-            {new Date(row.original.createdAt).toLocaleDateString("vi-VN")}
+            {resolveEmployeeName(row.original.contractManagerId) ?? "—"}
           </span>
         ),
       },
       {
         id: "actions",
-        header: "",
+        header: () => <div className="text-center">{t("columns.actions")}</div>,
         enableSorting: false,
         cell: ({ row }) => {
           const customer = row.original
@@ -210,7 +232,7 @@ export function CustomerList() {
         },
       },
     ],
-    [t, locale]
+    [t, locale, page, pageSize, resolveEmployeeName]
   )
 
   const from = total === 0 ? 0 : (page - 1) * pageSize + 1

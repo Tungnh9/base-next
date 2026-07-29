@@ -20,6 +20,18 @@ const employeeOptions = [
   { id: "2", name: "Trần Thị B", department: "engineering" as const },
 ]
 
+// shortName/taxCode/salesRepId/contractManagerId are required fields — any
+// test that needs a successful submit has to fill all of them in, not just
+// the original 4-field baseline (name/email/phone/company).
+async function fillRequiredAssigneeAndTaxFields(user: ReturnType<typeof userEvent.setup>) {
+  await user.type(screen.getByLabelText("form.shortName"), "ABC")
+  await user.type(screen.getByLabelText("form.taxCode"), "0123456789")
+  await user.click(screen.getByRole("combobox", { name: "form.salesRep" }))
+  await user.click(screen.getByRole("option", { name: /Nguyễn Văn An/ }))
+  await user.click(screen.getByRole("combobox", { name: "form.contractManager" }))
+  await user.click(screen.getByRole("option", { name: /Trần Thị B/ }))
+}
+
 describe("CustomerForm — discard changes confirmation", () => {
   const onOpenChange = vi.fn()
   const onSubmit = vi.fn().mockResolvedValue(true)
@@ -81,6 +93,7 @@ describe("CustomerForm — discard changes confirmation", () => {
     await user.type(screen.getByLabelText("form.email"), "a@example.com")
     await user.type(screen.getByLabelText("form.phone"), "0901234567")
     await user.type(screen.getByLabelText("form.company"), "ABC Corp")
+    await fillRequiredAssigneeAndTaxFields(user)
     await user.click(screen.getByRole("button", { name: "form.submit" }))
 
     expect(onSubmit).toHaveBeenCalled()
@@ -110,6 +123,7 @@ describe("CustomerForm — mã khách hàng (code)", () => {
     const customer: Customer = {
       id: "1",
       code: "KH00042",
+      opportunityCount: 0,
       name: "Nguyễn Văn An",
       email: "an@example.com",
       phone: "0901234567",
@@ -156,6 +170,60 @@ describe("CustomerForm — NVKD/QLHĐ employee picker", () => {
     expect(screen.getByRole("option", { name: /Nguyễn Văn An/ })).toBeInTheDocument()
     expect(screen.getByRole("option", { name: /Trần Thị B/ })).toBeInTheDocument()
   })
+
+  it("does not offer a 'none' option — a real employee must be picked for both assignee fields", async () => {
+    const user = userEvent.setup()
+    mockUseEmployeeOptions.mockReturnValue({ options: employeeOptions, isLoading: false })
+    render(<CustomerForm open onOpenChange={onOpenChange} customer={null} onSubmit={onSubmit} />)
+
+    await user.click(screen.getByRole("combobox", { name: "form.salesRep" }))
+
+    expect(screen.getAllByRole("option")).toHaveLength(employeeOptions.length)
+  })
+
+  it("blocks submit and shows an error when NVKD/QLHĐ are left unselected", async () => {
+    const user = userEvent.setup()
+    mockUseEmployeeOptions.mockReturnValue({ options: employeeOptions, isLoading: false })
+    render(<CustomerForm open onOpenChange={onOpenChange} customer={null} onSubmit={onSubmit} />)
+
+    await user.type(screen.getByLabelText("form.name"), "Nguyễn Văn A")
+    await user.type(screen.getByLabelText("form.email"), "a@example.com")
+    await user.type(screen.getByLabelText("form.phone"), "0901234567")
+    await user.type(screen.getByLabelText("form.company"), "ABC Corp")
+    await user.type(screen.getByLabelText("form.shortName"), "ABC")
+    await user.type(screen.getByLabelText("form.taxCode"), "0123456789")
+    await user.click(screen.getByRole("button", { name: "form.submit" }))
+
+    expect(onSubmit).not.toHaveBeenCalled()
+    expect(screen.getByRole("combobox", { name: "form.salesRep" })).toHaveAttribute(
+      "aria-invalid",
+      "true"
+    )
+  })
+})
+
+describe("CustomerForm — phone/email/website icons", () => {
+  const onOpenChange = vi.fn()
+  const onSubmit = vi.fn().mockResolvedValue(true)
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockUseEmployeeOptions.mockReturnValue({ options: employeeOptions, isLoading: false })
+  })
+
+  it("renders a matching icon inside the phone, email, and website fields", () => {
+    render(<CustomerForm open onOpenChange={onOpenChange} customer={null} onSubmit={onSubmit} />)
+
+    const phoneWrapper = screen.getByLabelText("form.phone").closest('[data-slot="input-wrapper"]')
+    const emailWrapper = screen.getByLabelText("form.email").closest('[data-slot="input-wrapper"]')
+    const websiteWrapper = screen
+      .getByLabelText("form.website")
+      .closest('[data-slot="input-wrapper"]')
+
+    expect(phoneWrapper?.querySelector("svg.lucide-phone")).toBeInTheDocument()
+    expect(emailWrapper?.querySelector("svg.lucide-mail")).toBeInTheDocument()
+    expect(websiteWrapper?.querySelector("svg.lucide-globe")).toBeInTheDocument()
+  })
 })
 
 describe("CustomerForm — quốc gia/tỉnh thành cascade", () => {
@@ -194,10 +262,75 @@ describe("CustomerForm — quốc gia/tỉnh thành cascade", () => {
     await user.type(screen.getByLabelText("form.email"), "a@example.com")
     await user.type(screen.getByLabelText("form.phone"), "0901234567")
     await user.type(screen.getByLabelText("form.company"), "ABC Corp")
+    await fillRequiredAssigneeAndTaxFields(user)
     await user.click(screen.getByRole("button", { name: "form.submit" }))
 
     expect(onSubmit).toHaveBeenCalledWith(
       expect.objectContaining({ country: "japan", province: undefined })
     )
+  })
+})
+
+describe("CustomerForm — required-field markers", () => {
+  const onOpenChange = vi.fn()
+  const onSubmit = vi.fn().mockResolvedValue(true)
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockUseEmployeeOptions.mockReturnValue({ options: employeeOptions, isLoading: false })
+  })
+
+  // The "*" is a sibling of <label>, not inside it (see customer-form-field.tsx) —
+  // getByLabelText must still resolve on the exact label text for this to hold.
+  function asteriskFor(labelKey: string) {
+    return screen.getByText(labelKey).parentElement?.querySelector("span.text-destructive")
+  }
+
+  it("shows a red asterisk next to every required field's label", () => {
+    render(<CustomerForm open onOpenChange={onOpenChange} customer={null} onSubmit={onSubmit} />)
+
+    for (const key of [
+      "form.name",
+      "form.shortName",
+      "form.company",
+      "form.industry",
+      "form.classification",
+      "form.salesRep",
+      "form.contractManager",
+      "form.status",
+      "form.taxCode",
+      "form.phone",
+      "form.email",
+    ]) {
+      expect(asteriskFor(key), `expected an asterisk next to ${key}`).toBeInTheDocument()
+    }
+  })
+
+  it("does not show an asterisk next to optional fields", () => {
+    render(<CustomerForm open onOpenChange={onOpenChange} customer={null} onSubmit={onSubmit} />)
+
+    for (const key of ["form.website", "form.address", "form.country", "form.province"]) {
+      expect(asteriskFor(key), `did not expect an asterisk next to ${key}`).toBeNull()
+    }
+  })
+
+  it("still resolves form.name via getByLabelText despite the sibling asterisk", () => {
+    render(<CustomerForm open onOpenChange={onOpenChange} customer={null} onSubmit={onSubmit} />)
+
+    expect(screen.getByLabelText("form.name")).toBeInTheDocument()
+  })
+
+  it("marks every required Select as aria-required, for assistive tech that can't see the asterisk", () => {
+    render(<CustomerForm open onOpenChange={onOpenChange} customer={null} onSubmit={onSubmit} />)
+
+    for (const name of [
+      "form.industry",
+      "form.classification",
+      "form.status",
+      "form.salesRep",
+      "form.contractManager",
+    ]) {
+      expect(screen.getByRole("combobox", { name })).toHaveAttribute("aria-required", "true")
+    }
   })
 })

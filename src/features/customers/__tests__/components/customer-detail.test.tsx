@@ -38,6 +38,7 @@ const mockToastSuccess = vi.mocked(toast.success)
 const customer: Customer = {
   id: "1",
   code: "KH00001",
+  opportunityCount: 0,
   name: "Nguyễn Văn An",
   email: "an@example.com",
   phone: "0901234567",
@@ -45,6 +46,10 @@ const customer: Customer = {
   classification: "corporation",
   industry: "finance-banking",
   status: "collaborating",
+  shortName: "SVG",
+  taxCode: "0123456789",
+  salesRepId: "1",
+  contractManagerId: "2",
   createdAt: "2024-01-15T00:00:00.000Z",
 }
 
@@ -94,7 +99,9 @@ describe("CustomerDetail", () => {
 
   it("shows a placeholder for an assignee id that no longer matches any employee", () => {
     mockUseEmployeeOptions.mockReturnValue({ options: [], isLoading: false })
-    render(<CustomerDetail customer={{ ...customer, salesRepId: "99" }} />)
+    render(
+      <CustomerDetail customer={{ ...customer, salesRepId: "99", contractManagerId: undefined }} />
+    )
 
     expect(screen.getByText("form.assigneeUnknown")).toBeInTheDocument()
   })

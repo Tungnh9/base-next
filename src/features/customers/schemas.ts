@@ -46,8 +46,8 @@ export const createCustomerSchema = z.object({
   status: z.enum(CUSTOMER_STATUSES),
 
   // Thông tin chung
-  shortName: optionalText(100),
-  taxCode: optionalText(20),
+  shortName: z.string().trim().min(1, "Vui lòng nhập tên rút gọn").max(100),
+  taxCode: z.string().trim().min(1, "Vui lòng nhập mã số thuế").max(20),
   website: optionalWebsite(),
   address: optionalText(300),
   country: z.enum(CUSTOMER_COUNTRIES).optional(),
@@ -55,9 +55,17 @@ export const createCustomerSchema = z.object({
 
   // Người phụ trách (Employee.id) — existence not verified here, the action
   // layer would need an extra fetch to check it and a dangling id just
-  // renders as "Nhân viên #id" in the UI.
-  salesRepId: z.string().min(1).max(50).optional(),
-  contractManagerId: z.string().min(1).max(50).optional(),
+  // renders as "Nhân viên #id" in the UI. Both required per business rule;
+  // the `error` option covers the Select's "unselected" state (which is
+  // `undefined`, not ""), not just the too-short case.
+  salesRepId: z
+    .string({ error: "Vui lòng chọn NVKD phụ trách" })
+    .min(1, "Vui lòng chọn NVKD phụ trách")
+    .max(50),
+  contractManagerId: z
+    .string({ error: "Vui lòng chọn QLHĐ phụ trách" })
+    .min(1, "Vui lòng chọn QLHĐ phụ trách")
+    .max(50),
 
   // Người đại diện
   representativeName: optionalText(100),

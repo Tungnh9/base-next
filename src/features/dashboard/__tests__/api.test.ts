@@ -7,6 +7,7 @@ function makeCustomer(overrides: Partial<Customer> = {}): Customer {
   return {
     id: "1",
     code: "KH00001",
+    opportunityCount: 0,
     name: "Test Customer",
     email: "customer@example.com",
     phone: "0900000000",

@@ -431,15 +431,20 @@
       "updateSuccess": "Updated successfully"
     },
     "columns": {
+      "stt": "No.",
       "code": "Customer Code",
-      "name": "Name",
+      "name": "Customer Name",
       "email": "Email",
       "phone": "Phone",
       "company": "Company",
       "classification": "Classification",
       "industry": "Industry",
       "status": "Status",
-      "createdAt": "Created At"
+      "createdAt": "Created At",
+      "opportunities": "Opportunities",
+      "collaboratingSince": "Customer Since",
+      "contractManager": "Contract Manager",
+      "actions": "Actions"
     },
     "classification": {
       "corporation": "Corporation",
@@ -507,7 +512,6 @@
       "salesRep": "Sales representative",
       "contractManager": "Account manager",
       "assigneePlaceholder": "Select employee",
-      "assigneeNone": "Not selected",
       "assigneeEmpty": "No employees available",
       "assigneeUnknown": "Employee #{id}",
       "representativeName": "Representative",

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useForm, useWatch, Controller, type Control } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useTranslations } from "next-intl"
+import { Phone, Mail, Globe } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import {
   AlertDialog,
@@ -18,6 +19,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { Separator } from "@/components/ui/separator"
 import {
   Select,
   SelectContent,
@@ -61,8 +63,8 @@ const DEFAULT_VALUES: CreateCustomerFormValues = {
   address: "",
   country: "vietnam",
   province: undefined,
-  salesRepId: undefined,
-  contractManagerId: undefined,
+  salesRepId: "",
+  contractManagerId: "",
   representativeName: "",
   representativePosition: "",
   representativeMobile: "",
@@ -99,8 +101,8 @@ function toFormValues(customer: Customer): CreateCustomerFormValues {
     address: customer.address ?? "",
     country: customer.country ?? "vietnam",
     province: customer.province,
-    salesRepId: customer.salesRepId,
-    contractManagerId: customer.contractManagerId,
+    salesRepId: customer.salesRepId ?? "",
+    contractManagerId: customer.contractManagerId ?? "",
     representativeName: customer.representativeName ?? "",
     representativePosition: customer.representativePosition ?? "",
     representativeMobile: customer.representativeMobile ?? "",
@@ -120,18 +122,21 @@ function toFormValues(customer: Customer): CreateCustomerFormValues {
 }
 
 // NVKD/QLHĐ picker — Controller + useEmployeeOptions(), shared by both
-// assignee fields. Disabled while loading; a stored id whose employee no
-// longer exists renders as "Nhân viên #id" instead of a blank trigger.
+// (required) assignee fields. No "Không chọn" item — a real employee must be
+// picked. Disabled while loading; a stored id whose employee no longer
+// exists renders as "Nhân viên #id" instead of a blank trigger.
 function EmployeeSelectField({
   control,
   name,
   label,
+  error,
   options,
   isLoading,
 }: {
   control: Control<CreateCustomerFormValues>
   name: "salesRepId" | "contractManagerId"
   label: string
+  error?: string
   options: EmployeeOption[]
   isLoading: boolean
 }) {
@@ -140,7 +145,7 @@ function EmployeeSelectField({
   const tEmployees = useTranslations("employees")
 
   return (
-    <CustomerField label={label}>
+    <CustomerField label={label} error={error} required>
       <Controller
         control={control}
         name={name}
@@ -148,20 +153,24 @@ function EmployeeSelectField({
           const isOrphan = Boolean(field.value) && !options.some((o) => o.id === field.value)
           return (
             <Select
-              value={field.value ?? NO_SELECTION}
-              onValueChange={(v) => field.onChange(v === NO_SELECTION ? undefined : v)}
+              value={field.value || undefined}
+              onValueChange={(v) => field.onChange(v)}
               disabled={isLoading}
             >
-              <SelectTrigger className="w-full" aria-label={label}>
+              <SelectTrigger
+                className="w-full"
+                aria-label={label}
+                aria-invalid={Boolean(error)}
+                aria-required="true"
+              >
                 <SelectValue
                   placeholder={isLoading ? tCommon("loading") : t("form.assigneePlaceholder")}
                 />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={NO_SELECTION}>{t("form.assigneeNone")}</SelectItem>
                 {isOrphan && (
-                  <SelectItem value={field.value!}>
-                    {t("form.assigneeUnknown", { id: field.value! })}
+                  <SelectItem value={field.value}>
+                    {t("form.assigneeUnknown", { id: field.value })}
                   </SelectItem>
                 )}
                 {options.map((option) => (
@@ -250,14 +259,6 @@ export function CustomerForm({ open, onOpenChange, customer, onSubmit }: Custome
             <section className="flex flex-col gap-4">
               <h3 className="text-foreground text-sm font-semibold">{t("form.sectionGeneral")}</h3>
               <div className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
-                <CustomerTextField
-                  id="name"
-                  label={t("form.name")}
-                  placeholder={t("form.namePlaceholder")}
-                  error={errors.name?.message}
-                  {...register("name")}
-                />
-
                 <CustomerField id="code" label={t("form.code")}>
                   <Input
                     id="code"
@@ -265,20 +266,25 @@ export function CustomerForm({ open, onOpenChange, customer, onSubmit }: Custome
                     tabIndex={-1}
                     value={customer?.code ?? ""}
                     placeholder={t("form.codeAutoPlaceholder")}
-                    aria-describedby={!customer ? "code-hint" : undefined}
+                    title={!customer ? t("form.codeAutoHint") : undefined}
                   />
-                  {!customer && (
-                    <p id="code-hint" className="text-muted-foreground text-xs">
-                      {t("form.codeAutoHint")}
-                    </p>
-                  )}
                 </CustomerField>
+
+                <CustomerTextField
+                  id="name"
+                  label={t("form.name")}
+                  placeholder={t("form.namePlaceholder")}
+                  error={errors.name?.message}
+                  required
+                  {...register("name")}
+                />
 
                 <CustomerTextField
                   id="shortName"
                   label={t("form.shortName")}
                   placeholder={t("form.shortNamePlaceholder")}
                   error={errors.shortName?.message}
+                  required
                   {...register("shortName")}
                 />
 
@@ -287,16 +293,21 @@ export function CustomerForm({ open, onOpenChange, customer, onSubmit }: Custome
                   label={t("form.company")}
                   placeholder={t("form.companyPlaceholder")}
                   error={errors.company?.message}
+                  required
                   {...register("company")}
                 />
 
-                <CustomerField label={t("form.industry")} error={errors.industry?.message}>
+                <CustomerField label={t("form.industry")} error={errors.industry?.message} required>
                   <Controller
                     control={control}
                     name="industry"
                     render={({ field }) => (
                       <Select value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger className="w-full" aria-label={t("form.industry")}>
+                        <SelectTrigger
+                          className="w-full"
+                          aria-label={t("form.industry")}
+                          aria-required="true"
+                        >
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -314,13 +325,18 @@ export function CustomerForm({ open, onOpenChange, customer, onSubmit }: Custome
                 <CustomerField
                   label={t("form.classification")}
                   error={errors.classification?.message}
+                  required
                 >
                   <Controller
                     control={control}
                     name="classification"
                     render={({ field }) => (
                       <Select value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger className="w-full" aria-label={t("form.classification")}>
+                        <SelectTrigger
+                          className="w-full"
+                          aria-label={t("form.classification")}
+                          aria-required="true"
+                        >
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -339,6 +355,7 @@ export function CustomerForm({ open, onOpenChange, customer, onSubmit }: Custome
                   control={control}
                   name="salesRepId"
                   label={t("form.salesRep")}
+                  error={errors.salesRepId?.message}
                   options={employeeOptions}
                   isLoading={employeeOptionsLoading}
                 />
@@ -347,17 +364,22 @@ export function CustomerForm({ open, onOpenChange, customer, onSubmit }: Custome
                   control={control}
                   name="contractManagerId"
                   label={t("form.contractManager")}
+                  error={errors.contractManagerId?.message}
                   options={employeeOptions}
                   isLoading={employeeOptionsLoading}
                 />
 
-                <CustomerField label={t("form.status")} error={errors.status?.message}>
+                <CustomerField label={t("form.status")} error={errors.status?.message} required>
                   <Controller
                     control={control}
                     name="status"
                     render={({ field }) => (
                       <Select value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger className="w-full" aria-label={t("form.status")}>
+                        <SelectTrigger
+                          className="w-full"
+                          aria-label={t("form.status")}
+                          aria-required="true"
+                        >
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -377,6 +399,7 @@ export function CustomerForm({ open, onOpenChange, customer, onSubmit }: Custome
                   label={t("form.taxCode")}
                   placeholder={t("form.taxCodePlaceholder")}
                   error={errors.taxCode?.message}
+                  required
                   {...register("taxCode")}
                 />
 
@@ -385,6 +408,8 @@ export function CustomerForm({ open, onOpenChange, customer, onSubmit }: Custome
                   label={t("form.phone")}
                   placeholder={t("form.phonePlaceholder")}
                   error={errors.phone?.message}
+                  startIcon={<Phone className="size-4" />}
+                  required
                   {...register("phone")}
                 />
 
@@ -394,6 +419,8 @@ export function CustomerForm({ open, onOpenChange, customer, onSubmit }: Custome
                   label={t("form.email")}
                   placeholder={t("form.emailPlaceholder")}
                   error={errors.email?.message}
+                  startIcon={<Mail className="size-4" />}
+                  required
                   {...register("email")}
                 />
 
@@ -402,6 +429,7 @@ export function CustomerForm({ open, onOpenChange, customer, onSubmit }: Custome
                   label={t("form.website")}
                   placeholder={t("form.websitePlaceholder")}
                   error={errors.website?.message}
+                  startIcon={<Globe className="size-4" />}
                   {...register("website")}
                 />
 
@@ -410,79 +438,86 @@ export function CustomerForm({ open, onOpenChange, customer, onSubmit }: Custome
                   label={t("form.address")}
                   placeholder={t("form.addressPlaceholder")}
                   error={errors.address?.message}
-                  className="sm:col-span-2 lg:col-span-3"
+                  className="sm:col-span-1 lg:col-span-2"
                   {...register("address")}
                 />
 
-                <CustomerField label={t("form.country")} error={errors.country?.message}>
-                  <Controller
-                    control={control}
-                    name="country"
-                    render={({ field }) => (
-                      <Select
-                        value={field.value ?? NO_SELECTION}
-                        onValueChange={(v) => {
-                          const next = v === NO_SELECTION ? undefined : (v as CustomerCountry)
-                          field.onChange(next)
-                          // Tỉnh thành only exists inside Vietnam — leaving a
-                          // stale province behind would submit e.g.
-                          // { country: "japan", province: "ha-noi" }.
-                          if (next !== "vietnam") {
-                            setValue("province", undefined, { shouldDirty: true })
-                          }
-                        }}
-                      >
-                        <SelectTrigger className="w-full" aria-label={t("form.country")}>
-                          <SelectValue placeholder={t("form.countryPlaceholder")} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value={NO_SELECTION}>{t("form.countryNone")}</SelectItem>
-                          {CUSTOMER_COUNTRIES.map((c) => (
-                            <SelectItem key={c} value={c}>
-                              {t(`country.${c}`)}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                </CustomerField>
-
-                <CustomerField label={t("form.province")} error={errors.province?.message}>
-                  <Controller
-                    control={control}
-                    name="province"
-                    render={({ field }) => (
-                      <Select
-                        value={field.value ?? NO_SELECTION}
-                        onValueChange={(v) =>
-                          field.onChange(v === NO_SELECTION ? undefined : (v as VietnamProvince))
-                        }
-                        disabled={!isVietnam}
-                      >
-                        <SelectTrigger className="w-full" aria-label={t("form.province")}>
-                          <SelectValue
-                            placeholder={
-                              isVietnam
-                                ? t("form.provincePlaceholder")
-                                : t("form.provinceNotApplicable")
+                {/* Quốc gia/Tỉnh thành share their own 2-col strip spanning
+                    the full row, instead of each just taking one of the
+                    outer grid's 3 tracks and leaving the last one empty. */}
+                <div className="grid grid-cols-1 gap-4 sm:col-span-2 sm:grid-cols-2 lg:col-span-3">
+                  <CustomerField label={t("form.country")} error={errors.country?.message}>
+                    <Controller
+                      control={control}
+                      name="country"
+                      render={({ field }) => (
+                        <Select
+                          value={field.value ?? NO_SELECTION}
+                          onValueChange={(v) => {
+                            const next = v === NO_SELECTION ? undefined : (v as CustomerCountry)
+                            field.onChange(next)
+                            // Tỉnh thành only exists inside Vietnam — leaving
+                            // a stale province behind would submit e.g.
+                            // { country: "japan", province: "ha-noi" }.
+                            if (next !== "vietnam") {
+                              setValue("province", undefined, { shouldDirty: true })
                             }
-                          />
-                        </SelectTrigger>
-                        <SelectContent className="max-h-[320px]">
-                          <SelectItem value={NO_SELECTION}>{t("form.provinceNone")}</SelectItem>
-                          {VIETNAM_PROVINCES.map((province) => (
-                            <SelectItem key={province} value={province}>
-                              {t(`province.${province}`)}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                </CustomerField>
+                          }}
+                        >
+                          <SelectTrigger className="w-full" aria-label={t("form.country")}>
+                            <SelectValue placeholder={t("form.countryPlaceholder")} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value={NO_SELECTION}>{t("form.countryNone")}</SelectItem>
+                            {CUSTOMER_COUNTRIES.map((c) => (
+                              <SelectItem key={c} value={c}>
+                                {t(`country.${c}`)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                  </CustomerField>
+
+                  <CustomerField label={t("form.province")} error={errors.province?.message}>
+                    <Controller
+                      control={control}
+                      name="province"
+                      render={({ field }) => (
+                        <Select
+                          value={field.value ?? NO_SELECTION}
+                          onValueChange={(v) =>
+                            field.onChange(v === NO_SELECTION ? undefined : (v as VietnamProvince))
+                          }
+                          disabled={!isVietnam}
+                        >
+                          <SelectTrigger className="w-full" aria-label={t("form.province")}>
+                            <SelectValue
+                              placeholder={
+                                isVietnam
+                                  ? t("form.provincePlaceholder")
+                                  : t("form.provinceNotApplicable")
+                              }
+                            />
+                          </SelectTrigger>
+                          <SelectContent className="max-h-[320px]">
+                            <SelectItem value={NO_SELECTION}>{t("form.provinceNone")}</SelectItem>
+                            {VIETNAM_PROVINCES.map((province) => (
+                              <SelectItem key={province} value={province}>
+                                {t(`province.${province}`)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                  </CustomerField>
+                </div>
               </div>
             </section>
+
+            <Separator />
 
             <section className="flex flex-col gap-4">
               <h3 className="text-foreground text-sm font-semibold">{t("form.sectionContacts")}</h3>
@@ -579,6 +614,8 @@ export function CustomerForm({ open, onOpenChange, customer, onSubmit }: Custome
                 />
               </div>
             </section>
+
+            <Separator />
 
             <section className="flex flex-col gap-4">
               <h3 className="text-foreground text-sm font-semibold">{t("form.sectionMedia")}</h3>
