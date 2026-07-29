@@ -22,7 +22,7 @@ import {
 import { ROUTES } from "@/lib/constants"
 import { cn } from "@/lib/utils"
 import { updateCustomer, deleteCustomer } from "../actions"
-import { useResolveEmployeeName } from "../hooks/use-resolve-employee-name"
+import { useResolveEmployeeName } from "@/features/employees"
 import { CustomerForm } from "./customer-form"
 import { STATUS_VARIANT, type Customer } from "../types"
 import type { CreateCustomerFormValues } from "../schemas"

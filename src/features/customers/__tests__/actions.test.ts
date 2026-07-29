@@ -26,6 +26,7 @@ import {
   createCustomer,
   updateCustomer,
   deleteCustomer,
+  getCustomerOptions,
 } from "../actions"
 import { customerApi } from "../api"
 import { requireSession } from "@/lib/auth"
@@ -196,5 +197,73 @@ describe("customers actions — auth guard", () => {
 
     expect(result.error?.code).toBe("VALIDATION_ERROR")
     expect(mockUpdate).not.toHaveBeenCalled()
+  })
+})
+
+// getCustomerOptions backs the Sales Opportunities filter bar/table's
+// customer picker, reachable by every logged-in user — not admin-gated
+// (getCustomers() already isn't either). These tests pin down the
+// data-minimization contract: id/name/code only, one big page.
+describe("getCustomerOptions", () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it("returns UNAUTHORIZED without a session", async () => {
+    mockRequireSession.mockResolvedValue(null)
+
+    const result = await getCustomerOptions()
+
+    expect(result.error?.code).toBe("UNAUTHORIZED")
+    expect(mockGetAll).not.toHaveBeenCalled()
+  })
+
+  it("returns options for a logged-in session", async () => {
+    mockRequireSession.mockResolvedValue(mockSession as never)
+    mockGetAll.mockResolvedValue({
+      data: {
+        data: [{ id: "1", ...validInput, code: "2VT-C00001", createdAt: "now" }],
+        total: 1,
+        page: 1,
+        pageSize: 1000,
+        totalPages: 1,
+      },
+      error: null,
+    })
+
+    const result = await getCustomerOptions()
+
+    expect(result.error).toBeNull()
+    expect(result.data).toEqual([{ id: "1", name: validInput.name, code: "2VT-C00001" }])
+  })
+
+  it("only returns id/name/code — never email, phone, or taxCode", async () => {
+    mockRequireSession.mockResolvedValue(mockSession as never)
+    mockGetAll.mockResolvedValue({
+      data: {
+        data: [{ id: "1", ...validInput, code: "2VT-C00001", createdAt: "now" }],
+        total: 1,
+        page: 1,
+        pageSize: 1000,
+        totalPages: 1,
+      },
+      error: null,
+    })
+
+    const result = await getCustomerOptions()
+
+    expect(result.data?.[0]).not.toHaveProperty("email")
+    expect(result.data?.[0]).not.toHaveProperty("phone")
+    expect(result.data?.[0]).not.toHaveProperty("taxCode")
+  })
+
+  it("calls customerApi.getAll with a large pageSize to fetch every customer in one page", async () => {
+    mockRequireSession.mockResolvedValue(mockSession as never)
+    mockGetAll.mockResolvedValue({
+      data: { data: [], total: 0, page: 1, pageSize: 1000, totalPages: 1 },
+      error: null,
+    })
+
+    await getCustomerOptions()
+
+    expect(mockGetAll).toHaveBeenCalledWith({ pageSize: 1000 })
   })
 })

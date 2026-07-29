@@ -19,14 +19,16 @@ vi.mock("../../actions", () => ({
 // CustomerDetail renders CustomerForm (for the edit dialog) and resolves
 // assignee names via useEmployeeOptions() — without this mock, the real hook
 // would call the getEmployeeOptions Server Action -> cookies(), which throws
-// outside a request context in jsdom.
-vi.mock("@/features/employees", () => ({
+// outside a request context in jsdom. Mocking the LEAF module (not the whole
+// "@/features/employees" barrel) keeps the real useResolveEmployeeName
+// exercised — it's built on top of this same hook.
+vi.mock("@/features/employees/hooks/use-employee-options", () => ({
   useEmployeeOptions: vi.fn(() => ({ options: [], isLoading: false })),
 }))
 
 import { CustomerDetail } from "../../components/customer-detail"
 import { updateCustomer, deleteCustomer } from "../../actions"
-import { useEmployeeOptions } from "@/features/employees"
+import { useEmployeeOptions } from "@/features/employees/hooks/use-employee-options"
 import { toast } from "sonner"
 import type { Customer } from "../../types"
 
@@ -93,7 +95,7 @@ describe("CustomerDetail", () => {
     mockUseEmployeeOptions.mockReturnValue({ options: [], isLoading: true })
     render(<CustomerDetail customer={{ ...customer, salesRepId: "1" }} />)
 
-    expect(screen.queryByText("form.assigneeUnknown")).not.toBeInTheDocument()
+    expect(screen.queryByText("unknownEmployee")).not.toBeInTheDocument()
     expect(screen.getAllByText("—").length).toBeGreaterThan(0)
   })
 
@@ -103,7 +105,7 @@ describe("CustomerDetail", () => {
       <CustomerDetail customer={{ ...customer, salesRepId: "99", contractManagerId: undefined }} />
     )
 
-    expect(screen.getByText("form.assigneeUnknown")).toBeInTheDocument()
+    expect(screen.getByText("unknownEmployee")).toBeInTheDocument()
   })
 
   it("opens the edit form when Edit is clicked and updates in place on success", async () => {

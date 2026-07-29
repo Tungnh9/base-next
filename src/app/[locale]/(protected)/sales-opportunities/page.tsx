@@ -1,26 +1,16 @@
+import { OpportunityList } from "@/features/sales-opportunities"
 import { getTranslations } from "next-intl/server"
-import { Handshake } from "lucide-react"
-import { FeaturePlaceholder } from "@/components/common/feature-placeholder"
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
-  const [tNav, tMeta] = await Promise.all([
-    getTranslations({ locale, namespace: "nav" }),
-    getTranslations({ locale, namespace: "metadata" }),
-  ])
-  return { title: `${tNav("salesOpportunities")} — ${tMeta("siteName")}` }
+  const t = await getTranslations({ locale, namespace: "metadata" })
+  return { title: `${t("salesOpportunities")} — ${t("siteName")}` }
 }
 
-export default async function SalesOpportunitiesPage() {
-  const t = await getTranslations()
-
+export default function SalesOpportunitiesPage() {
   return (
     <div className="flex flex-1 flex-col p-6">
-      <FeaturePlaceholder
-        icon={Handshake}
-        title={t("nav.salesOpportunities")}
-        badgeLabel={t("nav.comingSoonBadge")}
-      />
+      <OpportunityList />
     </div>
   )
 }

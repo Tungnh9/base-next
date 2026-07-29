@@ -408,7 +408,8 @@
     "maintenance": "Under Maintenance",
     "comingSoon": "Coming Soon",
     "notAuthorized": "Not Authorized",
-    "siteName": "Vuexy"
+    "siteName": "Vuexy",
+    "salesOpportunities": "Sales Opportunities"
   },
   "customers": {
     "title": "Customers",
@@ -626,7 +627,8 @@
       "vinh-long": "Vĩnh Long",
       "vinh-phuc": "Vĩnh Phúc",
       "yen-bai": "Yên Bái"
-    }
+    },
+    "unknownCustomer": "Customer #{id}"
   },
   "employees": {
     "title": "Employees",
@@ -693,6 +695,55 @@
     "empty": "No employees yet",
     "searchPlaceholder": "Search by name, email...",
     "backToList": "Back to list",
+    "pagination": {
+      "previous": "Previous page",
+      "next": "Next page",
+      "summary": "Showing {from}-{to} of {total}"
+    },
+    "unknownEmployee": "Employee #{id}"
+  },
+  "salesOpportunities": {
+    "title": "Sales Opportunities",
+    "description": "Manage your sales opportunity list",
+    "addNew": "Add Opportunity",
+    "view": "View details",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteTitle": "Delete opportunity",
+    "confirmDelete": "Are you sure you want to delete opportunity <b>{name}</b>?",
+    "confirmDeleteMany": "Are you sure you want to delete {count} selected opportunities?",
+    "deleteSelected": "Delete selected ({count})",
+    "selectAll": "Select all",
+    "selectRow": "Select {name}",
+    "toast": {
+      "deleteSuccess": "Opportunity deleted",
+      "deleteManySuccess": "{count} opportunities deleted",
+      "deleteManyPartialFail": "Failed to delete {failed}/{total} opportunities"
+    },
+    "columns": {
+      "stt": "No.",
+      "name": "Opportunity Name",
+      "customer": "Customer",
+      "contractValue": "Contract Value",
+      "createdAt": "Created At",
+      "status": "Status",
+      "salesRep": "Sales Rep",
+      "actions": "Actions"
+    },
+    "status": {
+      "processing": "Processing",
+      "pending-approval": "Pending Approval",
+      "transferred": "Transferred to Contract Manager"
+    },
+    "filters": {
+      "customer": "Customer",
+      "salesRep": "Sales Rep",
+      "status": "Status",
+      "createdRange": "Created date range",
+      "all": "All"
+    },
+    "empty": "No opportunities yet",
+    "searchPlaceholder": "Search by opportunity name...",
     "pagination": {
       "previous": "Previous page",
       "next": "Next page",

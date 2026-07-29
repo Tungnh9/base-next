@@ -1,12 +1,12 @@
 import { renderHook } from "@testing-library/react"
 import { describe, it, expect, vi, beforeEach } from "vitest"
 
-vi.mock("@/features/employees", () => ({
+vi.mock("../use-employee-options", () => ({
   useEmployeeOptions: vi.fn(),
 }))
 
-import { useResolveEmployeeName } from "../../hooks/use-resolve-employee-name"
-import { useEmployeeOptions } from "@/features/employees"
+import { useResolveEmployeeName } from "../use-resolve-employee-name"
+import { useEmployeeOptions } from "../use-employee-options"
 
 const mockUseEmployeeOptions = vi.mocked(useEmployeeOptions)
 
@@ -40,6 +40,6 @@ describe("useResolveEmployeeName", () => {
     mockUseEmployeeOptions.mockReturnValue({ options, isLoading: false })
     const { result } = renderHook(() => useResolveEmployeeName())
 
-    expect(result.current("99")).toBe("form.assigneeUnknown")
+    expect(result.current("99")).toBe("unknownEmployee")
   })
 })

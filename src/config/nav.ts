@@ -52,7 +52,6 @@ export function createNavConfig(): NavSection[] {
           label: "nav.salesOpportunities",
           href: ROUTES.salesOpportunities,
           icon: Handshake,
-          disabled: true,
         },
         {
           label: "nav.inputRecords",
