@@ -571,6 +571,7 @@ export function CustomerForm({ open, onOpenChange, customer, onSubmit }: Custome
                   label={t("form.representativeMobile")}
                   placeholder={t("form.mobilePlaceholder")}
                   error={errors.representativeMobile?.message}
+                  startIcon={<Phone className="size-4" />}
                   {...register("representativeMobile")}
                 />
                 <CustomerTextField
@@ -578,6 +579,7 @@ export function CustomerForm({ open, onOpenChange, customer, onSubmit }: Custome
                   label={t("form.contactMobile")}
                   placeholder={t("form.mobilePlaceholder")}
                   error={errors.contactMobile?.message}
+                  startIcon={<Phone className="size-4" />}
                   {...register("contactMobile")}
                 />
                 <CustomerTextField
@@ -585,6 +587,7 @@ export function CustomerForm({ open, onOpenChange, customer, onSubmit }: Custome
                   label={t("form.mediaContactMobile")}
                   placeholder={t("form.mobilePlaceholder")}
                   error={errors.mediaContactMobile?.message}
+                  startIcon={<Phone className="size-4" />}
                   {...register("mediaContactMobile")}
                 />
 
@@ -594,6 +597,7 @@ export function CustomerForm({ open, onOpenChange, customer, onSubmit }: Custome
                   label={t("form.representativeEmail")}
                   placeholder={t("form.contactEmailPlaceholder")}
                   error={errors.representativeEmail?.message}
+                  startIcon={<Mail className="size-4" />}
                   {...register("representativeEmail")}
                 />
                 <CustomerTextField
@@ -602,6 +606,7 @@ export function CustomerForm({ open, onOpenChange, customer, onSubmit }: Custome
                   label={t("form.contactEmail")}
                   placeholder={t("form.contactEmailPlaceholder")}
                   error={errors.contactEmail?.message}
+                  startIcon={<Mail className="size-4" />}
                   {...register("contactEmail")}
                 />
                 <CustomerTextField
@@ -610,6 +615,7 @@ export function CustomerForm({ open, onOpenChange, customer, onSubmit }: Custome
                   label={t("form.mediaContactEmail")}
                   placeholder={t("form.contactEmailPlaceholder")}
                   error={errors.mediaContactEmail?.message}
+                  startIcon={<Mail className="size-4" />}
                   {...register("mediaContactEmail")}
                 />
               </div>

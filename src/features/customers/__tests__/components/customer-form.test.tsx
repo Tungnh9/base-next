@@ -224,6 +224,24 @@ describe("CustomerForm — phone/email/website icons", () => {
     expect(emailWrapper?.querySelector("svg.lucide-mail")).toBeInTheDocument()
     expect(websiteWrapper?.querySelector("svg.lucide-globe")).toBeInTheDocument()
   })
+
+  it("renders a matching icon inside every mobile/email field in the Người liên hệ section", () => {
+    render(<CustomerForm open onOpenChange={onOpenChange} customer={null} onSubmit={onSubmit} />)
+
+    for (const key of [
+      "form.representativeMobile",
+      "form.contactMobile",
+      "form.mediaContactMobile",
+    ]) {
+      const wrapper = screen.getByLabelText(key).closest('[data-slot="input-wrapper"]')
+      expect(wrapper?.querySelector("svg.lucide-phone")).toBeInTheDocument()
+    }
+
+    for (const key of ["form.representativeEmail", "form.contactEmail", "form.mediaContactEmail"]) {
+      const wrapper = screen.getByLabelText(key).closest('[data-slot="input-wrapper"]')
+      expect(wrapper?.querySelector("svg.lucide-mail")).toBeInTheDocument()
+    }
+  })
 })
 
 describe("CustomerForm — quốc gia/tỉnh thành cascade", () => {
