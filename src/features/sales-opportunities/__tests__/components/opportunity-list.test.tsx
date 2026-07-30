@@ -11,6 +11,16 @@ vi.mock("@/features/employees", () => ({
   useEmployeeOptions: vi.fn(() => ({ options: [], isLoading: false })),
   useResolveEmployeeName: vi.fn(() => () => undefined),
 }))
+// The real DatePicker's calendar UI belongs to a shared component tested on
+// its own — stubbing it here keeps this suite focused on OpportunityList's
+// own wiring (does it forward DatePicker's onChange to setDateRange?).
+vi.mock("@/components/ui/date-picker", () => ({
+  DatePicker: ({ onChange }: { onChange?: (v: unknown) => void }) => (
+    <button onClick={() => onChange?.({ from: new Date(2024, 0, 1), to: new Date(2024, 0, 31) })}>
+      mock-date-picker
+    </button>
+  ),
+}))
 
 import { OpportunityList } from "../../components/opportunity-list"
 import { useOpportunities } from "../../hooks/use-opportunities"
@@ -269,5 +279,113 @@ describe("OpportunityList", () => {
     await user.click(screen.getByRole("button", { name: "pagination.next" }))
 
     expect(setPage).toHaveBeenCalledWith(2)
+  })
+
+  it("selecting a real customer option calls setCustomerId with its id", async () => {
+    const user = userEvent.setup()
+    const setCustomerId = vi.fn()
+    mockUseOpportunities.mockReturnValue(baseHookReturn({ setCustomerId, setPage, setSearch }))
+    mockUseCustomerOptions.mockReturnValue({
+      options: [{ id: "1", name: "Công ty A", code: "2VT-C00001" }],
+      isLoading: false,
+    })
+    render(<OpportunityList />)
+
+    await user.click(screen.getAllByRole("combobox")[0])
+    await user.click(screen.getByRole("option", { name: /Công ty A/ }))
+
+    expect(setCustomerId).toHaveBeenCalledWith("1")
+  })
+
+  it("resetting the customer filter back to 'all' calls setCustomerId with undefined", async () => {
+    const user = userEvent.setup()
+    const setCustomerId = vi.fn()
+    // Starts already filtered by a real customer so the "all" item is a
+    // genuine change — Radix's Select only fires onValueChange when the
+    // clicked item differs from the current controlled value.
+    mockUseOpportunities.mockReturnValue(
+      baseHookReturn({ customerId: "1", setCustomerId, setPage, setSearch })
+    )
+    mockUseCustomerOptions.mockReturnValue({
+      options: [{ id: "1", name: "Công ty A", code: "2VT-C00001" }],
+      isLoading: false,
+    })
+    render(<OpportunityList />)
+
+    await user.click(screen.getAllByRole("combobox")[0])
+    await user.click(screen.getByRole("option", { name: "filters.all" }))
+
+    expect(setCustomerId).toHaveBeenCalledWith(undefined)
+  })
+
+  it("selecting a real NVKD option calls setSalesRepId with its id", async () => {
+    const user = userEvent.setup()
+    const setSalesRepId = vi.fn()
+    mockUseOpportunities.mockReturnValue(baseHookReturn({ setSalesRepId, setPage, setSearch }))
+    mockUseEmployeeOptions.mockReturnValue({
+      options: [{ id: "1", name: "Nguyễn Văn An", department: "sales" }],
+      isLoading: false,
+    })
+    render(<OpportunityList />)
+
+    await user.click(screen.getAllByRole("combobox")[1])
+    await user.click(screen.getByRole("option", { name: /Nguyễn Văn An/ }))
+
+    expect(setSalesRepId).toHaveBeenCalledWith("1")
+  })
+
+  it("selecting a status option calls setStatus with it", async () => {
+    const user = userEvent.setup()
+    const setStatus = vi.fn()
+    mockUseOpportunities.mockReturnValue(baseHookReturn({ setStatus, setPage, setSearch }))
+    render(<OpportunityList />)
+
+    await user.click(screen.getAllByRole("combobox")[2])
+    await user.click(screen.getByRole("option", { name: "status.processing" }))
+
+    expect(setStatus).toHaveBeenCalledWith("processing")
+  })
+
+  it("resetting the status filter back to 'all' calls setStatus with undefined", async () => {
+    const user = userEvent.setup()
+    const setStatus = vi.fn()
+    // Starts already filtered by a real status so the "all" item is a
+    // genuine change — Radix's Select only fires onValueChange when the
+    // clicked item differs from the current controlled value.
+    mockUseOpportunities.mockReturnValue(
+      baseHookReturn({ status: "processing", setStatus, setPage, setSearch })
+    )
+    render(<OpportunityList />)
+
+    await user.click(screen.getAllByRole("combobox")[2])
+    await user.click(screen.getByRole("option", { name: "filters.all" }))
+
+    expect(setStatus).toHaveBeenCalledWith(undefined)
+  })
+
+  it("picking a date range forwards it to setDateRange", async () => {
+    const user = userEvent.setup()
+    const setDateRange = vi.fn()
+    mockUseOpportunities.mockReturnValue(baseHookReturn({ setDateRange, setPage, setSearch }))
+    render(<OpportunityList />)
+
+    await user.click(screen.getByRole("button", { name: "mock-date-picker" }))
+
+    expect(setDateRange).toHaveBeenCalledWith({
+      from: new Date(2024, 0, 1),
+      to: new Date(2024, 0, 31),
+    })
+  })
+
+  it("clicking Cancel closes the confirm dialog without deleting", async () => {
+    const user = userEvent.setup()
+    render(<OpportunityList />)
+
+    await user.click(screen.getAllByRole("button", { name: "delete" })[0])
+    const dialog = screen.getByRole("alertdialog")
+    await user.click(within(dialog).getByRole("button", { name: "cancel" }))
+
+    expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument()
+    expect(handleDelete).not.toHaveBeenCalled()
   })
 })

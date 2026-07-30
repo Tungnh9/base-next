@@ -82,6 +82,17 @@ describe("useOpportunities", () => {
     expect(mockGetOpportunities).toHaveBeenCalledWith(baseParams)
   })
 
+  it("stops loading without touching state when getOpportunities resolves with neither data nor an error", async () => {
+    mockGetOpportunities.mockResolvedValue({ data: null, error: null } as never)
+
+    const { result } = renderHook(() => useOpportunities())
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+    expect(result.current.opportunities).toEqual([])
+    expect(mockToastError).not.toHaveBeenCalled()
+  })
+
   it("toasts an error and stops loading when getOpportunities resolves with an error", async () => {
     mockGetOpportunities.mockResolvedValue({
       data: null,
