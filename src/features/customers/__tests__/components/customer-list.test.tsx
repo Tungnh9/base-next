@@ -6,14 +6,16 @@ vi.mock("../../hooks/use-customers")
 // CustomerList always mounts CustomerForm (Radix only unmounts DialogContent
 // while closed), so the form's real useEmployeeOptions() would otherwise fire
 // on mount and call the getEmployeeOptions Server Action -> cookies(), which
-// throws outside a request context in jsdom.
-vi.mock("@/features/employees", () => ({
+// throws outside a request context in jsdom. Mocking the LEAF module (not the
+// whole "@/features/employees" barrel) keeps the real useResolveEmployeeName
+// exercised — it's built on top of this same hook.
+vi.mock("@/features/employees/hooks/use-employee-options", () => ({
   useEmployeeOptions: vi.fn(() => ({ options: [], isLoading: false })),
 }))
 
 import { CustomerList } from "../../components/customer-list"
 import { useCustomers } from "../../hooks/use-customers"
-import { useEmployeeOptions } from "@/features/employees"
+import { useEmployeeOptions } from "@/features/employees/hooks/use-employee-options"
 import type { Customer } from "../../types"
 
 const mockUseCustomers = vi.mocked(useCustomers)

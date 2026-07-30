@@ -40,12 +40,12 @@ describe("Sidebar", () => {
   it("renders a disabled nav item without a navigable link, showing the coming-soon indicator", () => {
     render(<Sidebar />)
 
-    const label = screen.getByText("nav.salesOpportunities")
+    const label = screen.getByText("nav.inputRecords")
     const row = label.closest("div")
     expect(row).not.toBeNull()
     expect(row).toHaveAttribute("aria-disabled", "true")
 
-    expect(screen.queryByRole("link", { name: /nav.salesOpportunities/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole("link", { name: /nav.inputRecords/i })).not.toBeInTheDocument()
     expect(within(row!).getByText("nav.comingSoonBadge")).toBeInTheDocument()
   })
 

@@ -26,7 +26,7 @@ describe("createNavConfig", () => {
     expect(dashboardItem.disabled).toBeFalsy()
   })
 
-  it("marks every item in the Sales Process section as disabled with the correct routes", () => {
+  it("keeps Sales Opportunities enabled and marks the rest of Sales Process as disabled", () => {
     const [, salesSection] = createNavConfig()
     const expectedRoutes = [
       ROUTES.salesOpportunities,
@@ -39,7 +39,9 @@ describe("createNavConfig", () => {
     ]
 
     expect(salesSection.items.map((item) => item.href)).toEqual(expectedRoutes)
-    expect(salesSection.items.every((item) => item.disabled === true)).toBe(true)
+    const [opportunitiesItem, ...restOfSalesSection] = salesSection.items
+    expect(opportunitiesItem.disabled).toBeFalsy()
+    expect(restOfSalesSection.every((item) => item.disabled === true)).toBe(true)
   })
 
   it("marks every item in the Inventory & Reports section as disabled with the correct routes", () => {
@@ -86,14 +88,15 @@ describe("createNavConfig", () => {
     expect(employeesItem?.disabled).toBeFalsy()
   })
 
-  it("has exactly 13 disabled items and exactly 3 enabled items", () => {
+  it("has exactly 12 disabled items and exactly 4 enabled items", () => {
     const allItems = createNavConfig().flatMap((section) => section.items)
     const disabledItems = allItems.filter((item) => item.disabled === true)
     const enabledItems = allItems.filter((item) => !item.disabled)
 
-    expect(disabledItems).toHaveLength(13)
+    expect(disabledItems).toHaveLength(12)
     expect(enabledItems.map((item) => item.label)).toEqual([
       "nav.dashboard",
+      "nav.salesOpportunities",
       "nav.customers",
       "nav.employees",
     ])

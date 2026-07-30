@@ -1,13 +1,11 @@
 "use client"
 
 import { useMemo, useState, type MouseEvent } from "react"
-import Link from "next/link"
-import { useTranslations, useLocale } from "next-intl"
+import { useTranslations } from "next-intl"
 import { Plus, Eye, Pencil, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import {
   Select,
   SelectContent,
@@ -15,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { DatePicker } from "@/components/ui/date-picker"
 import {
   AlertDialog,
   AlertDialogContent,
@@ -26,26 +25,19 @@ import {
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog"
 import { DataTable, type DataTableColumnDef } from "@/components/ui/data-table"
-import { ROUTES } from "@/lib/constants"
-import { useCustomers } from "../hooks/use-customers"
-import { useResolveEmployeeName } from "@/features/employees"
-import { CustomerForm } from "./customer-form"
-import { CUSTOMER_CLASSIFICATIONS, CUSTOMER_INDUSTRIES, CUSTOMER_STATUSES } from "../constants"
-import {
-  STATUS_VARIANT,
-  type Customer,
-  type CustomerClassification,
-  type CustomerIndustry,
-  type CustomerStatus,
-} from "../types"
-import type { CreateCustomerFormValues } from "../schemas"
+import { useCustomerOptions, useResolveCustomerName } from "@/features/customers"
+import { useEmployeeOptions, useResolveEmployeeName } from "@/features/employees"
+import { useOpportunities } from "../hooks/use-opportunities"
+import { formatContractValue, OPPORTUNITY_STATUSES } from "../constants"
+import { STATUS_VARIANT, type SalesOpportunity, type OpportunityStatus } from "../types"
 
-export function CustomerList() {
-  const t = useTranslations("customers")
+export function OpportunityList() {
+  const t = useTranslations("salesOpportunities")
+  const tNav = useTranslations("nav")
   const tCommon = useTranslations("common")
-  const locale = useLocale()
+  const tEmployees = useTranslations("employees")
   const {
-    customers,
+    opportunities,
     total,
     totalPages,
     page,
@@ -53,39 +45,30 @@ export function CustomerList() {
     pageSize,
     search,
     setSearch,
-    classification,
-    setClassification,
-    industry,
-    setIndustry,
+    customerId,
+    setCustomerId,
+    salesRepId,
+    setSalesRepId,
     status,
     setStatus,
+    dateRange,
+    setDateRange,
     isLoading,
-    handleCreate,
-    handleUpdate,
     handleDelete,
     handleDeleteMany,
-  } = useCustomers()
+  } = useOpportunities()
+  const { options: customerOptions } = useCustomerOptions()
+  const { options: employeeOptions } = useEmployeeOptions()
+  const resolveCustomerName = useResolveCustomerName()
   const resolveEmployeeName = useResolveEmployeeName()
 
-  const [formOpen, setFormOpen] = useState(false)
-  const [editing, setEditing] = useState<Customer | null>(null)
-  const [selectedRows, setSelectedRows] = useState<Customer[]>([])
-  const [pendingDelete, setPendingDelete] = useState<Customer[] | null>(null)
+  const [selectedRows, setSelectedRows] = useState<SalesOpportunity[]>([])
+  const [pendingDelete, setPendingDelete] = useState<SalesOpportunity[] | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
   // DataTable's internal rowSelection/sorting state is keyed by row index, not
   // row id — bumping this key forces a remount (fresh internal state) after
   // a delete refetches, so a stale index can't silently re-select the wrong row.
   const [tableKey, setTableKey] = useState(0)
-
-  function openCreate() {
-    setEditing(null)
-    setFormOpen(true)
-  }
-
-  async function onFormSubmit(values: CreateCustomerFormValues) {
-    if (editing) return handleUpdate(editing.id, values)
-    return handleCreate(values)
-  }
 
   // Radix closes AlertDialog on Action click unless the event is prevented —
   // we need to await the delete first so it can't fire twice mid-flight.
@@ -93,7 +76,7 @@ export function CustomerList() {
     event.preventDefault()
     if (!pendingDelete || isDeleting) return
     setIsDeleting(true)
-    const ids = pendingDelete.map((c) => c.id)
+    const ids = pendingDelete.map((o) => o.id)
     if (ids.length === 1) {
       await handleDelete(ids[0])
     } else {
@@ -105,7 +88,7 @@ export function CustomerList() {
     setPendingDelete(null)
   }
 
-  const columns = useMemo<DataTableColumnDef<Customer>[]>(
+  const columns = useMemo<DataTableColumnDef<SalesOpportunity>[]>(
     () => [
       {
         id: "stt",
@@ -120,59 +103,34 @@ export function CustomerList() {
       {
         accessorKey: "name",
         header: t("columns.name"),
-        cell: ({ row }) => {
-          const customer = row.original
-          return (
-            <div className="flex items-center gap-3">
-              <Avatar>
-                {customer.avatarUrl && <AvatarImage src={customer.avatarUrl} alt={customer.name} />}
-                <AvatarFallback>{customer.name.charAt(0).toUpperCase()}</AvatarFallback>
-              </Avatar>
-              <div className="flex flex-col">
-                <Link
-                  href={`/${locale}${ROUTES.customers}/${customer.id}`}
-                  className="text-foreground hover:text-primary font-semibold hover:underline"
-                >
-                  {customer.name}
-                </Link>
-                <span className="text-muted-foreground text-xs">{customer.code}</span>
-              </div>
-            </div>
-          )
-        },
+        cell: ({ row }) => <span className="text-foreground font-medium">{row.original.name}</span>,
       },
       {
-        accessorKey: "classification",
-        header: t("columns.classification"),
+        id: "customer",
+        header: t("columns.customer"),
+        enableSorting: false,
         cell: ({ row }) => (
           <span className="text-muted-foreground">
-            {t(`classification.${row.original.classification}`)}
+            {resolveCustomerName(row.original.customerId) ?? "—"}
           </span>
         ),
       },
       {
-        accessorKey: "industry",
-        header: t("columns.industry"),
+        accessorKey: "contractValue",
+        header: t("columns.contractValue"),
         cell: ({ row }) => (
-          <span className="text-muted-foreground">{t(`industry.${row.original.industry}`)}</span>
+          <span className="text-muted-foreground">
+            {formatContractValue(row.original.contractValue)}
+          </span>
         ),
       },
       {
         accessorKey: "createdAt",
-        header: t("columns.collaboratingSince"),
+        header: t("columns.createdAt"),
         cell: ({ row }) => (
           <span className="text-muted-foreground">
             {new Date(row.original.createdAt).toLocaleDateString("vi-VN")}
           </span>
-        ),
-      },
-      {
-        accessorKey: "opportunityCount",
-        header: t("columns.opportunities"),
-        cell: ({ row }) => (
-          <div className="text-muted-foreground text-center font-semibold">
-            {row.original.opportunityCount}
-          </div>
         ),
       },
       {
@@ -185,12 +143,12 @@ export function CustomerList() {
         ),
       },
       {
-        id: "contractManager",
-        header: t("columns.contractManager"),
+        id: "salesRep",
+        header: t("columns.salesRep"),
         enableSorting: false,
         cell: ({ row }) => (
           <span className="text-muted-foreground">
-            {resolveEmployeeName(row.original.contractManagerId) ?? "—"}
+            {resolveEmployeeName(row.original.salesRepId) ?? "—"}
           </span>
         ),
       },
@@ -198,41 +156,28 @@ export function CustomerList() {
         id: "actions",
         header: () => <div className="text-center">{t("columns.actions")}</div>,
         enableSorting: false,
-        cell: ({ row }) => {
-          const customer = row.original
-          return (
-            <div className="flex items-center justify-end gap-1">
-              <Button variant="ghost" size="icon" aria-label={t("view")} asChild>
-                <Link href={`/${locale}${ROUTES.customers}/${customer.id}`}>
-                  <Eye className="size-4" />
-                </Link>
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => {
-                  setEditing(customer)
-                  setFormOpen(true)
-                }}
-                aria-label={t("edit")}
-              >
-                <Pencil className="size-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setPendingDelete([customer])}
-                aria-label={t("delete")}
-                className="text-destructive hover:text-destructive"
-              >
-                <Trash2 className="size-4" />
-              </Button>
-            </div>
-          )
-        },
+        cell: ({ row }) => (
+          <div className="flex items-center justify-end gap-1">
+            <Button variant="ghost" size="icon" aria-label={t("view")} disabled>
+              <Eye className="size-4" />
+            </Button>
+            <Button variant="ghost" size="icon" aria-label={t("edit")} disabled>
+              <Pencil className="size-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setPendingDelete([row.original])}
+              aria-label={t("delete")}
+              className="text-destructive hover:text-destructive"
+            >
+              <Trash2 className="size-4" />
+            </Button>
+          </div>
+        ),
       },
     ],
-    [t, locale, page, pageSize, resolveEmployeeName]
+    [t, page, pageSize, resolveCustomerName, resolveEmployeeName]
   )
 
   const from = total === 0 ? 0 : (page - 1) * pageSize + 1
@@ -246,70 +191,85 @@ export function CustomerList() {
           <h1 className="text-foreground text-2xl font-semibold">{t("title")}</h1>
           <p className="text-muted-foreground mt-0.5 text-sm">{t("description")}</p>
         </div>
-        <Button onClick={openCreate}>
-          <Plus className="mr-1.5 size-4" />
-          {t("addNew")}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Badge variant="warning" skin="light">
+            {tNav("comingSoonBadge")}
+          </Badge>
+          <Button disabled>
+            <Plus className="mr-1.5 size-4" />
+            {t("addNew")}
+          </Button>
+        </div>
       </div>
 
-      {/* Filter bar — 4 fields share the row equally instead of sizing to content */}
+      {/* Filter bar — Tìm kiếm → Khách hàng → NVKD → Trạng thái → Thời gian tạo */}
       <div className="flex flex-col gap-3">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-6">
           <Input
+            className="sm:col-span-2"
             placeholder={t("searchPlaceholder")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
           <Select
-            value={classification ?? "all"}
-            onValueChange={(v) =>
-              setClassification(v === "all" ? undefined : (v as CustomerClassification))
-            }
+            value={customerId ?? "all"}
+            onValueChange={(v) => setCustomerId(v === "all" ? undefined : v)}
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder={t("filters.classification")} />
+              <SelectValue placeholder={t("filters.customer")} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{t("filters.all")}</SelectItem>
-              {CUSTOMER_CLASSIFICATIONS.map((c) => (
-                <SelectItem key={c} value={c}>
-                  {t(`classification.${c}`)}
+              {customerOptions.map((option) => (
+                <SelectItem key={option.id} value={option.id}>
+                  {option.name}
+                  <span className="text-muted-foreground">{` · ${option.code}`}</span>
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
           <Select
-            value={industry ?? "all"}
-            onValueChange={(v) => setIndustry(v === "all" ? undefined : (v as CustomerIndustry))}
+            value={salesRepId ?? "all"}
+            onValueChange={(v) => setSalesRepId(v === "all" ? undefined : v)}
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder={t("filters.industry")} />
+              <SelectValue placeholder={t("filters.salesRep")} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{t("filters.all")}</SelectItem>
-              {CUSTOMER_INDUSTRIES.map((i) => (
-                <SelectItem key={i} value={i}>
-                  {t(`industry.${i}`)}
+              {employeeOptions.map((option) => (
+                <SelectItem key={option.id} value={option.id}>
+                  {option.name}
+                  <span className="text-muted-foreground">
+                    {` · ${tEmployees(`department.${option.department}`)}`}
+                  </span>
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
           <Select
             value={status ?? "all"}
-            onValueChange={(v) => setStatus(v === "all" ? undefined : (v as CustomerStatus))}
+            onValueChange={(v) => setStatus(v === "all" ? undefined : (v as OpportunityStatus))}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder={t("filters.status")} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{t("filters.all")}</SelectItem>
-              {CUSTOMER_STATUSES.map((s) => (
+              {OPPORTUNITY_STATUSES.map((s) => (
                 <SelectItem key={s} value={s}>
                   {t(`status.${s}`)}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
+          <DatePicker
+            mode="range"
+            className="w-full"
+            value={dateRange}
+            onChange={(v) => setDateRange(v as typeof dateRange)}
+            placeholder={t("filters.createdRange")}
+          />
         </div>
         {selectedRows.length > 0 && (
           <div className="flex justify-end">
@@ -328,12 +288,12 @@ export function CustomerList() {
       <DataTable
         key={tableKey}
         columns={columns}
-        data={customers}
+        data={opportunities}
         isLoading={isLoading}
         selectable
         onSelectionChange={setSelectedRows}
         selectAllLabel={t("selectAll")}
-        getRowSelectLabel={(customer) => t("selectRow", { name: customer.name })}
+        getRowSelectLabel={(opportunity) => t("selectRow", { name: opportunity.name })}
         emptyMessage={t("empty")}
         pagination={{
           page,
@@ -344,13 +304,6 @@ export function CustomerList() {
           nextLabel: t("pagination.next"),
           summary: t("pagination.summary", { from, to, total }),
         }}
-      />
-
-      <CustomerForm
-        open={formOpen}
-        onOpenChange={setFormOpen}
-        customer={editing}
-        onSubmit={onFormSubmit}
       />
 
       <AlertDialog

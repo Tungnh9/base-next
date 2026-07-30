@@ -408,7 +408,8 @@
     "maintenance": "Đang bảo trì",
     "comingSoon": "Sắp ra mắt",
     "notAuthorized": "Không có quyền truy cập",
-    "siteName": "Vuexy"
+    "siteName": "Vuexy",
+    "salesOpportunities": "Cơ hội Sale"
   },
   "customers": {
     "title": "Khách hàng",
@@ -626,7 +627,8 @@
       "vinh-long": "Vĩnh Long",
       "vinh-phuc": "Vĩnh Phúc",
       "yen-bai": "Yên Bái"
-    }
+    },
+    "unknownCustomer": "Khách hàng #{id}"
   },
   "employees": {
     "title": "Nhân viên",
@@ -693,6 +695,55 @@
     "empty": "Chưa có nhân viên nào",
     "searchPlaceholder": "Tìm theo tên, email...",
     "backToList": "Quay lại danh sách",
+    "pagination": {
+      "previous": "Trang trước",
+      "next": "Trang sau",
+      "summary": "Hiển thị {from}-{to} trong {total}"
+    },
+    "unknownEmployee": "Nhân viên #{id}"
+  },
+  "salesOpportunities": {
+    "title": "Cơ hội Sale",
+    "description": "Quản lý danh sách cơ hội Sale",
+    "addNew": "Thêm cơ hội Sale",
+    "view": "Xem chi tiết",
+    "edit": "Chỉnh sửa",
+    "delete": "Xóa",
+    "deleteTitle": "Xóa cơ hội Sale",
+    "confirmDelete": "Bạn có chắc muốn xóa cơ hội Sale <b>{name}</b> này?",
+    "confirmDeleteMany": "Bạn có chắc muốn xóa {count} cơ hội Sale đã chọn?",
+    "deleteSelected": "Xóa đã chọn ({count})",
+    "selectAll": "Chọn tất cả",
+    "selectRow": "Chọn {name}",
+    "toast": {
+      "deleteSuccess": "Đã xóa cơ hội Sale",
+      "deleteManySuccess": "Đã xóa {count} cơ hội Sale",
+      "deleteManyPartialFail": "Xóa thất bại {failed}/{total} cơ hội Sale"
+    },
+    "columns": {
+      "stt": "STT",
+      "name": "Tên cơ hội Sale",
+      "customer": "Khách hàng",
+      "contractValue": "Giá trị HĐ",
+      "createdAt": "Thời gian tạo",
+      "status": "Tình trạng",
+      "salesRep": "NVKD",
+      "actions": "Hành động"
+    },
+    "status": {
+      "processing": "Đang xử lý",
+      "pending-approval": "Chờ duyệt",
+      "transferred": "Đã chuyển QLHĐ"
+    },
+    "filters": {
+      "customer": "Khách hàng",
+      "salesRep": "NVKD",
+      "status": "Tình trạng",
+      "createdRange": "Thời gian tạo",
+      "all": "Tất cả"
+    },
+    "empty": "Chưa có cơ hội Sale nào",
+    "searchPlaceholder": "Tìm theo tên cơ hội...",
     "pagination": {
       "previous": "Trang trước",
       "next": "Trang sau",

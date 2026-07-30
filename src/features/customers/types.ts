@@ -126,3 +126,18 @@ export const STATUS_VARIANT: Record<CustomerStatus, "success" | "warning" | "inf
   paused: "warning",
   potential: "info",
 }
+
+// Minimal projection for customer pickers in other features (e.g. the sales
+// opportunities filter bar/table). Deliberately excludes email/phone/taxCode/
+// address/contacts/notes — a picker in an unrelated feature has no business
+// receiving the full Customer record just to render a dropdown label.
+//
+// `code` is included on purpose: customer *names* are person names that
+// repeat and look alike, while `code` ("2VT-C00001") is the business-unique
+// identifier users actually recognize — rendered as "Tên khách hàng · Mã KH",
+// the same way the employee picker renders "tên · phòng ban".
+export interface CustomerOption {
+  id: string
+  name: string
+  code: string
+}
