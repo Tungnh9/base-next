@@ -107,7 +107,7 @@ export function CustomerDetail({ customer: initialCustomer }: CustomerDetailProp
       </Link>
 
       <div className="border-border bg-card rounded-xl border p-6">
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-center gap-4">
             <Avatar size={64}>
               {/* avatarUrl is always undefined in mock mode (no object storage

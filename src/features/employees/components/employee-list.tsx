@@ -180,7 +180,7 @@ export function EmployeeList() {
   return (
     <div className="flex flex-col gap-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-foreground text-2xl font-semibold">{t("title")}</h1>
           <p className="text-muted-foreground mt-0.5 text-sm">{t("description")}</p>
@@ -192,12 +192,12 @@ export function EmployeeList() {
       </div>
 
       {/* Search + bulk action bar */}
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Input
           placeholder={t("searchPlaceholder")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="max-w-sm"
+          className="sm:max-w-sm"
         />
         {selectedRows.length > 0 && (
           <Button variant="destructive" skin="light" onClick={() => setPendingDelete(selectedRows)}>
