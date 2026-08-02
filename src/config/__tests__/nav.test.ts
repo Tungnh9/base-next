@@ -75,29 +75,30 @@ describe("createNavConfig", () => {
     expect(documentArchiveItem?.disabled).toBe(true)
   })
 
-  it("marks Settings as disabled and keeps Employees admin-gated and enabled in System", () => {
+  it("keeps Settings enabled and Employees admin-gated and enabled in System", () => {
     const [, , , , systemSection] = createNavConfig()
     const settingsItem = systemSection.items.find((item) => item.label === "nav.settings")
     const employeesItem = systemSection.items.find((item) => item.label === "nav.employees")
 
     expect(settingsItem?.href).toBe(ROUTES.settings)
-    expect(settingsItem?.disabled).toBe(true)
+    expect(settingsItem?.disabled).toBeFalsy()
 
     expect(employeesItem?.href).toBe(ROUTES.employees)
     expect(employeesItem?.requiredRole).toBe("admin")
     expect(employeesItem?.disabled).toBeFalsy()
   })
 
-  it("has exactly 12 disabled items and exactly 4 enabled items", () => {
+  it("has exactly 11 disabled items and exactly 5 enabled items", () => {
     const allItems = createNavConfig().flatMap((section) => section.items)
     const disabledItems = allItems.filter((item) => item.disabled === true)
     const enabledItems = allItems.filter((item) => !item.disabled)
 
-    expect(disabledItems).toHaveLength(12)
+    expect(disabledItems).toHaveLength(11)
     expect(enabledItems.map((item) => item.label)).toEqual([
       "nav.dashboard",
       "nav.salesOpportunities",
       "nav.customers",
+      "nav.settings",
       "nav.employees",
     ])
   })

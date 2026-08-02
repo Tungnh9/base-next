@@ -767,6 +767,91 @@
       "support": "Support"
     }
   },
+  "settings": {
+    "title": "Settings",
+    "description": "Manage operational workflows, notifications, users and permissions across the system.",
+    "tabs": {
+      "workflow": "Workflow & Notifications",
+      "usersPermissions": "Users & Permissions"
+    },
+    "workflow": {
+      "cardTitle": "Operational workflow — {count} stages",
+      "cardDescription": "Status & action buttons for each stage",
+      "saveButton": "Save configuration",
+      "saveToast": "Configuration saved",
+      "enabledBadge": "Enabled",
+      "disabledBadge": "Disabled",
+      "configureButton": "Configure",
+      "collapseButton": "Collapse",
+      "stageSubtitle": "{example} · {statesCount} states · {actionsCount} actions",
+      "stageSubtitleEmpty": "{statesCount} states · {actionsCount} actions",
+      "statesTitle": "State list · {count}",
+      "addState": "Add state",
+      "removeState": "Remove state",
+      "actionsTitle": "Action buttons · {count}",
+      "addAction": "Add action",
+      "removeAction": "Remove action",
+      "actionTypes": {
+        "primary": "Primary",
+        "secondary": "Secondary",
+        "success": "Confirm",
+        "danger": "Danger"
+      },
+      "targetStatePlaceholder": "Select state",
+      "previewLabel": "Preview"
+    },
+    "notifications": {
+      "cardTitle": "Notifications & reminders",
+      "items": {
+        "paymentDueReminder": "Payment due reminder (8 days before)",
+        "budgetOverrunWarning": "Contract budget overrun warning",
+        "acceptanceReminder": "Acceptance reminder when booking completes",
+        "invoiceAutoEmail": "Automatic email when invoice is issued"
+      }
+    },
+    "users": {
+      "cardTitle": "System users",
+      "addUser": "Add user",
+      "columns": {
+        "user": "User",
+        "role": "Role",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "status": {
+        "active": "Active",
+        "locked": "Locked"
+      },
+      "confirmDelete": "Are you sure you want to remove {name}?",
+      "dialog": {
+        "title": "Add user",
+        "name": "Full name",
+        "email": "Email",
+        "role": "Role",
+        "submit": "Add",
+        "cancel": "Cancel"
+      }
+    },
+    "roles": {
+      "cardTitle": "Roles & permissions",
+      "addRole": "Add role",
+      "usersCount": "{count} users",
+      "moduleColumn": "Module",
+      "permissions": {
+        "view": "View",
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "modules": {
+        "customers": "Customers",
+        "employees": "Employees",
+        "salesOpportunities": "Sales opportunities",
+        "invoices": "Invoices",
+        "settings": "Settings"
+      }
+    }
+  },
   "misc": {
     "maintenance": {
       "title": "Under Maintenance!",

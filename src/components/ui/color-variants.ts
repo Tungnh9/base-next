@@ -13,3 +13,16 @@ export const COLOR_VARIANT_CLASSES = {
 } as const
 
 export type ColorVariant = keyof typeof COLOR_VARIANT_CLASSES
+
+// Fixed display order for anything that needs to list/cycle through all 7
+// semantic colors (e.g. a color-swatch picker) — single source of truth so
+// consumers don't each hardcode their own ordering of the same 7 keys.
+export const COLOR_VARIANTS: ColorVariant[] = [
+  "primary",
+  "secondary",
+  "success",
+  "danger",
+  "warning",
+  "info",
+  "dark",
+]
