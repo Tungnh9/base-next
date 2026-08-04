@@ -241,6 +241,26 @@
     "quickNav": "Điều hướng nhanh",
     "noResults": "Không tìm thấy kết quả"
   },
+  "calculator": {
+    "openLabel": "Máy tính",
+    "error": "Lỗi",
+    "keys": {
+      "digit": "Số {digit}",
+      "clear": "Xóa tất cả",
+      "clearEntry": "Xóa nhập liệu",
+      "backspace": "Xóa lùi",
+      "percent": "Phần trăm",
+      "divide": "Chia",
+      "multiply": "Nhân",
+      "subtract": "Trừ",
+      "add": "Cộng",
+      "toggleSign": "Đổi dấu",
+      "decimalPoint": "Dấu thập phân",
+      "equals": "Bằng",
+      "clearLabel": "C",
+      "clearEntryLabel": "CE"
+    }
+  },
   "editor": {
     "placeholder": "Gõ '/' để chèn nội dung, '@' để đề cập ai đó…",
     "heading": {

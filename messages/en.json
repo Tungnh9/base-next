@@ -241,6 +241,26 @@
     "quickNav": "Quick navigation",
     "noResults": "No results found"
   },
+  "calculator": {
+    "openLabel": "Calculator",
+    "error": "Error",
+    "keys": {
+      "digit": "Digit {digit}",
+      "clear": "Clear all",
+      "clearEntry": "Clear entry",
+      "backspace": "Backspace",
+      "percent": "Percent",
+      "divide": "Divide",
+      "multiply": "Multiply",
+      "subtract": "Subtract",
+      "add": "Add",
+      "toggleSign": "Toggle sign",
+      "decimalPoint": "Decimal point",
+      "equals": "Equals",
+      "clearLabel": "C",
+      "clearEntryLabel": "CE"
+    }
+  },
   "editor": {
     "placeholder": "Type '/' for commands, '@' to mention someone…",
     "heading": {
