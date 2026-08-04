@@ -787,6 +787,91 @@
       "support": "Hỗ trợ"
     }
   },
+  "settings": {
+    "title": "Cấu hình",
+    "description": "Quản lý quy trình vận hành, thông báo, người dùng và phân quyền trong hệ thống.",
+    "tabs": {
+      "workflow": "Quy trình & thông báo",
+      "usersPermissions": "Người dùng & phân quyền"
+    },
+    "workflow": {
+      "cardTitle": "Quy trình vận hành — {count} giai đoạn",
+      "cardDescription": "Trạng thái & nút hành động từng giai đoạn",
+      "saveButton": "Lưu cấu hình",
+      "saveToast": "Đã lưu cấu hình",
+      "enabledBadge": "Đang bật",
+      "disabledBadge": "Đã tắt",
+      "configureButton": "Cấu hình",
+      "collapseButton": "Thu gọn",
+      "stageSubtitle": "{example} · {statesCount} trạng thái · {actionsCount} nút",
+      "stageSubtitleEmpty": "{statesCount} trạng thái · {actionsCount} nút",
+      "statesTitle": "Danh sách trạng thái · {count}",
+      "addState": "Thêm trạng thái",
+      "removeState": "Xoá trạng thái",
+      "actionsTitle": "Bộ nút hành động · {count}",
+      "addAction": "Thêm nút",
+      "removeAction": "Xoá nút",
+      "actionTypes": {
+        "primary": "Nút chính",
+        "secondary": "Nút phụ",
+        "success": "Xác nhận",
+        "danger": "Nguy hiểm"
+      },
+      "targetStatePlaceholder": "Chọn trạng thái",
+      "previewLabel": "Xem trước"
+    },
+    "notifications": {
+      "cardTitle": "Thông báo & nhắc việc",
+      "items": {
+        "paymentDueReminder": "Nhắc đến hạn thanh toán (trước 8 ngày)",
+        "budgetOverrunWarning": "Cảnh báo hợp đồng hết ngân sách",
+        "acceptanceReminder": "Nhắc nghiệm thu khi booking hoàn thành",
+        "invoiceAutoEmail": "Email tự động khi xuất hoá đơn"
+      }
+    },
+    "users": {
+      "cardTitle": "Người dùng hệ thống",
+      "addUser": "Thêm người dùng",
+      "columns": {
+        "user": "Người dùng",
+        "role": "Vai trò",
+        "status": "Trạng thái",
+        "actions": "Thao tác"
+      },
+      "status": {
+        "active": "Đang hoạt động",
+        "locked": "Đã khoá"
+      },
+      "confirmDelete": "Bạn có chắc muốn xoá người dùng {name}?",
+      "dialog": {
+        "title": "Thêm người dùng",
+        "name": "Họ và tên",
+        "email": "Email",
+        "role": "Vai trò",
+        "submit": "Thêm",
+        "cancel": "Huỷ"
+      }
+    },
+    "roles": {
+      "cardTitle": "Vai trò & phân quyền",
+      "addRole": "Thêm vai trò",
+      "usersCount": "{count} người dùng",
+      "moduleColumn": "Chức năng",
+      "permissions": {
+        "view": "Xem",
+        "create": "Thêm",
+        "edit": "Sửa",
+        "delete": "Xoá"
+      },
+      "modules": {
+        "customers": "Khách hàng",
+        "employees": "Nhân viên",
+        "salesOpportunities": "Cơ hội bán hàng",
+        "invoices": "Hoá đơn",
+        "settings": "Cấu hình"
+      }
+    }
+  },
   "misc": {
     "maintenance": {
       "title": "Đang bảo trì!",
