@@ -186,7 +186,7 @@ export function OpportunityList() {
   return (
     <div className="flex flex-col gap-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-foreground text-2xl font-semibold">{t("title")}</h1>
           <p className="text-muted-foreground mt-0.5 text-sm">{t("description")}</p>

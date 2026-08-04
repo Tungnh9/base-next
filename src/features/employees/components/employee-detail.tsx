@@ -78,7 +78,7 @@ export function EmployeeDetail({ employee: initialEmployee }: EmployeeDetailProp
       </Link>
 
       <div className="border-border bg-card rounded-xl border p-6">
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-center gap-4">
             <Avatar size={64}>
               <AvatarFallback>{employee.name.charAt(0).toUpperCase()}</AvatarFallback>
@@ -106,7 +106,7 @@ export function EmployeeDetail({ employee: initialEmployee }: EmployeeDetailProp
           </div>
         </div>
 
-        <dl className="mt-6 grid grid-cols-2 gap-x-6 gap-y-4">
+        <dl className="mt-6 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
           <div>
             <dt className="text-muted-foreground text-xs">{t("columns.email")}</dt>
             <dd className="mt-1 text-sm">{employee.email}</dd>
