@@ -2,6 +2,7 @@ import { getLocale } from "next-intl/server"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { getSession } from "@/lib/auth"
 import type { Locale } from "@/i18n/config"
+import { CalculatorWidget } from "./calculator-widget"
 import { LanguageSwitcher } from "./language-switcher"
 import { NotificationDropdown } from "./notification-dropdown"
 import { SearchBox } from "./search-box"
@@ -21,6 +22,7 @@ export async function Header() {
         <div className="ml-auto flex shrink-0 items-center gap-4">
           <LanguageSwitcher currentLocale={locale} />
           <ThemeToggle />
+          <CalculatorWidget />
           <ShortcutsDropdown />
           <NotificationDropdown />
           {session && (
