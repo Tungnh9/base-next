@@ -153,9 +153,10 @@ export async function verifyForgotPasswordCodeAction(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  const email = formData.get("email") as string
+  const parsedEmail = forgotPasswordSchema.shape.email.safeParse(formData.get("email"))
   const parsedCode = otpSchema.safeParse(formData.get("code"))
-  if (!email || !parsedCode.success) return { error: "invalidVerificationCode" }
+  if (!parsedEmail.success || !parsedCode.success) return { error: "invalidVerificationCode" }
+  const email = parsedEmail.data
 
   const identifier = `verify-code:${email.trim().toLowerCase()}`
   const rateLimitStatus = await checkRateLimit(identifier, VERIFY_CODE_RATE_LIMIT)
@@ -257,8 +258,9 @@ export async function resendVerificationEmailAction(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  const email = formData.get("email") as string
-  if (!email) return { error: "resendFailed" }
+  const parsedEmail = forgotPasswordSchema.shape.email.safeParse(formData.get("email"))
+  if (!parsedEmail.success) return { error: "resendFailed" }
+  const email = parsedEmail.data
 
   const identifier = `resend-verify:${email.trim().toLowerCase()}`
   const rateLimitStatus = await checkRateLimit(identifier, RESEND_EMAIL_RATE_LIMIT)

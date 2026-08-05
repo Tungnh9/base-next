@@ -331,6 +331,17 @@ describe("verifyForgotPasswordCodeAction", () => {
     expect(mockVerifyForgotPasswordCode).not.toHaveBeenCalled()
   })
 
+  it("returns invalidVerificationCode for a malformed email without touching the rate limit (regression guard: email used to skip Zod validation entirely)", async () => {
+    const result = await verifyForgotPasswordCodeAction(
+      {},
+      formDataForVerify("not-an-email", "120820")
+    )
+
+    expect(result).toEqual({ error: "invalidVerificationCode" })
+    expect(mockCheckRateLimit).not.toHaveBeenCalled()
+    expect(mockVerifyForgotPasswordCode).not.toHaveBeenCalled()
+  })
+
   it("returns tooManyRequests when the rate limit denies", async () => {
     mockCheckRateLimit.mockReturnValue({ allowed: false, remaining: 0, retryAfterMs: 15_000 })
 
@@ -452,6 +463,14 @@ describe("resendVerificationEmailAction", () => {
 
     expect(result).toEqual({ error: "resendFailed" })
     expect(mockCheckRateLimit).not.toHaveBeenCalled()
+  })
+
+  it("returns resendFailed for a malformed email without touching the rate limit (regression guard: email used to skip Zod validation entirely)", async () => {
+    const result = await resendVerificationEmailAction({}, formDataForResend("not-an-email"))
+
+    expect(result).toEqual({ error: "resendFailed" })
+    expect(mockCheckRateLimit).not.toHaveBeenCalled()
+    expect(mockResendVerificationEmail).not.toHaveBeenCalled()
   })
 
   it("returns tooManyRequests when the rate limit denies", async () => {

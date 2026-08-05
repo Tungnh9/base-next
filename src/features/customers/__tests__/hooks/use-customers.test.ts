@@ -49,12 +49,15 @@ const customerB: Customer = {
   createdAt: "2024-02-01T00:00:00.000Z",
 }
 
-function pageOf(data: Customer[], overrides: Partial<{ total: number; totalPages: number }> = {}) {
+function pageOf(
+  data: Customer[],
+  overrides: Partial<{ total: number; totalPages: number; page: number }> = {}
+) {
   return {
     data: {
       data,
       total: overrides.total ?? data.length,
-      page: 1,
+      page: overrides.page ?? 1,
       pageSize: 10,
       totalPages: overrides.totalPages ?? 1,
     },
@@ -104,6 +107,12 @@ describe("useCustomers", () => {
   it("setPage refetches with the new page number", async () => {
     const { result } = renderHook(() => useCustomers())
     await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+    // Echo the requested page back (as a real, non-clamping response would)
+    // so the page-sync guard in the effect has nothing to correct here.
+    mockGetCustomers.mockImplementation(async ({ page: requestedPage = 1 } = {}) =>
+      pageOf([customerA, customerB], { page: requestedPage })
+    )
 
     act(() => result.current.setPage(2))
     await waitFor(() => expect(mockGetCustomers).toHaveBeenCalledTimes(2))
@@ -321,6 +330,53 @@ describe("useCustomers", () => {
     expect(ok).toBe(true)
     expect(mockGetCustomers).toHaveBeenCalledTimes(2)
     expect(mockToastSuccess).toHaveBeenCalledWith("deleteSuccess")
+  })
+
+  it("syncs page down to the server-clamped page after deleting the last row of the last page (regression guard)", async () => {
+    const { result } = renderHook(() => useCustomers())
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+    // Move to the last page (3 of 3), echoing the requested page back
+    // normally — nothing to clamp yet.
+    mockGetCustomers.mockImplementation(async ({ page: requestedPage = 1 } = {}) => ({
+      data: { data: [customerA], total: 21, page: requestedPage, pageSize: 10, totalPages: 3 },
+      error: null,
+    }))
+    act(() => result.current.setPage(3))
+    await waitFor(() => expect(result.current.page).toBe(3))
+    await waitFor(() =>
+      expect(mockGetCustomers).toHaveBeenLastCalledWith({
+        page: 3,
+        pageSize: 10,
+        search: "",
+        classification: undefined,
+        industry: undefined,
+        status: undefined,
+      })
+    )
+
+    // Deleting the last row on page 3 makes the server clamp back to page 2
+    // (mirrors mock-data.ts's own `Math.min(Math.max(1, page), totalPages)`) —
+    // still requested as page 3 (stale local state) but the response says 2.
+    mockDeleteCustomer.mockResolvedValue({ data: undefined, error: null })
+    mockGetCustomers.mockResolvedValue({
+      data: { data: [customerA, customerB], total: 20, page: 2, pageSize: 10, totalPages: 2 },
+      error: null,
+    })
+
+    await act(async () => {
+      await result.current.handleDelete("1")
+    })
+
+    await waitFor(() => expect(result.current.page).toBe(2))
+    expect(mockGetCustomers).toHaveBeenLastCalledWith({
+      page: 2,
+      pageSize: 10,
+      search: "",
+      classification: undefined,
+      industry: undefined,
+      status: undefined,
+    })
   })
 
   it("handleDelete returns false and does not refetch on error", async () => {

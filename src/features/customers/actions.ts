@@ -1,8 +1,13 @@
 "use server"
 
-import { requireSession, unauthorizedError } from "@/lib/auth"
+import { requireSession, unauthorizedError, validationError } from "@/lib/auth"
 import { customerApi } from "./api"
-import { createCustomerSchema, updateCustomerSchema, getCustomersParamsSchema } from "./schemas"
+import {
+  createCustomerSchema,
+  updateCustomerSchema,
+  getCustomersParamsSchema,
+  customerIdSchema,
+} from "./schemas"
 import type {
   CreateCustomerInput,
   UpdateCustomerInput,
@@ -15,18 +20,17 @@ export async function getCustomers(params: GetCustomersParams = {}) {
   if (!session) return { data: null, error: unauthorizedError() }
 
   const parsed = getCustomersParamsSchema.safeParse(params)
-  if (!parsed.success)
-    return {
-      data: null,
-      error: { message: "Dữ liệu không hợp lệ", code: "VALIDATION_ERROR", status: 400 },
-    }
+  if (!parsed.success) return { data: null, error: await validationError() }
   return customerApi.getAll(parsed.data)
 }
 
 export async function getCustomerById(id: string) {
   const session = await requireSession()
   if (!session) return { data: null, error: unauthorizedError() }
-  return customerApi.getById(id)
+
+  const parsedId = customerIdSchema.safeParse(id)
+  if (!parsedId.success) return { data: null, error: await validationError() }
+  return customerApi.getById(parsedId.data)
 }
 
 export async function createCustomer(input: CreateCustomerInput) {
@@ -34,11 +38,7 @@ export async function createCustomer(input: CreateCustomerInput) {
   if (!session) return { data: null, error: unauthorizedError() }
 
   const parsed = createCustomerSchema.safeParse(input)
-  if (!parsed.success)
-    return {
-      data: null,
-      error: { message: "Dữ liệu không hợp lệ", code: "VALIDATION_ERROR", status: 400 },
-    }
+  if (!parsed.success) return { data: null, error: await validationError() }
   return customerApi.create(parsed.data)
 }
 
@@ -46,19 +46,19 @@ export async function updateCustomer(id: string, input: UpdateCustomerInput) {
   const session = await requireSession()
   if (!session) return { data: null, error: unauthorizedError() }
 
+  const parsedId = customerIdSchema.safeParse(id)
   const parsed = updateCustomerSchema.safeParse(input)
-  if (!parsed.success)
-    return {
-      data: null,
-      error: { message: "Dữ liệu không hợp lệ", code: "VALIDATION_ERROR", status: 400 },
-    }
-  return customerApi.update(id, parsed.data)
+  if (!parsedId.success || !parsed.success) return { data: null, error: await validationError() }
+  return customerApi.update(parsedId.data, parsed.data)
 }
 
 export async function deleteCustomer(id: string) {
   const session = await requireSession()
   if (!session) return { data: null, error: unauthorizedError() }
-  return customerApi.delete(id)
+
+  const parsedId = customerIdSchema.safeParse(id)
+  if (!parsedId.success) return { data: null, error: await validationError() }
+  return customerApi.delete(parsedId.data)
 }
 
 // Picker data source for other features (e.g. the Sales Opportunities filter

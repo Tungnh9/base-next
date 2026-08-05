@@ -23,7 +23,11 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
     getTranslations({ locale, namespace: "dashboard" }),
     getTranslations({ locale, namespace: "customers" }),
   ])
-  const stats = await getDashboardStats()
+  const { data: stats, error } = await getDashboardStats()
+  // No dedicated error.tsx for this route — throwing lets the nearest
+  // boundary (root src/app/error.tsx) handle it, rather than silently
+  // rendering a misleading all-zero dashboard on a real backend failure.
+  if (error || !stats) throw new Error(error?.message ?? "Failed to load dashboard stats")
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-6">

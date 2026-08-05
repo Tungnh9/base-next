@@ -1,83 +1,95 @@
 "use client"
 
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
+import { useTranslations } from "next-intl"
+import { toast } from "sonner"
 
-import { MOCK_ROLES, MOCK_USERS } from "../mock-data"
-import type { PermissionAction, PermissionModuleKey, Role, SystemUser } from "../types"
-
-let userIdCounter = 0
-function nextUserId() {
-  userIdCounter += 1
-  return `new-user-${userIdCounter}`
-}
-
-let roleIdCounter = 0
-function nextRoleId() {
-  roleIdCounter += 1
-  return `new-role-${roleIdCounter}`
-}
-
-const EMPTY_MODULE_PERMISSIONS = { view: false, create: false, edit: false, delete: false }
+import { addRole, addUser, getUserPermissionsData, removeUser, togglePermission } from "../actions"
+import type {
+  AddUserInput,
+  PermissionAction,
+  PermissionModuleKey,
+  Role,
+  SystemUser,
+} from "../types"
 
 export function useUserPermissions() {
-  const [users, setUsers] = useState<SystemUser[]>(MOCK_USERS)
-  const [roles, setRoles] = useState<Role[]>(MOCK_ROLES)
+  const t = useTranslations("settings.toast")
+  const [users, setUsers] = useState<SystemUser[]>([])
+  const [roles, setRoles] = useState<Role[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
-  const addUser = useCallback((input: { name: string; email: string; roleId: string }) => {
-    setUsers((prev) => [
-      ...prev,
-      {
-        id: nextUserId(),
-        name: input.name,
-        email: input.email,
-        roleId: input.roleId,
-        status: "active",
-      },
-    ])
+  useEffect(() => {
+    getUserPermissionsData().then(({ data, error }) => {
+      if (error) {
+        toast.error(error.message)
+      } else if (data) {
+        setUsers(data.users)
+        setRoles(data.roles)
+      }
+      setIsLoading(false)
+    })
   }, [])
 
-  const removeUser = useCallback((userId: string) => {
-    setUsers((prev) => prev.filter((u) => u.id !== userId))
-  }, [])
+  const handleAddUser = useCallback(
+    async (input: AddUserInput) => {
+      const { data, error } = await addUser(input)
+      if (error || !data) {
+        toast.error(error?.message ?? t("addUserSuccess"))
+        return false
+      }
+      setUsers((prev) => [...prev, data])
+      toast.success(t("addUserSuccess"))
+      return true
+    },
+    [t]
+  )
 
-  const addRole = useCallback(() => {
-    setRoles((prev) => [
-      ...prev,
-      {
-        id: nextRoleId(),
-        name: "Vai trò mới",
-        permissions: {
-          customers: { ...EMPTY_MODULE_PERMISSIONS },
-          employees: { ...EMPTY_MODULE_PERMISSIONS },
-          salesOpportunities: { ...EMPTY_MODULE_PERMISSIONS },
-          invoices: { ...EMPTY_MODULE_PERMISSIONS },
-          settings: { ...EMPTY_MODULE_PERMISSIONS },
-        },
-      },
-    ])
-  }, [])
+  const handleRemoveUser = useCallback(
+    async (userId: string) => {
+      const { error } = await removeUser(userId)
+      if (error) {
+        toast.error(error.message)
+        return false
+      }
+      setUsers((prev) => prev.filter((u) => u.id !== userId))
+      toast.success(t("removeUserSuccess"))
+      return true
+    },
+    [t]
+  )
 
-  const togglePermission = useCallback(
-    (roleId: string, moduleKey: PermissionModuleKey, action: PermissionAction) => {
-      setRoles((prev) =>
-        prev.map((role) =>
-          role.id === roleId
-            ? {
-                ...role,
-                permissions: {
-                  ...role.permissions,
-                  [moduleKey]: {
-                    ...role.permissions[moduleKey],
-                    [action]: !role.permissions[moduleKey][action],
-                  },
-                },
-              }
-            : role
-        )
-      )
+  const handleAddRole = useCallback(async () => {
+    const { data, error } = await addRole(t("newRoleDefaultName"))
+    if (error || !data) {
+      toast.error(error?.message ?? t("addRoleSuccess"))
+      return false
+    }
+    setRoles((prev) => [...prev, data])
+    toast.success(t("addRoleSuccess"))
+    return true
+  }, [t])
+
+  const handleTogglePermission = useCallback(
+    async (roleId: string, moduleKey: PermissionModuleKey, action: PermissionAction) => {
+      const { data, error } = await togglePermission(roleId, moduleKey, action)
+      if (error || !data) {
+        toast.error(error?.message ?? "")
+        return false
+      }
+      setRoles((prev) => prev.map((r) => (r.id === roleId ? data : r)))
+      return true
     },
     []
   )
 
-  return { users, roles, addUser, removeUser, addRole, togglePermission }
+  return {
+    users,
+    roles,
+    isLoading,
+    addUser: handleAddUser,
+    removeUser: handleRemoveUser,
+    addRole: handleAddRole,
+    togglePermission: handleTogglePermission,
+  }
 }

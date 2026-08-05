@@ -75,12 +75,13 @@ describe("createNavConfig", () => {
     expect(documentArchiveItem?.disabled).toBe(true)
   })
 
-  it("keeps Settings enabled and Employees admin-gated and enabled in System", () => {
+  it("keeps Settings and Employees both enabled and admin-gated in System", () => {
     const [, , , , systemSection] = createNavConfig()
     const settingsItem = systemSection.items.find((item) => item.label === "nav.settings")
     const employeesItem = systemSection.items.find((item) => item.label === "nav.employees")
 
     expect(settingsItem?.href).toBe(ROUTES.settings)
+    expect(settingsItem?.requiredRole).toBe("admin")
     expect(settingsItem?.disabled).toBeFalsy()
 
     expect(employeesItem?.href).toBe(ROUTES.employees)

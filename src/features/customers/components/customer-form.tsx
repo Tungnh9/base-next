@@ -38,7 +38,7 @@ import {
   NO_SELECTION,
   VIETNAM_PROVINCES,
 } from "../constants"
-import { createCustomerSchema, type CreateCustomerFormValues } from "../schemas"
+import { createCreateCustomerSchema, type CreateCustomerFormValues } from "../schemas"
 import type { Customer, CustomerCountry, VietnamProvince } from "../types"
 import type { EmployeeOption } from "@/features/employees"
 
@@ -197,6 +197,7 @@ function EmployeeSelectField({
 
 export function CustomerForm({ open, onOpenChange, customer, onSubmit }: CustomerFormProps) {
   const t = useTranslations("customers")
+  const tErrors = useTranslations("customers.errors")
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false)
   const { options: employeeOptions, isLoading: employeeOptionsLoading } = useEmployeeOptions()
 
@@ -208,7 +209,7 @@ export function CustomerForm({ open, onOpenChange, customer, onSubmit }: Custome
     setValue,
     formState: { errors, isSubmitting, isDirty },
   } = useForm<CreateCustomerFormValues>({
-    resolver: zodResolver(createCustomerSchema),
+    resolver: zodResolver(createCreateCustomerSchema(tErrors)),
     defaultValues: DEFAULT_VALUES,
   })
 

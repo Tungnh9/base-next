@@ -1,4 +1,13 @@
-import type { NotificationSetting, Role, SystemUser, WorkflowStage } from "./types"
+import { mockApi, mockApiError } from "@/lib/mock"
+import type {
+  AddUserInput,
+  NotificationSetting,
+  PermissionAction,
+  PermissionModuleKey,
+  Role,
+  SystemUser,
+  WorkflowStage,
+} from "./types"
 
 // ─── Workflow stages ────────────────────────────────────────────────────────
 // key/order mirror nav.sectionSalesProcess in src/config/nav.ts 1:1 — stage
@@ -200,3 +209,85 @@ export const MOCK_USERS: SystemUser[] = [
     status: "active",
   },
 ]
+
+// ─── Mutable in-memory mock backend ────────────────────────────────────────
+// Mirrors the employees/customers mock-data pattern: module-level mutable
+// state that simulates server-side persistence across requests within the
+// same server process (mock mode only — see src/lib/mock.ts, USE_MOCK_API).
+// The MOCK_* consts above are the seed data these start from.
+
+let workflowStages: WorkflowStage[] = MOCK_WORKFLOW_STAGES
+let users: SystemUser[] = MOCK_USERS
+let roles: Role[] = MOCK_ROLES
+
+let userIdCounter = users.length + 1
+let roleIdCounter = roles.length + 1
+
+const EMPTY_MODULE_PERMISSIONS = { view: false, create: false, edit: false, delete: false }
+
+export const settingsMockApi = {
+  getWorkflowConfig: () => mockApi<WorkflowStage[]>(workflowStages),
+
+  saveWorkflowConfig: (stages: WorkflowStage[]) => {
+    workflowStages = stages
+    return mockApi<WorkflowStage[]>(workflowStages)
+  },
+
+  getUserPermissionsData: () => mockApi<{ users: SystemUser[]; roles: Role[] }>({ users, roles }),
+
+  addUser: (input: AddUserInput) => {
+    const roleExists = roles.some((r) => r.id === input.roleId)
+    if (!roleExists) {
+      return mockApiError({ message: "Role not found", code: "NOT_FOUND", status: 404 })
+    }
+    const next: SystemUser = {
+      id: `user-${userIdCounter++}`,
+      name: input.name,
+      email: input.email,
+      roleId: input.roleId,
+      status: "active",
+    }
+    users = [...users, next]
+    return mockApi<SystemUser>(next)
+  },
+
+  removeUser: (userId: string) => {
+    const found = users.some((u) => u.id === userId)
+    if (!found) return mockApiError({ message: "User not found", code: "NOT_FOUND", status: 404 })
+    users = users.filter((u) => u.id !== userId)
+    return mockApi<void>(undefined as void)
+  },
+
+  addRole: (defaultName: string) => {
+    const next: Role = {
+      id: `role-${roleIdCounter++}`,
+      name: defaultName,
+      permissions: {
+        customers: { ...EMPTY_MODULE_PERMISSIONS },
+        employees: { ...EMPTY_MODULE_PERMISSIONS },
+        salesOpportunities: { ...EMPTY_MODULE_PERMISSIONS },
+        invoices: { ...EMPTY_MODULE_PERMISSIONS },
+        settings: { ...EMPTY_MODULE_PERMISSIONS },
+      },
+    }
+    roles = [...roles, next]
+    return mockApi<Role>(next)
+  },
+
+  togglePermission: (roleId: string, moduleKey: PermissionModuleKey, action: PermissionAction) => {
+    const role = roles.find((r) => r.id === roleId)
+    if (!role) return mockApiError({ message: "Role not found", code: "NOT_FOUND", status: 404 })
+    const updated: Role = {
+      ...role,
+      permissions: {
+        ...role.permissions,
+        [moduleKey]: {
+          ...role.permissions[moduleKey],
+          [action]: !role.permissions[moduleKey][action],
+        },
+      },
+    }
+    roles = roles.map((r) => (r.id === roleId ? updated : r))
+    return mockApi<Role>(updated)
+  },
+}

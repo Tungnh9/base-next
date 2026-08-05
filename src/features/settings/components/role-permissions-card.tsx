@@ -39,12 +39,12 @@ const LOCKED_ROLE_ID = "role-admin"
 interface RolePermissionsCardProps {
   roles: Role[]
   users: SystemUser[]
-  onAddRole: () => void
+  onAddRole: () => Promise<boolean>
   onTogglePermission: (
     roleId: string,
     moduleKey: PermissionModuleKey,
     action: PermissionAction
-  ) => void
+  ) => Promise<boolean>
 }
 
 function RolePermissionsCard({

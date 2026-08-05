@@ -19,7 +19,14 @@ vi.mock("next/headers", () => ({
 }))
 
 import { redirect } from "next/navigation"
-import { signToken, requireRole, requireSession, unauthorizedError, forbiddenError } from "../auth"
+import {
+  signToken,
+  requireRole,
+  requireSession,
+  unauthorizedError,
+  forbiddenError,
+  validationError,
+} from "../auth"
 
 describe("requireRole", () => {
   beforeEach(() => {
@@ -76,6 +83,20 @@ describe("forbiddenError", () => {
       code: "FORBIDDEN",
       status: 403,
       message: expect.any(String),
+    })
+  })
+})
+
+describe("validationError", () => {
+  it("returns a 400 ApiError shape with a translated (locale-aware) message", async () => {
+    // next-intl/server is globally mocked in src/test/setup.ts to
+    // `getTranslations: async () => (key) => key` — so this proves the
+    // message goes through the translation function rather than being a
+    // hardcoded literal, without needing a real i18n provider in this test.
+    await expect(validationError()).resolves.toMatchObject({
+      code: "VALIDATION_ERROR",
+      status: 400,
+      message: "invalidData",
     })
   })
 })

@@ -1,8 +1,10 @@
 "use client"
 
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
+import { useTranslations } from "next-intl"
+import { toast } from "sonner"
 
-import { MOCK_WORKFLOW_STAGES } from "../mock-data"
+import { getWorkflowConfig, saveWorkflowConfig } from "../actions"
 import type { ActionNodeType, ColorVariant, WorkflowStage } from "../types"
 
 let stateIdCounter = 0
@@ -26,27 +28,56 @@ function mapStage(
 }
 
 export function useWorkflowConfig() {
-  const [stages, setStages] = useState<WorkflowStage[]>(MOCK_WORKFLOW_STAGES)
+  const t = useTranslations("settings.toast")
+  const [stages, setStages] = useState<WorkflowStage[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
 
-  const addState = useCallback((stageId: string) => {
-    setStages((prev) =>
-      mapStage(prev, stageId, (stage) => ({
-        ...stage,
-        states: [
-          ...stage.states,
-          { id: nextStateId(), name: "Trạng thái mới", color: "secondary" },
-        ],
-      }))
-    )
+  useEffect(() => {
+    getWorkflowConfig().then(({ data, error }) => {
+      if (error) {
+        toast.error(error.message)
+      } else if (data) {
+        setStages(data)
+      }
+      setIsLoading(false)
+    })
   }, [])
 
+  const addState = useCallback(
+    (stageId: string) => {
+      setStages((prev) =>
+        mapStage(prev, stageId, (stage) => ({
+          ...stage,
+          states: [
+            ...stage.states,
+            { id: nextStateId(), name: t("newStateDefaultName"), color: "secondary" },
+          ],
+        }))
+      )
+    },
+    [t]
+  )
+
+  // Removing a state must not leave any action's targetStateId dangling
+  // (regression guard — a saved config with an orphaned targetStateId used
+  // to render an unset/blank target Select with no indication of what broke).
+  // Any action that targeted the removed state is reassigned to whichever
+  // state ends up first, matching addAction()'s own default-target rule.
   const removeState = useCallback((stageId: string, stateId: string) => {
     setStages((prev) =>
-      mapStage(prev, stageId, (stage) => ({
-        ...stage,
-        states:
-          stage.states.length > 1 ? stage.states.filter((s) => s.id !== stateId) : stage.states,
-      }))
+      mapStage(prev, stageId, (stage) => {
+        if (stage.states.length <= 1) return stage
+        const remainingStates = stage.states.filter((s) => s.id !== stateId)
+        const fallbackStateId = remainingStates[0]?.id ?? ""
+        return {
+          ...stage,
+          states: remainingStates,
+          actions: stage.actions.map((a) =>
+            a.targetStateId === stateId ? { ...a, targetStateId: fallbackStateId } : a
+          ),
+        }
+      })
     )
   }, [])
 
@@ -68,22 +99,25 @@ export function useWorkflowConfig() {
     )
   }, [])
 
-  const addAction = useCallback((stageId: string) => {
-    setStages((prev) =>
-      mapStage(prev, stageId, (stage) => ({
-        ...stage,
-        actions: [
-          ...stage.actions,
-          {
-            id: nextActionId(),
-            label: "Nút mới",
-            type: "secondary" as ActionNodeType,
-            targetStateId: stage.states[0]?.id ?? "",
-          },
-        ],
-      }))
-    )
-  }, [])
+  const addAction = useCallback(
+    (stageId: string) => {
+      setStages((prev) =>
+        mapStage(prev, stageId, (stage) => ({
+          ...stage,
+          actions: [
+            ...stage.actions,
+            {
+              id: nextActionId(),
+              label: t("newActionDefaultLabel"),
+              type: "secondary" as ActionNodeType,
+              targetStateId: stage.states[0]?.id ?? "",
+            },
+          ],
+        }))
+      )
+    },
+    [t]
+  )
 
   const removeAction = useCallback((stageId: string, actionId: string) => {
     setStages((prev) =>
@@ -128,8 +162,22 @@ export function useWorkflowConfig() {
     []
   )
 
+  const save = useCallback(async () => {
+    setIsSaving(true)
+    const { data, error } = await saveWorkflowConfig(stages)
+    setIsSaving(false)
+    if (error) {
+      toast.error(error.message)
+      return false
+    }
+    if (data) setStages(data)
+    return true
+  }, [stages])
+
   return {
     stages,
+    isLoading,
+    isSaving,
     addState,
     removeState,
     updateStateName,
@@ -139,5 +187,6 @@ export function useWorkflowConfig() {
     updateActionLabel,
     updateActionType,
     updateActionTarget,
+    save,
   }
 }

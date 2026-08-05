@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { type Editor } from "@tiptap/react"
 import { useTranslations } from "next-intl"
 import { Video as VideoIcon, CheckCircle2, Loader2 } from "lucide-react"
@@ -40,6 +40,15 @@ export function VideoDialog({ editor }: VideoDialogProps) {
   const [files, setFiles] = useState<File[]>([])
   const [uploadState, setUploadState] = useState<UploadState>(IDLE_UPLOAD)
   const progressTimer = useRef<ReturnType<typeof setInterval> | null>(null)
+  // Tracked separately from progressTimer so it can be cancelled too — it
+  // used to be a bare window.setTimeout() below with no ref at all, so
+  // closing the dialog or picking a different file mid-upload couldn't
+  // cancel it. Left to fire later, it would overwrite whatever the user was
+  // doing by then with the stale file's "done" state and leak its blob URL.
+  // Typed as `number` (not NodeJS.Timeout/ReturnType<typeof setTimeout>)
+  // because this is explicitly window.setTimeout()'s DOM return type — same
+  // distinction use-attachments.ts's PendingTimers makes for its own timeout.
+  const uploadTimeout = useRef<number | null>(null)
 
   const parsed = parseVideoUrl(urlInput)
 
@@ -48,7 +57,18 @@ export function VideoDialog({ editor }: VideoDialogProps) {
       clearInterval(progressTimer.current)
       progressTimer.current = null
     }
+    if (uploadTimeout.current) {
+      clearTimeout(uploadTimeout.current)
+      uploadTimeout.current = null
+    }
   }
+
+  // Cancel any in-flight simulated upload if the editor unmounts the toolbar
+  // mid-upload (e.g. navigating away) — same reasoning as use-attachments.ts's
+  // unmount cleanup, which this dialog didn't have at all before.
+  useEffect(() => {
+    return () => stopProgressTimer()
+  }, [])
 
   function handleOpenChange(next: boolean) {
     if (!next) {
@@ -102,7 +122,7 @@ export function VideoDialog({ editor }: VideoDialogProps) {
       )
     }, 120)
 
-    window.setTimeout(() => {
+    uploadTimeout.current = window.setTimeout(() => {
       stopProgressTimer()
       setUploadState({
         status: "done",

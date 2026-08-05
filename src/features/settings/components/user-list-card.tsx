@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useTranslations } from "next-intl"
-import { Pencil, Plus, Trash2 } from "lucide-react"
+import { Plus, Trash2 } from "lucide-react"
 
 import {
   AlertDialog,
@@ -42,7 +42,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import type { Role, SystemUser } from "../types"
+import { createAddUserSchema } from "../schemas"
+import type { AddUserInput, Role, SystemUser } from "../types"
 
 function getInitials(name: string) {
   return name
@@ -57,18 +58,20 @@ function getInitials(name: string) {
 interface UserListCardProps {
   users: SystemUser[]
   roles: Role[]
-  onAddUser: (input: { name: string; email: string; roleId: string }) => void
-  onRemoveUser: (userId: string) => void
+  onAddUser: (input: AddUserInput) => Promise<boolean>
+  onRemoveUser: (userId: string) => Promise<boolean>
 }
 
 function UserListCard({ users, roles, onAddUser, onRemoveUser }: UserListCardProps) {
   const t = useTranslations("settings.users")
+  const tErrors = useTranslations("settings.users.dialog.errors")
   const tCommon = useTranslations("common")
   const [addOpen, setAddOpen] = useState(false)
   const [pendingDelete, setPendingDelete] = useState<SystemUser | null>(null)
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [roleId, setRoleId] = useState(roles[0]?.id ?? "")
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
   const roleName = (id: string) => roles.find((role) => role.id === id)?.name ?? id
 
@@ -76,13 +79,21 @@ function UserListCard({ users, roles, onAddUser, onRemoveUser }: UserListCardPro
     setName("")
     setEmail("")
     setRoleId(roles[0]?.id ?? "")
+    setFieldErrors({})
   }
 
-  const handleAdd = () => {
-    if (!name.trim() || !email.trim() || !roleId) return
-    onAddUser({ name: name.trim(), email: email.trim(), roleId })
-    resetForm()
-    setAddOpen(false)
+  const handleAdd = async () => {
+    const parsed = createAddUserSchema(tErrors).safeParse({ name, email, roleId })
+    if (!parsed.success) {
+      setFieldErrors(Object.fromEntries(parsed.error.issues.map((i) => [i.path[0], i.message])))
+      return
+    }
+    setFieldErrors({})
+    const success = await onAddUser(parsed.data)
+    if (success) {
+      resetForm()
+      setAddOpen(false)
+    }
   }
 
   return (
@@ -132,9 +143,6 @@ function UserListCard({ users, roles, onAddUser, onRemoveUser }: UserListCardPro
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end gap-1">
-                    <Button type="button" variant="ghost" size="icon" aria-label={tCommon("edit")}>
-                      <Pencil className="size-4" />
-                    </Button>
                     <Button
                       type="button"
                       variant="ghost"
@@ -167,11 +175,22 @@ function UserListCard({ users, roles, onAddUser, onRemoveUser }: UserListCardPro
           <DialogBody className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
               <label className="text-foreground text-sm font-medium">{t("dialog.name")}</label>
-              <Input value={name} onChange={(e) => setName(e.target.value)} />
+              <Input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                isValid={!fieldErrors.name}
+              />
+              {fieldErrors.name && <p className="text-destructive text-xs">{fieldErrors.name}</p>}
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-foreground text-sm font-medium">{t("dialog.email")}</label>
-              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                isValid={!fieldErrors.email}
+              />
+              {fieldErrors.email && <p className="text-destructive text-xs">{fieldErrors.email}</p>}
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-foreground text-sm font-medium">{t("dialog.role")}</label>

@@ -9,7 +9,9 @@
     "delete": "Delete",
     "edit": "Edit",
     "back": "Back",
-    "close": "Close"
+    "close": "Close",
+    "invalidData": "Invalid data",
+    "toggleTheme": "Toggle light/dark theme"
   },
   "auth": {
     "login": "Login",
@@ -203,6 +205,12 @@
     "expandLabel": "Expand sidebar",
     "collapseLabel": "Collapse sidebar"
   },
+  "footer": {
+    "copyright": "© {year} App. All rights reserved.",
+    "license": "License",
+    "documentation": "Documentation",
+    "support": "Support"
+  },
   "languageSwitcher": {
     "changeLabel": "Change language"
   },
@@ -274,7 +282,33 @@
     },
     "color": {
       "removeColor": "Remove color",
-      "removeHighlight": "Remove highlight"
+      "removeHighlight": "Remove highlight",
+      "names": {
+        "primary": "Primary",
+        "success": "Success",
+        "warning": "Warning",
+        "danger": "Danger",
+        "info": "Info",
+        "black": "Black",
+        "dark": "Dark",
+        "muted": "Muted",
+        "light": "Light",
+        "white": "White",
+        "red": "Red",
+        "pink": "Pink",
+        "purple": "Purple",
+        "indigo": "Indigo",
+        "blue": "Blue",
+        "cyan": "Cyan",
+        "teal": "Teal",
+        "green": "Green",
+        "lime": "Lime",
+        "yellow": "Yellow",
+        "amber": "Amber",
+        "orange": "Orange",
+        "brown": "Brown",
+        "gray": "Gray"
+      }
     },
     "toolbar": {
       "undo": "Undo (Ctrl+Z)",
@@ -450,6 +484,18 @@
       "deleteManySuccess": "{count} customers deleted",
       "deleteManyPartialFail": "Failed to delete {failed}/{total} customers",
       "updateSuccess": "Updated successfully"
+    },
+    "errors": {
+      "nameMin": "Name must be at least 2 characters",
+      "emailInvalid": "Invalid email address",
+      "phoneInvalid": "Invalid phone number",
+      "mobileInvalid": "Invalid phone number",
+      "companyRequired": "Please enter a company name",
+      "shortNameRequired": "Please enter a short name",
+      "taxCodeRequired": "Please enter a tax code",
+      "websiteInvalid": "Invalid website",
+      "salesRepRequired": "Please select a sales representative",
+      "contractManagerRequired": "Please select a contract manager"
     },
     "columns": {
       "stt": "No.",
@@ -670,6 +716,12 @@
       "deleteManySuccess": "{count} employees deleted",
       "deleteManyPartialFail": "Failed to delete {failed}/{total} employees"
     },
+    "errors": {
+      "nameMin": "Name must be at least 2 characters",
+      "emailInvalid": "Invalid email address",
+      "phoneInvalid": "Invalid phone number",
+      "positionRequired": "Please enter a job position"
+    },
     "columns": {
       "name": "Name",
       "email": "Email",
@@ -790,6 +842,14 @@
   "settings": {
     "title": "Settings",
     "description": "Manage operational workflows, notifications, users and permissions across the system.",
+    "toast": {
+      "addUserSuccess": "User added",
+      "removeUserSuccess": "User removed",
+      "addRoleSuccess": "Role added",
+      "newRoleDefaultName": "New role",
+      "newStateDefaultName": "New state",
+      "newActionDefaultLabel": "New action"
+    },
     "tabs": {
       "workflow": "Workflow & Notifications",
       "usersPermissions": "Users & Permissions"
@@ -849,7 +909,12 @@
         "email": "Email",
         "role": "Role",
         "submit": "Add",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "errors": {
+          "nameMin": "Name must be at least 2 characters",
+          "emailInvalid": "Invalid email address",
+          "roleRequired": "Please select a role"
+        }
       }
     },
     "roles": {
