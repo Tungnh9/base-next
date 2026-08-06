@@ -23,6 +23,11 @@ vi.mock("@/lib/auth", () => ({
     code: "FORBIDDEN",
     status: 403,
   })),
+  validationError: vi.fn(async () => ({
+    message: "Dữ liệu không hợp lệ",
+    code: "VALIDATION_ERROR",
+    status: 400,
+  })),
 }))
 
 import {

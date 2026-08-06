@@ -25,7 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { createEmployeeSchema, type CreateEmployeeFormValues } from "../schemas"
+import { createCreateEmployeeSchema, type CreateEmployeeFormValues } from "../schemas"
 import type { Employee, EmployeeDepartment, EmployeeStatus } from "../types"
 
 const DEPARTMENTS: EmployeeDepartment[] = [
@@ -47,6 +47,7 @@ interface EmployeeFormProps {
 
 export function EmployeeForm({ open, onOpenChange, employee, onSubmit }: EmployeeFormProps) {
   const t = useTranslations("employees")
+  const tErrors = useTranslations("employees.errors")
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false)
 
   const {
@@ -56,7 +57,7 @@ export function EmployeeForm({ open, onOpenChange, employee, onSubmit }: Employe
     control,
     formState: { errors, isSubmitting, isDirty },
   } = useForm<CreateEmployeeFormValues>({
-    resolver: zodResolver(createEmployeeSchema),
+    resolver: zodResolver(createCreateEmployeeSchema(tErrors)),
     defaultValues: { department: "engineering", status: "active" },
   })
 

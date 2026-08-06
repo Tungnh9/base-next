@@ -15,6 +15,7 @@ function WorkflowCard() {
   const t = useTranslations("settings.workflow")
   const {
     stages,
+    isSaving,
     addState,
     removeState,
     updateStateName,
@@ -24,10 +25,12 @@ function WorkflowCard() {
     updateActionLabel,
     updateActionType,
     updateActionTarget,
+    save,
   } = useWorkflowConfig()
 
-  const handleSave = () => {
-    toast.success(t("saveToast"))
+  const handleSave = async () => {
+    const success = await save()
+    if (success) toast.success(t("saveToast"))
   }
 
   return (
@@ -37,7 +40,7 @@ function WorkflowCard() {
           <CardTitle>{t("cardTitle", { count: stages.length })}</CardTitle>
           <CardDescription>{t("cardDescription")}</CardDescription>
         </div>
-        <Button type="button" onClick={handleSave}>
+        <Button type="button" onClick={handleSave} disabled={isSaving}>
           <Check className="mr-1.5 size-4" />
           {t("saveButton")}
         </Button>

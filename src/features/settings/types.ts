@@ -89,3 +89,9 @@ export interface Role {
   name: string
   permissions: RolePermissions
 }
+
+export interface AddUserInput {
+  name: string
+  email: string
+  roleId: string
+}

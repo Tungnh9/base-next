@@ -10,16 +10,36 @@ const EMPLOYEE_DEPARTMENTS = [
 ] as const
 const EMPLOYEE_STATUSES = ["active", "inactive", "on-leave"] as const
 
+// Plain schema — used server-side (actions.ts), where a validation failure
+// only needs to be detected, not shown to the end user field-by-field (the
+// Server Action always returns the generic, translated VALIDATION_ERROR).
 export const createEmployeeSchema = z.object({
-  name: z.string().min(2, "Họ tên tối thiểu 2 ký tự"),
-  email: z.string().email("Email không hợp lệ"),
-  phone: z.string().min(8, "Số điện thoại không hợp lệ"),
+  name: z.string().min(2),
+  email: z.string().email(),
+  phone: z.string().min(8),
   department: z.enum(EMPLOYEE_DEPARTMENTS),
-  position: z.string().min(2, "Vui lòng nhập vị trí công việc"),
+  position: z.string().min(2),
   status: z.enum(EMPLOYEE_STATUSES),
 })
 
 export const updateEmployeeSchema = createEmployeeSchema.partial()
+
+// Translated variant for the client-side form (react-hook-form + zodResolver),
+// mirroring the createXSchema(t) pattern already used in features/auth/schemas.ts.
+export function createCreateEmployeeSchema(t: (key: string) => string) {
+  return z.object({
+    name: z.string().min(2, t("nameMin")),
+    email: z.string().email(t("emailInvalid")),
+    phone: z.string().min(8, t("phoneInvalid")),
+    department: z.enum(EMPLOYEE_DEPARTMENTS),
+    position: z.string().min(2, t("positionRequired")),
+    status: z.enum(EMPLOYEE_STATUSES),
+  })
+}
+
+export function createUpdateEmployeeSchema(t: (key: string) => string) {
+  return createCreateEmployeeSchema(t).partial()
+}
 
 // getEmployees()/getEmployeeById() are Server Actions — directly callable
 // regardless of which UI called them — so their params need the same

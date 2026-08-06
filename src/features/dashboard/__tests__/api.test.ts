@@ -1,7 +1,16 @@
-import { describe, it, expect } from "vitest"
-import { aggregateStats } from "../api"
+import { describe, it, expect, vi } from "vitest"
+
+vi.mock("@/features/customers/api", () => ({ customerApi: { getAll: vi.fn() } }))
+vi.mock("@/features/employees/api", () => ({ employeeApi: { getAll: vi.fn() } }))
+
+import { aggregateStats, getDashboardStats } from "../api"
+import { customerApi } from "@/features/customers/api"
+import { employeeApi } from "@/features/employees/api"
 import type { Customer } from "@/features/customers/types"
 import type { Employee } from "@/features/employees/types"
+
+const mockCustomersGetAll = vi.mocked(customerApi.getAll)
+const mockEmployeesGetAll = vi.mocked(employeeApi.getAll)
 
 function makeCustomer(overrides: Partial<Customer> = {}): Customer {
   return {
@@ -108,5 +117,56 @@ describe("aggregateStats", () => {
     expect(stats.employeesByDepartment.finance).toBe(1)
     expect(stats.employeesByDepartment.hr).toBe(1)
     expect(stats.employeesByDepartment.engineering).toBe(0)
+  })
+})
+
+describe("getDashboardStats", () => {
+  it("aggregates and returns data when both fetches succeed", async () => {
+    mockCustomersGetAll.mockResolvedValue({
+      data: { data: [makeCustomer()], total: 1, page: 1, pageSize: 1000, totalPages: 1 },
+      error: null,
+    })
+    mockEmployeesGetAll.mockResolvedValue({
+      data: { data: [makeEmployee()], total: 1, page: 1, pageSize: 1000, totalPages: 1 },
+      error: null,
+    })
+
+    const { data, error } = await getDashboardStats()
+
+    expect(error).toBeNull()
+    expect(data?.totalCustomers).toBe(1)
+    expect(data?.totalEmployees).toBe(1)
+  })
+
+  it("surfaces the customers error instead of silently rendering an all-zero dashboard (regression guard)", async () => {
+    mockCustomersGetAll.mockResolvedValue({
+      data: null,
+      error: { message: "boom", code: "SERVER_ERROR", status: 500 },
+    })
+    mockEmployeesGetAll.mockResolvedValue({
+      data: { data: [makeEmployee()], total: 1, page: 1, pageSize: 1000, totalPages: 1 },
+      error: null,
+    })
+
+    const { data, error } = await getDashboardStats()
+
+    expect(data).toBeNull()
+    expect(error).toEqual({ message: "boom", code: "SERVER_ERROR", status: 500 })
+  })
+
+  it("surfaces the employees error when customers succeeds but employees fails", async () => {
+    mockCustomersGetAll.mockResolvedValue({
+      data: { data: [makeCustomer()], total: 1, page: 1, pageSize: 1000, totalPages: 1 },
+      error: null,
+    })
+    mockEmployeesGetAll.mockResolvedValue({
+      data: null,
+      error: { message: "employees down", code: "SERVER_ERROR", status: 500 },
+    })
+
+    const { data, error } = await getDashboardStats()
+
+    expect(data).toBeNull()
+    expect(error).toEqual({ message: "employees down", code: "SERVER_ERROR", status: 500 })
   })
 })

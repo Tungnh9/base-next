@@ -29,6 +29,12 @@ export function useEmployees() {
         setEmployees(data.data)
         setTotal(data.total)
         setTotalPages(data.totalPages)
+        // The server clamps an out-of-range page (see mock-data.ts's
+        // safePage) — e.g. deleting the last row of the last page shrinks
+        // totalPages below the still-stale `page` we requested. Sync back
+        // to what the server actually returned so pagination/STT don't go
+        // stale; this re-triggers the effect once more at the corrected page.
+        if (data.page !== page) setPage(data.page)
       }
       setIsLoading(false)
     })

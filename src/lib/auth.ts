@@ -1,6 +1,7 @@
 import { SignJWT, jwtVerify, type JWTPayload } from "jose"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
+import { getTranslations } from "next-intl/server"
 import { env } from "@/lib/env"
 import { ROUTES } from "@/lib/constants"
 import type { ApiError } from "@/types"
@@ -124,4 +125,15 @@ export function forbiddenError(): ApiError {
     code: "FORBIDDEN",
     status: 403,
   }
+}
+
+// Shared 400 payload for a failed Zod .safeParse() in a Server Action.
+// Async (unlike unauthorizedError()/forbiddenError() above) because it needs
+// getTranslations() to resolve the request's locale — every actions.ts file
+// used to inline this as a hardcoded Vietnamese literal, which showed up
+// untranslated on /en. Centralizing it here also stops every feature from
+// re-declaring its own byte-identical VALIDATION_ERROR constant.
+export async function validationError(): Promise<ApiError> {
+  const t = await getTranslations("common")
+  return { message: t("invalidData"), code: "VALIDATION_ERROR", status: 400 }
 }

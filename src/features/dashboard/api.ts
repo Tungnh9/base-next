@@ -2,6 +2,7 @@ import { customerApi } from "@/features/customers/api"
 import { employeeApi } from "@/features/employees/api"
 import type { Customer } from "@/features/customers/types"
 import type { Employee } from "@/features/employees/types"
+import type { ApiResponse } from "@/types"
 import {
   CUSTOMER_STATUSES,
   EMPLOYEE_STATUSES,
@@ -50,14 +51,21 @@ export function aggregateStats(customers: Customer[], employees: Employee[]): Da
 // template/demo scale (a handful of mock rows), but a real backend with
 // large datasets should expose a dedicated aggregate/stats endpoint instead
 // of shipping every row to the server just to compute counts.
-export async function getDashboardStats(): Promise<DashboardStats> {
+export async function getDashboardStats(): Promise<ApiResponse<DashboardStats>> {
   const [customersRes, employeesRes] = await Promise.all([
     customerApi.getAll({ pageSize: CUSTOMER_PAGE_SIZE }),
     employeeApi.getAll({ pageSize: EMPLOYEE_PAGE_SIZE }),
   ])
 
+  // Unlike getCustomerOptions()/getEmployeeOptions() (the same fetch-one-
+  // big-page shortcut elsewhere), a failure here used to fall through to
+  // empty arrays — rendering a misleading all-zero dashboard with no
+  // indication anything went wrong. Surface the first real error instead.
+  if (customersRes.error) return { data: null, error: customersRes.error }
+  if (employeesRes.error) return { data: null, error: employeesRes.error }
+
   const customers = customersRes.data?.data ?? []
   const employees = employeesRes.data?.data ?? []
 
-  return aggregateStats(customers, employees)
+  return { data: aggregateStats(customers, employees), error: null }
 }

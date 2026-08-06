@@ -13,13 +13,13 @@ import {
 // type to unknown and that fights zodResolver + useForm<FormValues>.
 const optionalText = (max = 200) => z.string().trim().max(max).optional()
 
-const optionalEmail = () =>
-  z.union([z.literal(""), z.string().trim().email("Email không hợp lệ")]).optional()
+const optionalEmail = (message?: string) =>
+  z.union([z.literal(""), z.string().trim().email(message)]).optional()
 
 // Deliberately looser than a strict URL check: users type "example.com"
 // without a scheme far more often than a full URL, and rejecting that is
 // worse than accepting a slightly malformed host.
-const optionalWebsite = () =>
+const optionalWebsite = (message?: string) =>
   z
     .union([
       z.literal(""),
@@ -27,27 +27,27 @@ const optionalWebsite = () =>
         .string()
         .trim()
         .max(200)
-        .regex(/^((https?:\/\/)?[\w-]+(\.[\w-]+)+([/?#][^\s]*)?)$/i, "Website không hợp lệ"),
+        .regex(/^((https?:\/\/)?[\w-]+(\.[\w-]+)+([/?#][^\s]*)?)$/i, message),
     ])
     .optional()
 
-const optionalMobile = () =>
-  z
-    .union([z.literal(""), z.string().trim().min(8, "Số điện thoại không hợp lệ").max(20)])
-    .optional()
+const optionalMobile = (message?: string) =>
+  z.union([z.literal(""), z.string().trim().min(8, message).max(20)]).optional()
 
+// Plain schema — used server-side (actions.ts), where a validation failure
+// only needs to be detected, not shown to the end user field-by-field (the
+// Server Action always returns the generic, translated VALIDATION_ERROR).
 export const createCustomerSchema = z.object({
-  name: z.string().min(2, "Họ tên tối thiểu 2 ký tự"),
-  email: z.string().email("Email không hợp lệ"),
-  phone: z.string().min(8, "Số điện thoại không hợp lệ"),
-  company: z.string().min(1, "Vui lòng nhập tên công ty"),
+  name: z.string().min(2),
+  email: z.string().email(),
+  phone: z.string().min(8),
+  company: z.string().min(1),
   classification: z.enum(CUSTOMER_CLASSIFICATIONS),
   industry: z.enum(CUSTOMER_INDUSTRIES),
   status: z.enum(CUSTOMER_STATUSES),
 
-  // Thông tin chung
-  shortName: z.string().trim().min(1, "Vui lòng nhập tên rút gọn").max(100),
-  taxCode: z.string().trim().min(1, "Vui lòng nhập mã số thuế").max(20),
+  shortName: z.string().trim().min(1).max(100),
+  taxCode: z.string().trim().min(1).max(20),
   website: optionalWebsite(),
   address: optionalText(300),
   country: z.enum(CUSTOMER_COUNTRIES).optional(),
@@ -55,31 +55,20 @@ export const createCustomerSchema = z.object({
 
   // Người phụ trách (Employee.id) — existence not verified here, the action
   // layer would need an extra fetch to check it and a dangling id just
-  // renders as "Nhân viên #id" in the UI. Both required per business rule;
-  // the `error` option covers the Select's "unselected" state (which is
-  // `undefined`, not ""), not just the too-short case.
-  salesRepId: z
-    .string({ error: "Vui lòng chọn NVKD phụ trách" })
-    .min(1, "Vui lòng chọn NVKD phụ trách")
-    .max(50),
-  contractManagerId: z
-    .string({ error: "Vui lòng chọn QLHĐ phụ trách" })
-    .min(1, "Vui lòng chọn QLHĐ phụ trách")
-    .max(50),
+  // renders as "Nhân viên #id" in the UI. Both required per business rule.
+  salesRepId: z.string().min(1).max(50),
+  contractManagerId: z.string().min(1).max(50),
 
-  // Người đại diện
   representativeName: optionalText(100),
   representativePosition: optionalText(100),
   representativeMobile: optionalMobile(),
   representativeEmail: optionalEmail(),
 
-  // Người liên hệ
   contactName: optionalText(100),
   contactPosition: optionalText(100),
   contactMobile: optionalMobile(),
   contactEmail: optionalEmail(),
 
-  // Người phụ trách truyền thông
   mediaContactName: optionalText(100),
   mediaContactPosition: optionalText(100),
   mediaContactMobile: optionalMobile(),
@@ -92,6 +81,59 @@ export const createCustomerSchema = z.object({
 })
 
 export const updateCustomerSchema = createCustomerSchema.partial()
+
+// Translated variant for the client-side form (react-hook-form + zodResolver),
+// mirroring the createXSchema(t) pattern already used in features/auth/schemas.ts.
+export function createCreateCustomerSchema(t: (key: string) => string) {
+  return z.object({
+    name: z.string().min(2, t("nameMin")),
+    email: z.string().email(t("emailInvalid")),
+    phone: z.string().min(8, t("phoneInvalid")),
+    company: z.string().min(1, t("companyRequired")),
+    classification: z.enum(CUSTOMER_CLASSIFICATIONS),
+    industry: z.enum(CUSTOMER_INDUSTRIES),
+    status: z.enum(CUSTOMER_STATUSES),
+
+    shortName: z.string().trim().min(1, t("shortNameRequired")).max(100),
+    taxCode: z.string().trim().min(1, t("taxCodeRequired")).max(20),
+    website: optionalWebsite(t("websiteInvalid")),
+    address: optionalText(300),
+    country: z.enum(CUSTOMER_COUNTRIES).optional(),
+    province: z.enum(VIETNAM_PROVINCES).optional(),
+
+    salesRepId: z
+      .string({ error: t("salesRepRequired") })
+      .min(1, t("salesRepRequired"))
+      .max(50),
+    contractManagerId: z
+      .string({ error: t("contractManagerRequired") })
+      .min(1, t("contractManagerRequired"))
+      .max(50),
+
+    representativeName: optionalText(100),
+    representativePosition: optionalText(100),
+    representativeMobile: optionalMobile(t("mobileInvalid")),
+    representativeEmail: optionalEmail(t("emailInvalid")),
+
+    contactName: optionalText(100),
+    contactPosition: optionalText(100),
+    contactMobile: optionalMobile(t("mobileInvalid")),
+    contactEmail: optionalEmail(t("emailInvalid")),
+
+    mediaContactName: optionalText(100),
+    mediaContactPosition: optionalText(100),
+    mediaContactMobile: optionalMobile(t("mobileInvalid")),
+    mediaContactEmail: optionalEmail(t("emailInvalid")),
+
+    avatarFileName: optionalText(255),
+    notes: optionalText(2000),
+    review: optionalText(2000),
+  })
+}
+
+export function createUpdateCustomerSchema(t: (key: string) => string) {
+  return createCreateCustomerSchema(t).partial()
+}
 
 // getCustomers()/getCustomerById() are Server Actions — directly callable
 // regardless of which UI called them — so their params need the same

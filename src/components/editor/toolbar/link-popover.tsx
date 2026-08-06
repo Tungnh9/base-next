@@ -14,6 +14,7 @@ interface LinkPopoverProps {
 
 export function LinkPopover({ editor }: LinkPopoverProps) {
   const t = useTranslations("editor")
+  const tCommon = useTranslations("common")
   const [open, setOpen] = useState(false)
   const [url, setUrl] = useState("")
 
@@ -65,7 +66,7 @@ export function LinkPopover({ editor }: LinkPopoverProps) {
             autoFocus
           />
           <Button type="button" size="sm" onClick={handleApply}>
-            OK
+            {tCommon("confirm")}
           </Button>
         </div>
         {isActive && (

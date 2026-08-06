@@ -120,7 +120,12 @@ export function createNavConfig(): NavSection[] {
     {
       title: "nav.sectionSystem",
       items: [
-        { label: "nav.settings", href: ROUTES.settings, icon: Settings },
+        {
+          label: "nav.settings",
+          href: ROUTES.settings,
+          icon: Settings,
+          requiredRole: "admin",
+        },
         {
           label: "nav.employees",
           href: ROUTES.employees,

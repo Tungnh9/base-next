@@ -9,32 +9,34 @@ import { cn } from "@/lib/utils"
 import { ToolbarButton } from "./toolbar-button"
 
 // Semantic first, then neutrals, then an extended palette — mirrors a typical
-// design-system swatch set rather than a plain rainbow grid.
+// design-system swatch set rather than a plain rainbow grid. `labelKey`
+// resolves through editor.color.names.* — never hardcoded, since it's shown
+// as the swatch's accessible/tooltip name.
 const PRESET_COLORS = [
-  { label: "Primary", value: "#7367f0" },
-  { label: "Success", value: "#28c76f" },
-  { label: "Warning", value: "#ff9f43" },
-  { label: "Danger", value: "#ea5455" },
-  { label: "Info", value: "#00cfe8" },
-  { label: "Black", value: "#2d2b3d" },
-  { label: "Dark", value: "#4b4663" },
-  { label: "Muted", value: "#7983bb" },
-  { label: "Light", value: "#b9bbbe" },
-  { label: "White", value: "#ffffff" },
-  { label: "Red", value: "#ff4757" },
-  { label: "Pink", value: "#e84393" },
-  { label: "Purple", value: "#9c27b0" },
-  { label: "Indigo", value: "#5c6bc0" },
-  { label: "Blue", value: "#2196f3" },
-  { label: "Cyan", value: "#00bcd4" },
-  { label: "Teal", value: "#009688" },
-  { label: "Green", value: "#4caf50" },
-  { label: "Lime", value: "#8bc34a" },
-  { label: "Yellow", value: "#ffeb3b" },
-  { label: "Amber", value: "#ffc107" },
-  { label: "Orange", value: "#ff5722" },
-  { label: "Brown", value: "#795548" },
-  { label: "Gray", value: "#607d8b" },
+  { labelKey: "primary", value: "#7367f0" },
+  { labelKey: "success", value: "#28c76f" },
+  { labelKey: "warning", value: "#ff9f43" },
+  { labelKey: "danger", value: "#ea5455" },
+  { labelKey: "info", value: "#00cfe8" },
+  { labelKey: "black", value: "#2d2b3d" },
+  { labelKey: "dark", value: "#4b4663" },
+  { labelKey: "muted", value: "#7983bb" },
+  { labelKey: "light", value: "#b9bbbe" },
+  { labelKey: "white", value: "#ffffff" },
+  { labelKey: "red", value: "#ff4757" },
+  { labelKey: "pink", value: "#e84393" },
+  { labelKey: "purple", value: "#9c27b0" },
+  { labelKey: "indigo", value: "#5c6bc0" },
+  { labelKey: "blue", value: "#2196f3" },
+  { labelKey: "cyan", value: "#00bcd4" },
+  { labelKey: "teal", value: "#009688" },
+  { labelKey: "green", value: "#4caf50" },
+  { labelKey: "lime", value: "#8bc34a" },
+  { labelKey: "yellow", value: "#ffeb3b" },
+  { labelKey: "amber", value: "#ffc107" },
+  { labelKey: "orange", value: "#ff5722" },
+  { labelKey: "brown", value: "#795548" },
+  { labelKey: "gray", value: "#607d8b" },
 ]
 
 interface TextColorButtonProps {
@@ -96,7 +98,7 @@ export function TextColorButton({ editor }: TextColorButtonProps) {
             <button
               key={c.value}
               type="button"
-              title={c.label}
+              title={t(`color.names.${c.labelKey}`)}
               onClick={() => applyColor(c.value)}
               className={cn(
                 "border-border size-6 rounded-[4px] border transition-transform hover:scale-110 focus:outline-none",

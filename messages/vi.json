@@ -9,7 +9,9 @@
     "delete": "Xóa",
     "edit": "Chỉnh sửa",
     "back": "Quay lại",
-    "close": "Đóng"
+    "close": "Đóng",
+    "invalidData": "Dữ liệu không hợp lệ",
+    "toggleTheme": "Chuyển giao diện sáng/tối"
   },
   "auth": {
     "login": "Đăng nhập",
@@ -203,6 +205,12 @@
     "expandLabel": "Mở rộng sidebar",
     "collapseLabel": "Thu gọn sidebar"
   },
+  "footer": {
+    "copyright": "© {year} App. Bảo lưu mọi quyền.",
+    "license": "Giấy phép",
+    "documentation": "Tài liệu",
+    "support": "Hỗ trợ"
+  },
   "languageSwitcher": {
     "changeLabel": "Đổi ngôn ngữ"
   },
@@ -274,7 +282,33 @@
     },
     "color": {
       "removeColor": "Xóa màu",
-      "removeHighlight": "Xóa highlight"
+      "removeHighlight": "Xóa highlight",
+      "names": {
+        "primary": "Chính",
+        "success": "Thành công",
+        "warning": "Cảnh báo",
+        "danger": "Nguy hiểm",
+        "info": "Thông tin",
+        "black": "Đen",
+        "dark": "Tối",
+        "muted": "Nhạt",
+        "light": "Sáng",
+        "white": "Trắng",
+        "red": "Đỏ",
+        "pink": "Hồng",
+        "purple": "Tím",
+        "indigo": "Chàm",
+        "blue": "Xanh dương",
+        "cyan": "Lục lam",
+        "teal": "Xanh mòng két",
+        "green": "Xanh lá",
+        "lime": "Xanh chanh",
+        "yellow": "Vàng",
+        "amber": "Hổ phách",
+        "orange": "Cam",
+        "brown": "Nâu",
+        "gray": "Xám"
+      }
     },
     "toolbar": {
       "undo": "Hoàn tác (Ctrl+Z)",
@@ -450,6 +484,18 @@
       "deleteManySuccess": "Đã xóa {count} khách hàng",
       "deleteManyPartialFail": "Xóa thất bại {failed}/{total} khách hàng",
       "updateSuccess": "Cập nhật thành công"
+    },
+    "errors": {
+      "nameMin": "Họ tên tối thiểu 2 ký tự",
+      "emailInvalid": "Email không hợp lệ",
+      "phoneInvalid": "Số điện thoại không hợp lệ",
+      "mobileInvalid": "Số điện thoại không hợp lệ",
+      "companyRequired": "Vui lòng nhập tên công ty",
+      "shortNameRequired": "Vui lòng nhập tên rút gọn",
+      "taxCodeRequired": "Vui lòng nhập mã số thuế",
+      "websiteInvalid": "Website không hợp lệ",
+      "salesRepRequired": "Vui lòng chọn NVKD phụ trách",
+      "contractManagerRequired": "Vui lòng chọn QLHĐ phụ trách"
     },
     "columns": {
       "stt": "STT",
@@ -670,6 +716,12 @@
       "deleteManySuccess": "Đã xóa {count} nhân viên",
       "deleteManyPartialFail": "Xóa thất bại {failed}/{total} nhân viên"
     },
+    "errors": {
+      "nameMin": "Họ tên tối thiểu 2 ký tự",
+      "emailInvalid": "Email không hợp lệ",
+      "phoneInvalid": "Số điện thoại không hợp lệ",
+      "positionRequired": "Vui lòng nhập vị trí công việc"
+    },
     "columns": {
       "name": "Họ tên",
       "email": "Email",
@@ -790,6 +842,14 @@
   "settings": {
     "title": "Cấu hình",
     "description": "Quản lý quy trình vận hành, thông báo, người dùng và phân quyền trong hệ thống.",
+    "toast": {
+      "addUserSuccess": "Đã thêm người dùng",
+      "removeUserSuccess": "Đã xoá người dùng",
+      "addRoleSuccess": "Đã thêm vai trò",
+      "newRoleDefaultName": "Vai trò mới",
+      "newStateDefaultName": "Trạng thái mới",
+      "newActionDefaultLabel": "Nút mới"
+    },
     "tabs": {
       "workflow": "Quy trình & thông báo",
       "usersPermissions": "Người dùng & phân quyền"
@@ -849,7 +909,12 @@
         "email": "Email",
         "role": "Vai trò",
         "submit": "Thêm",
-        "cancel": "Huỷ"
+        "cancel": "Huỷ",
+        "errors": {
+          "nameMin": "Họ tên tối thiểu 2 ký tự",
+          "emailInvalid": "Email không hợp lệ",
+          "roleRequired": "Vui lòng chọn vai trò"
+        }
       }
     },
     "roles": {
